@@ -122,6 +122,8 @@ section{padding:34px 0 8px;border-top:1px solid var(--rule);scroll-margin-top:60
 .src.bad{color:var(--bad)}
 #g_panel{margin:18px 0 0}
 .fpanel input[type=url]{font:500 13px var(--bd);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:7px 9px;min-height:36px}
+#r6_num{font:500 13px var(--bd);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:6px 8px;min-height:34px}
+.rtext{width:100%;box-sizing:border-box;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;resize:vertical;min-height:240px;white-space:pre}
 .udrop{margin:18px 0 0;padding:26px 18px;border:2px dashed var(--rule);border-radius:12px;background:var(--panel);text-align:center;cursor:pointer;font-size:14px;color:var(--mute)}
 .udrop b{font-family:var(--hd);color:var(--ink)}
 .udrop:hover,.udrop.over{border-color:var(--net);background:var(--hi)}
@@ -221,6 +223,7 @@ th,td{padding:7px 6px}
   .blk h3{font-size:13.5px;margin-bottom:6px}
   .pgnote{font-size:11.5px;padding:9px 10px}
   .udrop{padding:16px 10px;font-size:12px}
+  .rtext{font-size:11.5px;padding:10px}
   .fn{font-size:10.5px}
   .fnote{font-size:11px}
   .r{font-size:11.5px;grid-template-columns:78px 1fr auto;gap:8px}
@@ -233,6 +236,24 @@ th,td{padding:7px 6px}
   .heat tbody th{font-size:11px}
   .jump a{font-size:11px;padding:4px 10px}
 }
+
+/* ===== Warna pembeda tiap halaman ===== */
+:root{--c1:#0E7A6B;--c2:#2E6F95;--c3:#7A45C2;--c4:#C97A0E;--c5:#C4453A;--c6:#B0356F;--c7:#8B5E34;--pg:var(--c1)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c1:#3CC2AC;--c2:#6FB0D8;--c3:#B48CF0;--c4:#F0B24A;--c5:#F0776C;--c6:#E58AB8;--c7:#C9A27A}}
+:root[data-theme="dark"]{--c1:#3CC2AC;--c2:#6FB0D8;--c3:#B48CF0;--c4:#F0B24A;--c5:#F0776C;--c6:#E58AB8;--c7:#C9A27A}
+body[data-pg="1"]{--pg:var(--c1)}body[data-pg="2"]{--pg:var(--c2)}body[data-pg="3"]{--pg:var(--c3)}
+body[data-pg="4"]{--pg:var(--c4)}body[data-pg="5"]{--pg:var(--c5)}body[data-pg="7"]{--pg:var(--c6)}body[data-pg="6"]{--pg:var(--c7)}
+#tab1{--pg:var(--c1)}#tab2{--pg:var(--c2)}#tab3{--pg:var(--c3)}#tab4{--pg:var(--c4)}#tab5{--pg:var(--c5)}#tab7{--pg:var(--c6)}#tab6{--pg:var(--c7)}
+.top{border-bottom-color:var(--pg)}
+.tab{border-top:3px solid color-mix(in srgb,var(--pg) 45%,transparent);border-radius:6px 6px 0 0}
+.tab[aria-selected=true]{border-top-color:var(--pg);border-bottom-color:var(--pg);background:color-mix(in srgb,var(--pg) 9%,transparent)}
+[role=tabpanel] h2{border-left:4px solid var(--pg);padding-left:10px}
+.pgnote{border-left:4px solid var(--pg)}
+.fpanel{border-top:3px solid var(--pg)}
+.kpi{border-top-color:var(--pg)}
+th{border-bottom-color:var(--pg)}
+tfoot td{border-top-color:var(--pg)}
+.sub:empty{display:none}
 </style>
 </head>
 <body>
@@ -253,6 +274,7 @@ th,td{padding:7px 6px}
     <button type="button" class="tab" role="tab" id="tab3" data-p="3" aria-controls="page3" aria-selected="false" tabindex="-1">Page 3</button>
     <button type="button" class="tab" role="tab" id="tab4" data-p="4" aria-controls="page4" aria-selected="false" tabindex="-1">Page 4</button>
     <button type="button" class="tab" role="tab" id="tab5" data-p="5" aria-controls="page5" aria-selected="false" tabindex="-1">Page 5</button>
+    <button type="button" class="tab" role="tab" id="tab7" data-p="7" aria-controls="page7" aria-selected="false" tabindex="-1">Page 6</button>
     <button type="button" class="tab" role="tab" id="tab6" data-p="6" aria-controls="page6" aria-selected="false" tabindex="-1">Upload Data</button>
   </nav>
 
@@ -408,7 +430,6 @@ th,td{padding:7px 6px}
   </div>
 
   <div id="page3" role="tabpanel" aria-labelledby="tab3" hidden>
-    <p class="pgnote">Trend harian Gross Sales dan Quantity tiap kategori. Filter di halaman ini berdiri sendiri, jadi tidak mengubah Halaman 2. Gross Sales sudah dikurangi refund, dan Quantity memakai aturan yang sama dengan halaman lain.</p>
     <div class="fpanel" role="group" aria-label="Filter trend">
       <div class="frow">
         <div class="fgrp"><span class="fl">Area</span><div class="chips" id="t_areaChips" role="group" aria-label="Filter area trend"></div></div>
@@ -550,6 +571,51 @@ th,td{padding:7px 6px}
       <dl class="kpi kpi5b" id="d5_kpi"></dl>
       <div class="blk"><h3>Ringkasan per outlet</h3><div class="tw"><table id="d5_outTbl"></table></div></div>
       <div class="blk"><h3 id="d5_hDay">Penjualan harian</h3><div class="tw"><table id="d5_tbl"></table></div></div>
+    </section>
+  </div>
+
+  <div id="page7" role="tabpanel" aria-labelledby="tab7" hidden>
+    <section aria-labelledby="hRep" style="border-top:0">
+      <h2 id="hRep">Report ringkasan per outlet</h2>
+      <p class="sub" id="r6_sub"></p>
+      <div class="fpanel">
+        <div class="frow"><span class="fl">Outlet</span><div class="chips" id="r6_outletChips" role="group" aria-label="Pilih outlet"></div></div>
+        <div class="frow">
+          <span class="fl">Tanggal</span>
+          <label>Dari <input type="date" id="r6_from"></label>
+          <label>Sampai <input type="date" id="r6_to"></label>
+          <div class="chips" id="r6_periodChips" role="group" aria-label="Periode cepat"></div>
+        </div>
+        <div class="frow">
+          <span class="fl">Isi teks</span>
+          <label class="ck"><input type="checkbox" id="r6_jual" checked> Penjualan (Rp)</label>
+          <label class="ck"><input type="checkbox" id="r6_bill" checked> Bill Transaction</label>
+          <label class="ck"><input type="checkbox" id="r6_qty" checked> Quantity</label>
+          <label class="ck"><input type="checkbox" id="r6_wa" checked> Huruf tebal WhatsApp (*teks*)</label>
+        </div>
+        <div class="frow fend"><span class="fshow" id="r6_show"></span></div>
+      </div>
+      <div class="blk">
+        <h3>Teks laporan (siap salin)</h3>
+        <div class="frow" style="margin-bottom:8px">
+          <button type="button" class="chip exp" id="r6_copyText">Salin teks laporan</button>
+          <span class="fn" id="r6_msg" role="status" aria-live="polite"></span>
+        </div>
+        <textarea id="r6_text" class="rtext" rows="18" spellcheck="false" aria-label="Teks laporan"></textarea>
+      </div>
+      <div class="blk">
+        <h3>Tabel ringkasan per outlet (siap tempel ke Excel atau Google Sheets)</h3>
+        <div class="frow" style="margin-bottom:8px">
+          <label>Format angka salinan
+            <select id="r6_num">
+              <option value="plain">Angka polos (untuk Excel)</option>
+              <option value="thousand">Dengan titik ribuan</option>
+              <option value="rp">Seperti tampilan (Rp)</option>
+            </select></label>
+          <button type="button" class="chip exp" id="r6_copyTbl">Salin tabel</button>
+        </div>
+        <div class="tw"><table id="r6_tbl"></table></div>
+      </div>
     </section>
   </div>
 
@@ -1580,15 +1646,15 @@ function buildPage1(){
   const SUB={hMonth:null,
     hTrend:'Tinggi batang adalah Gross Sales, terbagi menjadi Net Sales dan diskon. Klik batang untuk membuka analisa bulan itu di Halaman 2.',
     hOa:'Tinggi batang adalah Gross Sales, terbagi menjadi Net Sales dan diskon. Klik batang untuk membuka analisa outlet atau area itu di Halaman 2.',
-    hOnl:'Online adalah transaksi dengan metode pembayaran GrabFood, ShopeeFood, dan GoFood. Metode pembayaran lain dihitung Offline.',
-    hTable:'Gross Sales sudah dikurangi refund, jadi Net Sales = Gross Sales - Diskon. Pajak (Tax) dicatat terpisah. Klik baris untuk membuka analisa bulan itu di Halaman 2.',
+    hOnl:'',
+    hTable:'',
     hOut:null};
   ['hMonth','hTrend','hOa','hOnl','hTable','hOut'].forEach(l=>{
     const src=document.querySelector('#page2 section[aria-labelledby="'+l+'"]'),c=src.cloneNode(true);
     c.querySelectorAll('[id]').forEach(e=>e.id='g_'+e.id);
     c.querySelectorAll('[aria-labelledby]').forEach(e=>e.setAttribute('aria-labelledby','g_'+e.getAttribute('aria-labelledby')));
     if(c.id)c.id='g_'+c.id;c.setAttribute('aria-labelledby','g_'+l);
-    if(SUB[l]){const s=c.querySelector('.sub');if(s)s.textContent=SUB[l]}
+    if(SUB[l]!==null&&SUB[l]!==undefined){const s=c.querySelector('.sub');if(s){if(SUB[l])s.textContent=SUB[l];else s.remove()}}
     p1.appendChild(c);
   });
   const hit=e=>e.target.closest&&e.target.closest('.bar,tr[data-mo]'),key=e=>e.key==='Enter'||e.key===' ';
@@ -1608,15 +1674,15 @@ function renderPage1(){
   }finally{PFX='';Object.assign(S,saved)}
 }
 function showPage(n){
-  PAGE=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;
+  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===2)render();
+  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===2)render();
   window.scrollTo(0,0);
 }
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>{b.onclick=()=>showPage(+b.dataset.p);
-    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const n=e.key==='ArrowRight'?PAGE%6+1:(PAGE+4)%6+1;showPage(n);$('tab'+n).focus()}}});
+    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,3,4,5,7,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
 }
 /* ===== Halaman 5: Daily Sales ===== */
 const DS={outlet:'all',from:'',to:''};
@@ -1700,7 +1766,7 @@ function renderDaily(){
     if(!dsEmpty(r))act++;
     days.push({d:TD[i],r});dsAdd(tot,r);
   }
-  $('d5_sub').textContent='Omset dan jumlah barang per hari untuk '+olabel+'. Gross Sales sudah dikurangi refund, Net Sales = Gross Sales - Diskon - Refund. Jumlah barang memakai pengali bundle dan sudah dikurangi refund.'+
+  $('d5_sub').textContent=''+
     (DSapprox?' Catatan: basis data transaksi tidak terbaca di browser ini'+(DSerr?' ('+DSerr+')':'')+', jadi kolom Diskon, Refund, dan Tax kosong dan Net Sales belum dikurangi refund.':'');
   const kp=[['Gross (Inc Tax)',tot[0]+tot[11],'rp','var(--ink)'],['Gross Sales',tot[0],'rp','var(--ink)'],
     ['Net (Inc Tax)',tot[7]+tot[11],'rp','var(--net)'],['Net Sales',tot[7],'rp','var(--net)'],
@@ -2251,6 +2317,8 @@ async function uSave(){
     const ap=clone.querySelector('#u_apply');if(ap)ap.disabled=true;
     ['d5_kpi','d5_outTbl','d5_tbl'].forEach(id=>{const n=clone.querySelector('#'+id);if(n)n.innerHTML=''});
     ['d5_show','d5_sub'].forEach(id=>{const n=clone.querySelector('#'+id);if(n)n.textContent=''});
+    ['r6_tbl'].forEach(id=>{const n=clone.querySelector('#'+id);if(n)n.innerHTML=''});
+    ['r6_show','r6_sub','r6_msg','r6_text'].forEach(id=>{const n=clone.querySelector('#'+id);if(n)n.textContent=''});
     const dz=clone.querySelector('#dbz');dz.textContent='@@DBZ@@';
     let html='<!DOCTYPE html>\n'+clone.outerHTML;
     const i0=html.indexOf('const D=');
@@ -2454,7 +2522,130 @@ function initSheet(){
   else gHead('Sumber data: data tersimpan di berkas ini. Sinkron Google Sheets belum dijalankan.');
 }
 
-period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initUpload();initSheet();showPage(1);
+/* ===== Page 6: Report ringkasan per outlet (siap salin) ===== */
+const RP={outs:new Set(),from:'',to:'',num:'plain',wa:true,jual:true,bill:true,qty:true};
+/* [label, indeks kolom di DSCOL, jenis, satuan, kelompok] */
+const RPTXT=[
+  ['Gross (Inc Tax)',1,'rp','','jual'],['Net (Inc Tax)',3,'rp','','jual'],['Tax',5,'rp','','jual'],
+  ['Gross Sales',0,'rp','','jual'],['Diskon',4,'rp','','jual'],['Net Sales',2,'rp','','jual'],
+  ['Bill Transaction',6,'n','','bill'],
+  ['Better Cup',7,'n','Cup','qty'],['Better 1 L',9,'n','Btl','qty'],['Pastry',8,'n','Pcs','qty'],
+  ['Mineral',11,'n','Btl','qty'],['Tumbler',10,'n','Tumbler','qty'],['Biscuit With Ice Cream',12,'n','Pcs','qty']
+];
+const rpPeriod=()=>RP.from===RP.to?dLong(RP.from):dLong(RP.from)+' s.d '+dLong(RP.to);
+async function rpCopy(text,msgId){
+  const m=document.getElementById(msgId);
+  let ok=false;
+  try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);ok=true}}catch(e){}
+  if(!ok){
+    const ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;left:-9999px;top:0';
+    document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,text.length);
+    try{ok=document.execCommand('copy')}catch(e){}
+    ta.remove();
+  }
+  m.textContent=ok?'Tersalin ke clipboard.':'Gagal menyalin otomatis. Blok teks lalu tekan Ctrl+C.';
+  clearTimeout(rpCopy._t);rpCopy._t=setTimeout(()=>{m.textContent=''},3500);
+}
+function rpChips(){
+  const box=$('r6_outletChips');box.innerHTML='';
+  const mk=(t,pressed,fn)=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t;b.setAttribute('aria-pressed',pressed);b.onclick=fn;box.appendChild(b)};
+  mk('Semua outlet',RP.outs.size===0,()=>{RP.outs.clear();renderReport()});
+  OUT.forEach(o=>mk(o,RP.outs.has(o),()=>{RP.outs.has(o)?RP.outs.delete(o):RP.outs.add(o);renderReport()}));
+  const pb=$('r6_periodChips');pb.innerHTML='';
+  const n=TD.length,yv=TD[Math.max(0,n-2)],w0=TD[Math.max(0,n-7)],m0=TMAX.slice(0,8)+'01',mStart=TD.find(d=>d>=m0)||TMIN;
+  [['Hari ini',TMAX,TMAX],['Kemarin',yv,yv],['7 hari terakhir',w0,TMAX],['Bulan ini',mStart,TMAX],['Semua tanggal',TMIN,TMAX]].forEach(([t,a,b2])=>{
+    const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=t;
+    c.setAttribute('aria-pressed',RP.from===a&&RP.to===b2);c.onclick=()=>{RP.from=a;RP.to=b2;renderReport()};pb.appendChild(c)});
+}
+function initReport(){
+  const f=$('r6_from'),g=$('r6_to');
+  f.onchange=e=>{if(!e.target.value)return;RP.from=e.target.value;if(RP.from>RP.to)RP.to=RP.from;renderReport()};
+  g.onchange=e=>{if(!e.target.value)return;RP.to=e.target.value;if(RP.to<RP.from)RP.from=RP.to;renderReport()};
+  [['r6_jual','jual'],['r6_bill','bill'],['r6_qty','qty'],['r6_wa','wa']].forEach(([id,k])=>{const c=$(id);c.checked=RP[k];c.onchange=()=>{RP[k]=c.checked;renderReport()}});
+  $('r6_num').onchange=e=>{RP.num=e.target.value;renderReport()};
+  $('r6_copyText').onclick=()=>rpCopy($('r6_text').value,'r6_msg');
+  $('r6_copyTbl').onclick=()=>rpCopy(rpTsv(),'r6_msg');
+}
+let rpRows=null;
+function rpData(){
+  const i0=Math.max(0,TD.indexOf(RP.from)),i1=Math.max(i0,TD.indexOf(RP.to));
+  const sel=RP.outs.size?OUT.filter(o=>RP.outs.has(o)):OUT;
+  const rows=[],tot=new Array(DSN).fill(0);let act=0;
+  sel.forEach(o=>{
+    const s=DSD[o],r=new Array(DSN).fill(0);let d=0;
+    if(s)for(let i=i0;i<=i1;i++){if(s[i]&&!dsEmpty(s[i])){d++;dsAdd(r,s[i])}}
+    if(RP.outs.size||d>0)rows.push({o,r,d});
+  });
+  for(let i=i0;i<=i1;i++){let any=false;sel.forEach(o=>{const s=DSD[o];if(s&&s[i]&&!dsEmpty(s[i])){any=true;dsAdd(tot,s[i])}});if(any)act++}
+  return {rows,tot,act,sel,days:i1-i0+1};
+}
+function rpNum(v,type){
+  if(RP.num==='plain')return String(type==='rp'?Math.round(v):Math.round(v*100)/100);
+  if(RP.num==='thousand')return nf.format(type==='rp'?Math.round(v):Math.round(v*100)/100);
+  return dsFmt(v,type);
+}
+function rpTsv(){
+  if(!rpRows)return '';
+  const head=['Outlet','Hari aktif'].concat(DSCOL.map(c=>c[0]));
+  const line=(nm,d,r)=>[nm,String(d)].concat(DSCOL.map(([t,get,ty])=>rpNum(get(r),ty)));
+  const out=[head].concat(rpRows.rows.map(x=>line(x.o,x.d,x.r)));
+  out.push(line('Total',rpRows.act,rpRows.tot));
+  return out.map(r=>r.join('\t')).join('\n');
+}
+function rpText(){
+  const {rows,tot,act,sel}=rpRows,B=s=>RP.wa?'*'+s+'*':s;
+  const groups=RPTXT.filter(x=>RP[x[4]]);
+  const fmt=(r,x)=>{const v=DSCOL[x[1]][1](r);return x[2]==='rp'?rp(v):nf.format(Math.round(v*100)/100)+(x[3]?' '+x[3]:'')};
+  const L=[];
+  L.push(B('LAPORAN PENJUALAN a better cup'));
+  L.push('Periode: '+rpPeriod());
+  L.push('Outlet: '+(RP.outs.size?sel.join(', '):'Semua outlet'));
+  const blk=(title,r,d)=>{
+    L.push('');L.push(B(title)+(d!=null?' ('+d+' hari aktif)':''));
+    groups.forEach((x,i)=>{
+      if(i>0&&groups[i-1][4]!==x[4])L.push('');
+      L.push(x[0]+': '+fmt(r,x));
+    });
+  };
+  if(!rows.length){L.push('');L.push('Tidak ada transaksi pada periode ini.')}
+  rows.forEach(x=>{
+    if(!x.d){L.push('');L.push(B(x.o));L.push('Tidak ada transaksi.');return}
+    blk(x.o,x.r,x.d);
+  });
+  if(rows.length>1)blk('TOTAL '+rows.length+' OUTLET',tot,act);
+  return L.join('\n');
+}
+function renderReport(){
+  rpChips();
+  if(!TD.length)return;
+  if(!RP.from||RP.from<TMIN||RP.from>TMAX)RP.from=TMAX;
+  if(!RP.to||RP.to>TMAX||RP.to<TMIN)RP.to=TMAX;
+  if(RP.from>RP.to)RP.from=RP.to;
+  [...RP.outs].forEach(o=>{if(!OUT.includes(o))RP.outs.delete(o)});
+  $('r6_from').min=$('r6_to').min=TMIN;$('r6_from').max=$('r6_to').max=TMAX;
+  $('r6_from').value=RP.from;$('r6_to').value=RP.to;$('r6_num').value=RP.num;
+  ['jual','bill','qty','wa'].forEach(k=>{$('r6_'+k).checked=RP[k]});
+  if(!DSD){
+    $('r6_sub').textContent='Menyiapkan data dari basis data transaksi, mohon tunggu sebentar…';
+    $('r6_text').value='';$('r6_tbl').innerHTML='';$('r6_show').textContent='';
+    if(!DSbusy){
+      DSbusy=true;
+      dsBuild().catch(err=>{DSerr=err.message;dsFallback()}).then(()=>{DSbusy=false;if(PAGE===5)renderDaily();if(PAGE===7)renderReport()});
+    }else setTimeout(()=>{if(PAGE===7)renderReport()},400);
+    return;
+  }
+  rpRows=rpData();
+  $('r6_sub').textContent=''+
+    (DSapprox?' Catatan: basis data transaksi tidak terbaca di browser ini, jadi kolom Diskon dan Tax kosong dan Net Sales belum dikurangi refund.':'');
+  $('r6_show').textContent=rpPeriod()+' ('+rpRows.days+' hari, '+rpRows.act+' hari ada transaksi), '+(RP.outs.size?rpRows.sel.join(', '):'semua outlet');
+  $('r6_text').value=rpText();
+  const head='<thead><tr><th>Outlet</th><th>Hari aktif</th>'+DSCOL.map(c=>`<th>${c[0]}</th>`).join('')+'</tr></thead>';
+  const body=rpRows.rows.map(x=>`<tr><td>${x.o}</td><td>${nf.format(x.d)}</td>`+DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(x.r),ty)}</td>`).join('')+'</tr>').join('');
+  $('r6_tbl').innerHTML=head+'<tbody>'+(body||`<tr><td colspan="${DSCOL.length+2}" style="text-align:left;color:var(--mute)">Belum ada transaksi pada periode ini</td></tr>`)+'</tbody><tfoot><tr><td>Total</td><td>'+nf.format(rpRows.act)+'</td>'+
+    DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(rpRows.tot),ty)}</td>`).join('')+'</tr></tfoot>';
+}
+
+period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initReport();initUpload();initSheet();showPage(1);
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
