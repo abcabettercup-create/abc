@@ -269,17 +269,17 @@ tfoot td{border-top-color:var(--pg)}
     </div>
   </header>
   <nav class="tabs" role="tablist" aria-label="Halaman dashboard">
-    <button type="button" class="tab" role="tab" id="tab1" data-p="1" aria-controls="page1" aria-selected="true">Page 1</button>
-    <button type="button" class="tab" role="tab" id="tab2" data-p="2" aria-controls="page2" aria-selected="false" tabindex="-1">Page 2</button>
-    <button type="button" class="tab" role="tab" id="tab3" data-p="3" aria-controls="page3" aria-selected="false" tabindex="-1">Page 3</button>
-    <button type="button" class="tab" role="tab" id="tab4" data-p="4" aria-controls="page4" aria-selected="false" tabindex="-1">Page 4</button>
-    <button type="button" class="tab" role="tab" id="tab5" data-p="5" aria-controls="page5" aria-selected="false" tabindex="-1">Page 5</button>
-    <button type="button" class="tab" role="tab" id="tab7" data-p="7" aria-controls="page7" aria-selected="false" tabindex="-1">Page 6</button>
-    <button type="button" class="tab" role="tab" id="tab6" data-p="6" aria-controls="page6" aria-selected="false" tabindex="-1">Upload Data</button>
+    <button type="button" class="tab" role="tab" id="tab1" data-p="1" aria-controls="page1" aria-selected="true">Summary</button>
+    <button type="button" class="tab" role="tab" id="tab2" data-p="2" aria-controls="page2" aria-selected="false" tabindex="-1">Monthly</button>
+    <button type="button" class="tab" role="tab" id="tab3" data-p="3" aria-controls="page3" aria-selected="false" tabindex="-1">Trend</button>
+    <button type="button" class="tab" role="tab" id="tab4" data-p="4" aria-controls="page4" aria-selected="false" tabindex="-1">Trafic</button>
+    <button type="button" class="tab" role="tab" id="tab5" data-p="5" aria-controls="page5" aria-selected="false" tabindex="-1">Daily</button>
+    <button type="button" class="tab" role="tab" id="tab7" data-p="7" aria-controls="page7" aria-selected="false" tabindex="-1">Report</button>
+    <button type="button" class="tab" role="tab" id="tab6" data-p="6" aria-controls="page6" aria-selected="false" tabindex="-1">Import-Export</button>
   </nav>
 
   <div id="page1" role="tabpanel" aria-labelledby="tab1">
-    <p class="pgnote">Halaman ini menampilkan seluruh data (semua bulan, semua outlet, Online dan Offline) dan tidak berubah oleh filter. Untuk memfilter periode, area, outlet, atau Online dan Offline, buka Halaman 2.</p>
+    <p class="pgnote">Halaman ini menampilkan seluruh data (semua bulan, semua outlet, Online dan Offline) dan tidak berubah oleh filter. Untuk memfilter periode, area, outlet, atau Online dan Offline, buka tab Monthly.</p>
   </div>
 
   <div id="page2" role="tabpanel" aria-labelledby="tab2" hidden>
@@ -300,9 +300,7 @@ tfoot td{border-top-color:var(--pg)}
         <div class="fgrp"><span class="fshow">Ditampilkan: <b id="rangeText"></b></span>
           <button type="button" class="chip" id="allPeriod" hidden>Semua periode</button>
           <button type="button" class="chip" id="resetPeriod" hidden>Kembali ke bulan terbaru</button></div>
-        <div class="fgrp fright"><span class="fn" id="exportMsg" role="status" aria-live="polite"></span>
-          <label class="ck"><input type="checkbox" id="exportDb" checked> Sertakan database transaksi</label>
-          <button type="button" class="chip exp" id="exportXlsx">Export ke Excel</button></div>
+        
       </div>
       <details class="fnote"><summary>Keterangan filter</summary>
         <p>Pilih bulan yang sama di Dari dan s.d untuk melihat satu bulan. Semester 1 = Jan sampai Jun, Semester 2 = Jul sampai Des, Q1 = Jan sampai Mar, Q2 = Apr sampai Jun, Q3 = Jul sampai Sep, Q4 = Okt sampai Des; bulan yang belum ada datanya tidak ikut dihitung. Week mengikuti kalender ISO 8601 (Senin sampai Minggu, Week 1 = minggu yang memuat 1 Januari 2026), dan week yang melewati pergantian bulan dihitung utuh. Penjualan Online = metode pembayaran GrabFood, ShopeeFood, dan GoFood; metode lain dihitung Offline. Area Jakarta (Jabotabek): Tebet, UNTAR, Kelapa Dua. Area Surabaya: Tunjungan, Petra University, Mulyosari.</p></details>
@@ -621,8 +619,8 @@ tfoot td{border-top-color:var(--pg)}
 
   <div id="page6" role="tabpanel" aria-labelledby="tab6" hidden>
     <section aria-labelledby="hUp" style="border-top:0">
-      <h2 id="hUp">Sumber data: Google Sheets dan upload berkas</h2>
-      <p class="sub">Unggah hasil export transaksi terbaru (.xlsx atau .csv). Seluruh angka di Halaman 1 sampai 4 dihitung ulang dari data gabungan, memakai aturan yang sama seperti sebelumnya.</p>
+      <h2 id="hUp">Import data: Google Sheets dan upload berkas</h2>
+      <p class="sub">Unggah hasil export transaksi terbaru (.xlsx atau .csv). Seluruh angka di semua halaman dihitung ulang dari data gabungan, memakai aturan yang sama seperti sebelumnya.</p>
       <div class="fpanel" id="g_panel">
         <div class="frow"><span class="fl">Google Sheets</span><span class="fn" id="g_state"></span></div>
         <div class="frow">
@@ -673,6 +671,17 @@ tfoot td{border-top-color:var(--pg)}
         <p class="fn">Kolom bertanda * wajib ada. Biasanya terisi otomatis, ubah hanya kalau nama kolom di berkas Anda berbeda.</p>
         <div class="tw" id="u_mapBox"></div>
       </details>
+
+      <div class="blk" id="ex_block" style="margin-top:22px">
+        <h3>Export data ke Excel</h3>
+        <p class="fn">Isi file mengikuti filter yang sedang aktif di tab Monthly (periode, area, outlet, dan penjualan Online atau Offline). Berisi ringkasan, tabel bulanan dan mingguan, Online vs Offline, Quantity, Variant, rincian, dan bila dicentang, database transaksi.</p>
+        <div class="frow"><span class="fshow">Filter aktif: <b id="ex_filter"></b></span><button type="button" class="chip" id="ex_goto">Ubah filter di Monthly</button></div>
+        <div class="frow">
+          <label class="ck"><input type="checkbox" id="exportDb" checked> Sertakan database transaksi</label>
+          <button type="button" class="chip exp" id="exportXlsx">Export ke Excel</button>
+          <span class="fn" id="exportMsg" role="status" aria-live="polite"></span>
+        </div>
+      </div>
 
       <div class="blk" style="margin-top:22px">
         <h3>Menyimpan hasil</h3>
@@ -1644,8 +1653,8 @@ let PAGE=1;
 function buildPage1(){
   const p1=$('page1');
   const SUB={hMonth:null,
-    hTrend:'Tinggi batang adalah Gross Sales, terbagi menjadi Net Sales dan diskon. Klik batang untuk membuka analisa bulan itu di Halaman 2.',
-    hOa:'Tinggi batang adalah Gross Sales, terbagi menjadi Net Sales dan diskon. Klik batang untuk membuka analisa outlet atau area itu di Halaman 2.',
+    hTrend:'Tinggi batang adalah Gross Sales, terbagi menjadi Net Sales dan diskon. Klik batang untuk membuka analisa bulan itu di Monthly.',
+    hOa:'Tinggi batang adalah Gross Sales, terbagi menjadi Net Sales dan diskon. Klik batang untuk membuka analisa outlet atau area itu di Monthly.',
     hOnl:'',
     hTable:'',
     hOut:null};
@@ -1677,6 +1686,7 @@ function showPage(n){
   PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
   if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===2)render();
+  if(n===6)exFilterText();
   window.scrollTo(0,0);
 }
 function initTabs(){
@@ -2446,7 +2456,7 @@ async function gApplyRecs(mode,auto){
   let base=xToRecords(DBC||{d:[],dates:[],outlets:[],maps:[]}),recs=UP.recs;const before=base.length;
   if(mode==='full'){
     if(auto&&before>0&&recs.length<before*0.5)
-      throw new Error('isi sheet ('+nf.format(recs.length)+' baris) jauh lebih sedikit dari data dashboard ('+nf.format(before)+' baris), jadi tidak diterapkan otomatis. Buka Upload Data dan pilih cara gabung yang sesuai, lalu klik Sinkron sekarang.');
+      throw new Error('isi sheet ('+nf.format(recs.length)+' baris) jauh lebih sedikit dari data dashboard ('+nf.format(before)+' baris), jadi tidak diterapkan otomatis. Buka Import-Export dan pilih cara gabung yang sesuai, lalu klik Sinkron sekarang.');
     base=[];
   }else if(mode==='replace'){
     const drop=new Set(recs.map(r=>r.date+'|'+r.o));base=base.filter(r=>!drop.has(r.date+'|'+r.o));
@@ -2523,14 +2533,15 @@ function initSheet(){
 }
 
 /* ===== Page 6: Report ringkasan per outlet (siap salin) ===== */
+const RPCOL=DSCOL.filter(c=>!/Biscuit/i.test(c[0]));
 const RP={outs:new Set(),from:'',to:'',num:'plain',wa:true,jual:true,bill:true,qty:true};
-/* [label, indeks kolom di DSCOL, jenis, satuan, kelompok] */
+/* [label, indeks kolom di RPCOL, jenis, satuan, kelompok] */
 const RPTXT=[
   ['Gross (Inc Tax)',1,'rp','','jual'],['Net (Inc Tax)',3,'rp','','jual'],['Tax',5,'rp','','jual'],
   ['Gross Sales',0,'rp','','jual'],['Diskon',4,'rp','','jual'],['Net Sales',2,'rp','','jual'],
   ['Bill Transaction',6,'n','','bill'],
   ['Better Cup',7,'n','Cup','qty'],['Better 1 L',9,'n','Btl','qty'],['Pastry',8,'n','Pcs','qty'],
-  ['Mineral',11,'n','Btl','qty'],['Tumbler',10,'n','Tumbler','qty'],['Biscuit With Ice Cream',12,'n','Pcs','qty']
+  ['Mineral',11,'n','Btl','qty'],['Tumbler',10,'n','Tumbler','qty']
 ];
 const rpPeriod=()=>RP.from===RP.to?dLong(RP.from):dLong(RP.from)+' s.d '+dLong(RP.to);
 async function rpCopy(text,msgId){
@@ -2586,8 +2597,8 @@ function rpNum(v,type){
 }
 function rpTsv(){
   if(!rpRows)return '';
-  const head=['Outlet','Hari aktif'].concat(DSCOL.map(c=>c[0]));
-  const line=(nm,d,r)=>[nm,String(d)].concat(DSCOL.map(([t,get,ty])=>rpNum(get(r),ty)));
+  const head=['Outlet','Hari aktif'].concat(RPCOL.map(c=>c[0]));
+  const line=(nm,d,r)=>[nm,String(d)].concat(RPCOL.map(([t,get,ty])=>rpNum(get(r),ty)));
   const out=[head].concat(rpRows.rows.map(x=>line(x.o,x.d,x.r)));
   out.push(line('Total',rpRows.act,rpRows.tot));
   return out.map(r=>r.join('\t')).join('\n');
@@ -2595,7 +2606,7 @@ function rpTsv(){
 function rpText(){
   const {rows,tot,act,sel}=rpRows,B=s=>RP.wa?'*'+s+'*':s;
   const groups=RPTXT.filter(x=>RP[x[4]]);
-  const fmt=(r,x)=>{const v=DSCOL[x[1]][1](r);return x[2]==='rp'?rp(v):nf.format(Math.round(v*100)/100)+(x[3]?' '+x[3]:'')};
+  const fmt=(r,x)=>{const v=RPCOL[x[1]][1](r);return x[2]==='rp'?rp(v):nf.format(Math.round(v*100)/100)+(x[3]?' '+x[3]:'')};
   const L=[];
   L.push(B('LAPORAN PENJUALAN a better cup'));
   L.push('Periode: '+rpPeriod());
@@ -2639,13 +2650,20 @@ function renderReport(){
     (DSapprox?' Catatan: basis data transaksi tidak terbaca di browser ini, jadi kolom Diskon dan Tax kosong dan Net Sales belum dikurangi refund.':'');
   $('r6_show').textContent=rpPeriod()+' ('+rpRows.days+' hari, '+rpRows.act+' hari ada transaksi), '+(RP.outs.size?rpRows.sel.join(', '):'semua outlet');
   $('r6_text').value=rpText();
-  const head='<thead><tr><th>Outlet</th><th>Hari aktif</th>'+DSCOL.map(c=>`<th>${c[0]}</th>`).join('')+'</tr></thead>';
-  const body=rpRows.rows.map(x=>`<tr><td>${x.o}</td><td>${nf.format(x.d)}</td>`+DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(x.r),ty)}</td>`).join('')+'</tr>').join('');
-  $('r6_tbl').innerHTML=head+'<tbody>'+(body||`<tr><td colspan="${DSCOL.length+2}" style="text-align:left;color:var(--mute)">Belum ada transaksi pada periode ini</td></tr>`)+'</tbody><tfoot><tr><td>Total</td><td>'+nf.format(rpRows.act)+'</td>'+
-    DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(rpRows.tot),ty)}</td>`).join('')+'</tr></tfoot>';
+  const head='<thead><tr><th>Outlet</th><th>Hari aktif</th>'+RPCOL.map(c=>`<th>${c[0]}</th>`).join('')+'</tr></thead>';
+  const body=rpRows.rows.map(x=>`<tr><td>${x.o}</td><td>${nf.format(x.d)}</td>`+RPCOL.map(([t,get,ty])=>`<td>${dsFmt(get(x.r),ty)}</td>`).join('')+'</tr>').join('');
+  $('r6_tbl').innerHTML=head+'<tbody>'+(body||`<tr><td colspan="${RPCOL.length+2}" style="text-align:left;color:var(--mute)">Belum ada transaksi pada periode ini</td></tr>`)+'</tbody><tfoot><tr><td>Total</td><td>'+nf.format(rpRows.act)+'</td>'+
+    RPCOL.map(([t,get,ty])=>`<td>${dsFmt(get(rpRows.tot),ty)}</td>`).join('')+'</tr></tfoot>';
 }
 
-period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initReport();initUpload();initSheet();showPage(1);
+function exFilterText(){
+  const el=document.getElementById('ex_filter');if(!el)return;
+  el.textContent=plabel()+chl()+(S.outlet!=='all'?', '+S.outlet:'');
+}
+function initExport(){
+  const g=document.getElementById('ex_goto');if(g)g.onclick=()=>showPage(2);
+}
+period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initReport();initExport();initUpload();initSheet();showPage(1);
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
