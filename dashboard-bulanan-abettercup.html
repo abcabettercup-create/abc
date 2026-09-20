@@ -167,6 +167,67 @@ tfoot td{font-weight:600;border-top:2px solid var(--ink);border-bottom:0}
   .kpi5{grid-template-columns:repeat(2,1fr)}
   .r{grid-template-columns:100px 1fr auto}
 }
+
+/* ==== Rapikan tampilan + optimasi layar kecil/Android ==== */
+.wrap{padding:24px 16px 48px}
+h1{font-size:clamp(22px,4.5vw,34px)}
+h2{font-size:18px}
+.sub{font-size:13.5px}
+section{padding:26px 0 6px}
+.kpi .v{font-size:clamp(17px,2.6vw,25px)}
+.kpi>div{padding-top:13px;padding-bottom:13px}
+.blk{padding-top:18px}
+.blk h3{font-size:15.5px}
+table{font-size:13px}
+th,td{padding:7px 6px}
+.chip{font-size:12.5px;padding:6px 12px}
+.fpanel{padding:14px 16px;gap:12px}
+.pgnote{font-size:13px;padding:10px 14px}
+.tab{padding:12px 14px 9px}
+
+@media (max-width:600px){
+  body{font-size:13px;line-height:1.45}
+  .wrap{padding:14px 10px 36px}
+  h1{font-size:19px;line-height:1.2}
+  h2{font-size:15.5px}
+  .sub{font-size:12px}
+  section{padding:16px 0 4px;scroll-margin-top:50px}
+  .top{gap:8px 14px;padding-bottom:10px}
+  .logoplate{padding:6px 10px}
+  .logo{height:34px}
+  .tabs{gap:1px}
+  .tab{font-size:10.5px;padding:8px 4px 6px;letter-spacing:-.01em}
+  .fpanel{padding:10px 11px;gap:8px}
+  .frow{gap:6px 12px}
+  .fl{font-size:12px;min-width:auto}
+  .fpanel label{font-size:12px;gap:5px}
+  .fpanel select,.fpanel input[type=date],.fpanel input[type=number]{font-size:12px;min-height:30px;padding:4px 6px}
+  .fpanel select{padding-right:22px}
+  .chip{font-size:11px;padding:5px 9px}
+  .kpi .v{font-size:15.5px}
+  .kpi dt{font-size:10.5px;gap:4px}
+  .kpi>div{padding:8px 5px}
+  .kpi .d{font-size:10px}
+  .kpi .u{font-size:12px}
+  table{font-size:11px}
+  th,td{padding:6px 4px}
+  th{font-size:10px}
+  .blk{padding-top:12px}
+  .blk h3{font-size:13.5px;margin-bottom:6px}
+  .pgnote{font-size:11.5px;padding:9px 10px}
+  .udrop{padding:16px 10px;font-size:12px}
+  .fn{font-size:10.5px}
+  .fnote{font-size:11px}
+  .r{font-size:11.5px;grid-template-columns:78px 1fr auto;gap:8px}
+  .legend{font-size:10.5px;gap:5px 14px}
+  .sbn{font-size:11.5px}
+  .note{font-size:11px}
+  .heat{font-size:10.5px}
+  .heat td{padding:7px 1px;min-width:30px}
+  .heat thead th{font-size:9.5px}
+  .heat tbody th{font-size:11px}
+  .jump a{font-size:11px;padding:4px 10px}
+}
 </style>
 </head>
 <body>
@@ -502,7 +563,7 @@ tfoot td{font-weight:600;border-top:2px solid var(--ink);border-bottom:0}
             <button type="button" class="chip" data-m="append" aria-pressed="false">Tambah saja (lewati struk kembar)</button>
           </div>
         </div>
-        <p class="fn" style="margin:0">Mode ganti cocok untuk export ulang satu bulan penuh: baris lama pada tanggal dan outlet yang sama dibuang dulu, lalu diganti isi berkas baru. Mode tambah hanya menambahkan baris dan melewati nomor struk yang sudah ada.</p>
+        <p class="fn" style="margin:0">Mode ganti menghapus <b>seluruh data lama pada tanggal yang ada di berkas baru, untuk semua outlet</b>, lalu diisi ulang dari berkas baru. Jadi kalau Anda unggah data 1 tanggal saja, seluruh data tanggal itu (apa pun outletnya) dianggap diganti total oleh berkas baru — pastikan berkas baru sudah lengkap semua outlet untuk tanggal tersebut. Mode tambah hanya menambahkan baris dan melewati nomor struk yang sudah ada.</p>
       </div>
       <p class="pgnote" id="u_status">Belum ada berkas yang dipilih.</p>
 
@@ -1532,8 +1593,9 @@ function initTabs(){
 /* ===== Halaman 5: Daily Sales ===== */
 const DS={outlet:'all',from:'',to:''};
 let DSD=null,DSbusy=false,DSapprox=false,DSerr='';
-const DSCOL=[['Gross Sales',r=>r[0],'rp'],['Gross (Inc Tax)',r=>r[0]+r[11],'rp'],['Diskon',r=>r[9],'rp'],
-  ['Refund',r=>r[10],'rp'],['Net Sales',r=>r[7],'rp'],['Tax',r=>r[11],'rp'],['Net (Inc Tax)',r=>r[7]+r[11],'rp'],
+const DSCOL=[['Gross Sales',r=>r[0],'rp'],['Gross (Inc Tax)',r=>r[0]+r[11],'rp'],
+  ['Net Sales',r=>r[7],'rp'],['Net (Inc Tax)',r=>r[7]+r[11],'rp'],
+  ['Diskon',r=>r[9],'rp'],['Tax',r=>r[11],'rp'],
   ['Bill Transaction',r=>r[8],'n'],['Better Cup (Cup)',r=>r[1],'n'],['Pastry (Pcs)',r=>r[3],'n'],
   ['Better 1 L (Btl)',r=>r[2],'n'],['Tumbler',r=>r[5],'n'],['Mineral (Btl)',r=>r[4],'n'],['Biscuit (Pcs)',r=>r[6],'n']];
 const DSN=13;
@@ -1612,10 +1674,12 @@ function renderDaily(){
   }
   $('d5_sub').textContent='Omset dan jumlah barang per hari untuk '+olabel+'. Gross Sales sudah dikurangi refund, Net Sales = Gross Sales - Diskon - Refund. Jumlah barang memakai pengali bundle dan sudah dikurangi refund.'+
     (DSapprox?' Catatan: basis data transaksi tidak terbaca di browser ini'+(DSerr?' ('+DSerr+')':'')+', jadi kolom Diskon, Refund, dan Tax kosong dan Net Sales belum dikurangi refund.':'');
-  const kp=[['Gross Sales',tot[0],'rp','var(--ink)'],['Gross (Inc Tax)',tot[0]+tot[11],'rp','var(--ink)'],
-    ['Net Sales',tot[7],'rp','var(--net)'],['Net (Inc Tax)',tot[7]+tot[11],'rp','var(--net)'],
-    ['Tax',tot[11],'rp','var(--tax)'],
+  const kp=[['Gross (Inc Tax)',tot[0]+tot[11],'rp','var(--ink)'],['Gross Sales',tot[0],'rp','var(--ink)'],
+    ['Net (Inc Tax)',tot[7]+tot[11],'rp','var(--net)'],['Net Sales',tot[7],'rp','var(--net)'],
+    ['Tax',tot[11],'rp','var(--tax)'],['Diskon',tot[9],'rp','var(--disc)'],
     ['Bill Transaction',tot[8],'n','var(--mute)'],['Better Cup (Cup)',tot[1],'n','var(--disc)'],
+    ['Pastry (Pcs)',tot[3],'n','var(--disc)'],['Tumbler',tot[5],'n','var(--tax)'],
+    ['Mineral (Btl)',tot[4],'n','var(--off)'],
     ['Hari ada transaksi',act,'n','var(--off)']];
   $('d5_kpi').innerHTML=kp.map(([t,v,ty,col])=>
     `<div><dt><i style="background:${col}"></i>${t}</dt><dd><div class="v"${ty==='rp'?` title="${rp(v)}"`:''}>${ty==='rp'?cmp(v):nf.format(Math.round(v*100)/100)}</div></dd></div>`).join('');
@@ -2065,9 +2129,18 @@ function uPrepare(){
   UP.recs=recs;
   const dts=[...new Set(recs.map(r=>r.date))].sort();
   const outl=[...new Set(recs.map(r=>r.o))];
+  let warnMode='';
+  if(UP.mode==='replace'&&DBC){
+    const oldByDate=new Map();
+    xToRecords(DBC).forEach(r=>{if(dts.includes(r.date)){let s=oldByDate.get(r.date);if(!s)oldByDate.set(r.date,s=new Set());s.add(r.o)}});
+    const newByDate=new Map();recs.forEach(r=>{let s=newByDate.get(r.date);if(!s)newByDate.set(r.date,s=new Set());s.add(r.o)});
+    const short=dts.filter(d=>{const o=oldByDate.get(d);return o&&[...o].some(x=>!newByDate.get(d).has(x))});
+    if(short.length)warnMode='<br><b style="color:var(--bad)">Perhatian:</b> pada '+short.length+' tanggal ('+short.slice(0,5).join(', ')+(short.length>5?', ...':'')+
+      '), berkas baru tidak memuat semua outlet yang sebelumnya sudah ada data. Mode ganti akan menghapus seluruh data lama di tanggal itu (semua outlet), jadi outlet yang tidak ada di berkas baru akan kosong untuk tanggal tersebut.';
+  }
   uStat('Terbaca <b>'+nf.format(recs.length)+'</b> baris dari <i>'+UP.file+'</i>'+(UP.raw.sheet?' (sheet '+UP.raw.sheet+')':'')+
     '.<br>Tanggal '+dts[0]+' s.d '+dts[dts.length-1]+' ('+dts.length+' hari), outlet: '+outl.join(', ')+
-    (warn.skipped?'<br>'+nf.format(warn.skipped)+' baris dilewati karena tanggal atau nama item kosong.':''),'');
+    (warn.skipped?'<br>'+nf.format(warn.skipped)+' baris dilewati karena tanggal atau nama item kosong.':'')+warnMode,'');
   uKelUI();
   uEl('u_detail').hidden=false;uEl('u_apply').disabled=false;
 }
@@ -2098,8 +2171,8 @@ async function uApply(){
       UP.recs.forEach(r=>{if(r._new){const n=nm.get(r.b+'\u0000'+r.c+'\u0000'+r.n);r.kel=n.kel;r.mul=KEL[n.kel].slice();delete r._new}});
       let base=xToRecords(DBC||{d:[],dates:[],outlets:[],maps:[]});
       if(UP.mode==='replace'){
-        const drop=new Set();UP.recs.forEach(r=>drop.add(r.date+'\u0000'+r.o));
-        base=base.filter(r=>!drop.has(r.date+'\u0000'+r.o));
+        const drop=new Set();UP.recs.forEach(r=>drop.add(r.date));
+        base=base.filter(r=>!drop.has(r.date));
       }else{
         const have=new Set(base.map(r=>r.o+'\u0000'+r.rec+'\u0000'+r.date));
         UP.recs=UP.recs.filter(r=>!have.has(r.o+'\u0000'+r.rec+'\u0000'+r.date));
