@@ -117,6 +117,11 @@ section{padding:34px 0 8px;border-top:1px solid var(--rule);scroll-margin-top:60
 .jump a{font:500 13px var(--bd);color:var(--ink);text-decoration:none;border:1px solid var(--rule);border-radius:999px;padding:5px 12px}
 .jump a:hover{background:var(--hi)}
 .jump+section{border-top:0}
+.src{margin-top:2px}
+.src.ok{color:var(--good)}
+.src.bad{color:var(--bad)}
+#g_panel{margin:18px 0 0}
+.fpanel input[type=url]{font:500 13px var(--bd);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:7px 9px;min-height:36px}
 .udrop{margin:18px 0 0;padding:26px 18px;border:2px dashed var(--rule);border-radius:12px;background:var(--panel);text-align:center;cursor:pointer;font-size:14px;color:var(--mute)}
 .udrop b{font-family:var(--hd);color:var(--ink)}
 .udrop:hover,.udrop.over{border-color:var(--net);background:var(--hi)}
@@ -238,6 +243,7 @@ th,td{padding:7px 6px}
       <div>
         <h1>Dashboard Analisa a better cup</h1>
         <p class="sub" id="period"></p>
+        <p class="sub src" id="srcStat">Sumber data: data tersimpan di berkas ini.</p>
       </div>
     </div>
   </header>
@@ -549,8 +555,29 @@ th,td{padding:7px 6px}
 
   <div id="page6" role="tabpanel" aria-labelledby="tab6" hidden>
     <section aria-labelledby="hUp" style="border-top:0">
-      <h2 id="hUp">Upload data baru</h2>
+      <h2 id="hUp">Sumber data: Google Sheets dan upload berkas</h2>
       <p class="sub">Unggah hasil export transaksi terbaru (.xlsx atau .csv). Seluruh angka di Halaman 1 sampai 4 dihitung ulang dari data gabungan, memakai aturan yang sama seperti sebelumnya.</p>
+      <div class="fpanel" id="g_panel">
+        <div class="frow"><span class="fl">Google Sheets</span><span class="fn" id="g_state"></span></div>
+        <div class="frow">
+          <label style="flex:1;min-width:240px">Tautan sheet (hasil Publikasikan ke web)
+            <input type="url" id="g_url" spellcheck="false" style="width:100%"></label>
+        </div>
+        <div class="frow">
+          <span class="fl">Cara gabung</span>
+          <div class="chips" id="g_modeChips">
+            <button type="button" class="chip" data-m="replace" aria-pressed="true">Ganti data pada tanggal dan outlet yang sama</button>
+            <button type="button" class="chip" data-m="full" aria-pressed="false">Ganti seluruh data dengan isi sheet</button>
+            <button type="button" class="chip" data-m="append" aria-pressed="false">Tambah saja (lewati struk kembar)</button>
+          </div>
+        </div>
+        <div class="frow fend">
+          <label class="ck"><input type="checkbox" id="g_auto" checked> Sinkron otomatis setiap dashboard dibuka</label>
+          <button type="button" class="chip exp" id="g_sync">Sinkron sekarang</button>
+        </div>
+        <p class="fn" style="margin:0">Data diambil langsung dari sheet lewat browser Anda, jadi butuh koneksi internet dan sheet harus sudah dipublikasikan ke web dalam format CSV. Sheet dibaca memakai aturan yang sama seperti upload berkas. Google memperbarui hasil publikasi sekitar tiap 5 menit. Kalau pengambilan gagal, dashboard tetap memakai data yang tersimpan di berkas ini.</p>
+        <p class="pgnote" id="g_status" style="margin:0">Belum sinkron.</p>
+      </div>
       <div id="u_drop" class="udrop" tabindex="0" role="button" aria-label="Pilih atau jatuhkan berkas data">
         <b>Klik untuk memilih berkas</b><br><span class="fn">atau jatuhkan berkas .xlsx / .csv ke area ini</span>
         <input type="file" id="u_file" accept=".xlsx,.xls,.csv,.txt" hidden>
@@ -561,9 +588,10 @@ th,td{padding:7px 6px}
           <div class="chips" id="u_modeChips">
             <button type="button" class="chip" data-m="replace" aria-pressed="true">Ganti data pada tanggal dan outlet yang sama</button>
             <button type="button" class="chip" data-m="append" aria-pressed="false">Tambah saja (lewati struk kembar)</button>
+            <button type="button" class="chip" data-m="full" aria-pressed="false">Ganti seluruh data dengan isi berkas</button>
           </div>
         </div>
-        <p class="fn" style="margin:0">Mode ganti menghapus <b>seluruh data lama pada tanggal yang ada di berkas baru, untuk semua outlet</b>, lalu diisi ulang dari berkas baru. Jadi kalau Anda unggah data 1 tanggal saja, seluruh data tanggal itu (apa pun outletnya) dianggap diganti total oleh berkas baru — pastikan berkas baru sudah lengkap semua outlet untuk tanggal tersebut. Mode tambah hanya menambahkan baris dan melewati nomor struk yang sudah ada.</p>
+        <p class="fn" style="margin:0">Mode ganti hanya mengganti data pada <b>kombinasi tanggal dan outlet yang ada di berkas baru</b>. Contoh: kalau berkas hanya berisi 20 Sep 2026, maka data tanggal itu untuk outlet yang ada di berkas diganti, sedangkan outlet lain dan tanggal lain tidak berubah. Mode tambah hanya menambahkan baris dan melewati nomor struk yang sudah ada. Mode ganti seluruh data mengosongkan data lama dulu.</p>
       </div>
       <p class="pgnote" id="u_status">Belum ada berkas yang dipilih.</p>
 
@@ -1905,14 +1933,14 @@ function autoMap(headers){
   return map;
 }
 function buildRecords(rows,hi,map){
-  const out=[],warn={badDate:0,skipped:0};
+  const out=[],warn={badDate:0,skipped:0,omap:new Map()};
   const G=(r,k)=>{const i=map[k];return i>=0&&i<r.length?r[i]:''};
   for(let i=hi+1;i<rows.length;i++){
     const r=rows[i];if(!r||!r.length)continue;
     const dRaw=G(r,'date'),date=toDate(dRaw);
     const item=String(G(r,'item')||'').trim();
     if(!date||!item){if(r.some(c=>c!==''&&c!=null))warn.skipped++;continue}
-    const outlet=String(G(r,'outlet')||'').trim()||'Tanpa Outlet';
+    const outlet=canonOutlet(G(r,'outlet'));warn.omap.set(String(G(r,'outlet')==null?'':G(r,'outlet')).trim(),outlet);
     const rec=String(G(r,'receipt')||'').trim();
     let ev=String(G(r,'event')||'').trim();
     const isRef=/refund/i.test(ev)||/^(full|partial) refund for:/i.test(item);
@@ -1930,7 +1958,7 @@ function buildRecords(rows,hi,map){
     }else rf=Math.abs(rf);
     out.push({date,t:toSec(G(r,'time'),dRaw),o:outlet,rec,e:isRef?1:0,
       st:normStype(String(G(r,'stype')||'').trim()),pm:String(G(r,'pay')||'').trim()||'Other',
-      c:String(G(r,'cat')||'').trim()||'Uncategorized',b:String(G(r,'brand')||'').trim()||'Unbranded',
+      c:(String(G(r,'cat')||'').trim()||'Uncategorized').replace(/^Guest Supplier$/,'Guest Supplies'),b:String(G(r,'brand')||'').trim()||'Unbranded',
       i:item,n:iname,v:normVar(G(r,'variant')),k:String(G(r,'sku')||'').trim(),
       q,g,dc,rf,nt,tx});
   }
@@ -2129,18 +2157,25 @@ function uPrepare(){
   UP.recs=recs;
   const dts=[...new Set(recs.map(r=>r.date))].sort();
   const outl=[...new Set(recs.map(r=>r.o))];
+  UP.omap=warn.omap;
+  const knownOut=new Set(D.outlets);
+  const omapPairs=[...warn.omap].filter(([a,b])=>a!==b),newOut=[...new Set(recs.map(r=>r.o))].filter(o=>!knownOut.has(o));
+  let omapTxt='';
+  if(omapPairs.length)omapTxt+='<br>Nama outlet dirapikan agar sama dengan dashboard: '+omapPairs.map(([a,b])=>'<i>'+a+'</i> menjadi <b>'+b+'</b>').join('; ')+'.';
+  if(newOut.length)omapTxt+='<br><b style="color:var(--bad)">Perhatian:</b> outlet '+newOut.map(o=>'<b>'+o+'</b>').join(', ')+' belum ada di dashboard. Outlet ini akan ditambahkan sebagai outlet baru, tetapi belum masuk filter area Jakarta atau Surabaya. Kalau sebenarnya ini outlet yang sudah ada dengan penulisan berbeda, jangan diterapkan dulu dan kabari untuk ditambahkan ke daftar nama.';
   let warnMode='';
   if(UP.mode==='replace'&&DBC){
-    const oldByDate=new Map();
-    xToRecords(DBC).forEach(r=>{if(dts.includes(r.date)){let s=oldByDate.get(r.date);if(!s)oldByDate.set(r.date,s=new Set());s.add(r.o)}});
-    const newByDate=new Map();recs.forEach(r=>{let s=newByDate.get(r.date);if(!s)newByDate.set(r.date,s=new Set());s.add(r.o)});
-    const short=dts.filter(d=>{const o=oldByDate.get(d);return o&&[...o].some(x=>!newByDate.get(d).has(x))});
-    if(short.length)warnMode='<br><b style="color:var(--bad)">Perhatian:</b> pada '+short.length+' tanggal ('+short.slice(0,5).join(', ')+(short.length>5?', ...':'')+
-      '), berkas baru tidak memuat semua outlet yang sebelumnya sudah ada data. Mode ganti akan menghapus seluruh data lama di tanggal itu (semua outlet), jadi outlet yang tidak ada di berkas baru akan kosong untuk tanggal tersebut.';
+    const cnt=new Map();recs.forEach(r=>{const k=r.date+'|'+r.o;cnt.set(k,(cnt.get(k)||0)+1)});
+    const old=new Map();
+    for(let i=0;i<DBC.d.length;i++){const k=DBC.dates[DBC.d[i]]+'|'+DBC.outlets[DBC.o[i]];if(cnt.has(k))old.set(k,(old.get(k)||0)+1)}
+    const fewer=[...cnt].filter(([k,n])=>(old.get(k)||0)>n),repl=[...cnt.keys()].filter(k=>old.has(k)).length;
+    warnMode='<br>Mode ganti: <b>'+repl+'</b> kombinasi tanggal dan outlet akan diganti, <b>'+(cnt.size-repl)+'</b> kombinasi baru akan ditambahkan. Data tanggal atau outlet lain tidak disentuh.'+
+      (fewer.length?'<br><b style="color:var(--bad)">Perhatian:</b> pada '+fewer.length+' kombinasi tanggal dan outlet ('+fewer.slice(0,4).map(([k,n])=>k.replace('|',' ')+': '+n+' baris baru, '+old.get(k)+' baris lama').join('; ')+(fewer.length>4?'; ...':'')+
+        ') berkas baru memuat baris lebih sedikit dari data lama. Kalau berkas baru hanya sebagian hari itu, data lama yang tidak ada di berkas baru ikut hilang.':'');
   }
   uStat('Terbaca <b>'+nf.format(recs.length)+'</b> baris dari <i>'+UP.file+'</i>'+(UP.raw.sheet?' (sheet '+UP.raw.sheet+')':'')+
     '.<br>Tanggal '+dts[0]+' s.d '+dts[dts.length-1]+' ('+dts.length+' hari), outlet: '+outl.join(', ')+
-    (warn.skipped?'<br>'+nf.format(warn.skipped)+' baris dilewati karena tanggal atau nama item kosong.':'')+warnMode,'');
+    (warn.skipped?'<br>'+nf.format(warn.skipped)+' baris dilewati karena tanggal atau nama item kosong.':'')+omapTxt+warnMode,'');
   uKelUI();
   uEl('u_detail').hidden=false;uEl('u_apply').disabled=false;
 }
@@ -2170,9 +2205,11 @@ async function uApply(){
       const nm=new Map();UP.newItems.forEach(n=>nm.set(n.b+'\u0000'+n.c+'\u0000'+n.i,n));
       UP.recs.forEach(r=>{if(r._new){const n=nm.get(r.b+'\u0000'+r.c+'\u0000'+r.n);r.kel=n.kel;r.mul=KEL[n.kel].slice();delete r._new}});
       let base=xToRecords(DBC||{d:[],dates:[],outlets:[],maps:[]});
-      if(UP.mode==='replace'){
-        const drop=new Set();UP.recs.forEach(r=>drop.add(r.date));
-        base=base.filter(r=>!drop.has(r.date));
+      if(UP.mode==='full'){
+        base=[];
+      }else if(UP.mode==='replace'){
+        const drop=new Set();UP.recs.forEach(r=>drop.add(r.date+'|'+r.o));
+        base=base.filter(r=>!drop.has(r.date+'|'+r.o));
       }else{
         const have=new Set(base.map(r=>r.o+'\u0000'+r.rec+'\u0000'+r.date));
         UP.recs=UP.recs.filter(r=>!have.has(r.o+'\u0000'+r.rec+'\u0000'+r.date));
@@ -2205,6 +2242,8 @@ async function uSave(){
     const clone=document.documentElement.cloneNode(true);
     clone.querySelectorAll('#page1 > [aria-labelledby^="g_"]').forEach(n=>n.remove());
     const sb=clone.querySelector('#u_status');if(sb)sb.innerHTML='';
+    const gs=clone.querySelector('#g_status');if(gs)gs.innerHTML='Belum sinkron.';
+    const ss=clone.querySelector('#srcStat');if(ss){ss.textContent='Sumber data: data tersimpan di berkas ini.';ss.className='sub src'}
     const db=clone.querySelector('#u_detail');if(db)db.hidden=true;
     const mb=clone.querySelector('#u_mapBox');if(mb)mb.innerHTML='';
     const ni=clone.querySelector('#u_newItems');if(ni)ni.innerHTML='';
@@ -2243,7 +2282,179 @@ function initUpload(){
   uEl('u_reload').onclick=()=>location.reload();
 }
 
-period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initUpload();showPage(1);
+/* ================= Sinkron dengan Google Sheets ================= */
+/* ---- nama outlet: samakan dengan nama di dashboard ---- */
+const OUTLET_ALIAS={'tebet':'Tebet','untar':'UNTAR','kelapa dua':'Kelapa Dua','kelapa da':'Kelapa Dua','tunjungan':'Tunjungan','mulyosari':'Mulyosari','petra university':'Petra University','petra':'Petra University'};
+function canonOutlet(v){
+  const s=String(v==null?'':v).replace(/a\s*better\s*cup/ig,' ').split(/\s+/).filter(Boolean).join(' ');
+  if(!s)return 'Tanpa Outlet';
+  const k=s.toLowerCase();
+  if(OUTLET_ALIAS[k])return OUTLET_ALIAS[k];
+  const kk=k.replace(/\s+/g,''),pool=(typeof D!=='undefined'&&D.outlets?D.outlets:[]).concat(Object.values(OUTLET_ALIAS));
+  const hit=pool.find(o=>o.toLowerCase().replace(/\s+/g,'')===kk);
+  return hit||s;
+}
+const GS={url:'https://docs.google.com/spreadsheets/d/e/2PACX-1vSvqUQIlUnLD8wh9LiZPgCGY5SSal9MkJetTmhIn8ncJhuyAHf3hnvCReIp5BSgP6WoR5jcnHtZH_kW/pub?output=csv',mode:'replace',auto:true,busy:false};
+const gEl=id=>document.getElementById(id);
+const gLS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function gCsvUrl(u){
+  u=String(u||'').trim();
+  if(!u)return '';
+  if(/output=csv|format=csv/i.test(u))return u;
+  let m=u.match(/^(https:\/\/docs\.google\.com\/spreadsheets\/d\/e\/[^\/?#]+)\/pub(?:html)?/i);
+  if(m){const g=u.match(/[?&#]gid=(\d+)/);return m[1]+'/pub?output=csv'+(g?'&gid='+g[1]+'&single=true':'')}
+  m=u.match(/^(https:\/\/docs\.google\.com\/spreadsheets\/d\/[^\/?#]+)/i);
+  if(m){const g=u.match(/[?&#]gid=(\d+)/);return m[1]+'/export?format=csv'+(g?'&gid='+g[1]:'')}
+  return u;
+}
+function gStat(msg){gEl('g_status').innerHTML=msg}
+function gHead(msg,ok){const e=gEl('srcStat');e.textContent=msg;e.className='sub src'+(ok===true?' ok':ok===false?' bad':'')}
+function gParseRaw(s){
+  const rows=[],n=s.length;let i=0,row=[];
+  if(s.charCodeAt(0)===0xFEFF)i=1;
+  while(i<n){
+    let field,c;
+    if(s.charCodeAt(i)===34){
+      i++;let out='',st=i;
+      for(;;){const j=s.indexOf('"',i);
+        if(j<0){out+=s.slice(st);i=n;break}
+        if(s.charCodeAt(j+1)===34){out+=s.slice(st,j+1);i=j+2;st=i;continue}
+        out+=s.slice(st,j);i=j+1;break}
+      field=out;c=s.charCodeAt(i);
+    }else{
+      const st=i;while(i<n){c=s.charCodeAt(i);if(c===44||c===10||c===13)break;i++}
+      field=s.slice(st,i);if(i>=n)c=-1;
+    }
+    row.push(field);
+    if(c===44){i++;if(i>=n){row.push('');rows.push(row);row=[]}continue}
+    if(c===13&&s.charCodeAt(i+1)===10)i++;
+    if(c===10||c===13){i++;rows.push(row);row=[]}
+    else if(i>=n){rows.push(row);row=[]}
+  }
+  if(row.length)rows.push(row);
+  return rows;
+}
+/* angka: tentukan gaya desimal (titik atau koma) dari isi kolom, lalu ubah semua sel angka dengan gaya yang sama */
+function gConvertNumbers(rows,hi,map){
+  const cols=['qty','gross','disc','refund','net','tax'].map(k=>map[k]).filter(i=>i>=0);
+  let comma=0,dot=0;
+  for(let i=hi+1;i<rows.length&&i<hi+6000;i++){
+    const r=rows[i];if(!r)continue;
+    cols.forEach(c=>{const s=String(r[c]==null?'':r[c]).trim();if(!s)return;
+      if(/,\d{1,2}$/.test(s)&&!/\.\d{1,2}$/.test(s))comma++;else if(/\.\d{1,2}$/.test(s)&&!/,\d{1,2}$/.test(s))dot++});
+  }
+  const style=comma>dot?'comma':'dot';
+  const conv=v=>{
+    if(typeof v==='number')return v;
+    let s=String(v==null?'':v).trim();if(s==='')return '';
+    let neg=/^\(.*\)$/.test(s);
+    s=s.replace(/[^\d,.\-]/g,'');
+    if(!s||s==='-')return 0;
+    if(s[0]==='-'){neg=!neg;s=s.slice(1)}
+    s=style==='comma'?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');
+    const x=parseFloat(s);return isNaN(x)?0:(neg?-x:x);
+  };
+  for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!r)continue;cols.forEach(c=>{if(c<r.length)r[c]=conv(r[c])})}
+  return style;
+}
+/* tanggal: samakan urutan hari-bulan; bila ada bukti bulan-hari (angka kedua > 12) pakai itu, selain itu hari-bulan */
+function gConvertDates(rows,hi,map){
+  const c=map.date;if(c<0)return 'day';
+  const re=/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})/;let dayEv=0,monEv=0;
+  for(let i=hi+1;i<rows.length;i++){const s=rows[i]&&rows[i][c];if(typeof s!=='string')continue;
+    const m=re.exec(s.trim());if(!m)continue;if(+m[1]>12)dayEv++;else if(+m[2]>12)monEv++}
+  const monthFirst=monEv>0&&dayEv===0;
+  for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!r||typeof r[c]!=='string')continue;
+    const s=r[c].trim(),m=re.exec(s);if(!m)continue;
+    const d=monthFirst?+m[2]:+m[1],mo=monthFirst?+m[1]:+m[2];
+    r[c]=m[3]+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0')+s.slice(m[0].length);
+  }
+  return monthFirst?'month':'day';
+}
+const gFmtDT=d=>d.toLocaleString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+async function gApplyRecs(mode,auto){
+  const nm=new Map();UP.newItems.forEach(n=>nm.set(n.b+'\u0000'+n.c+'\u0000'+n.i,n));
+  UP.recs.forEach(r=>{if(r._new){const n=nm.get(r.b+'\u0000'+r.c+'\u0000'+r.n);r.kel=n.kel;r.mul=KEL[n.kel].slice();delete r._new}});
+  let base=xToRecords(DBC||{d:[],dates:[],outlets:[],maps:[]}),recs=UP.recs;const before=base.length;
+  if(mode==='full'){
+    if(auto&&before>0&&recs.length<before*0.5)
+      throw new Error('isi sheet ('+nf.format(recs.length)+' baris) jauh lebih sedikit dari data dashboard ('+nf.format(before)+' baris), jadi tidak diterapkan otomatis. Buka Upload Data dan pilih cara gabung yang sesuai, lalu klik Sinkron sekarang.');
+    base=[];
+  }else if(mode==='replace'){
+    const drop=new Set(recs.map(r=>r.date+'|'+r.o));base=base.filter(r=>!drop.has(r.date+'|'+r.o));
+  }else{
+    const have=new Set(base.map(r=>r.o+'\u0000'+r.rec+'\u0000'+r.date));
+    recs=recs.filter(r=>!have.has(r.o+'\u0000'+r.rec+'\u0000'+r.date));
+  }
+  await new Promise(r=>setTimeout(r,20));
+  const all=base.concat(recs);
+  if(!all.length)throw new Error('tidak ada data tersisa setelah penggabungan.');
+  all.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.t-b.t||(a.o<b.o?-1:a.o>b.o?1:0)||(a.rec<b.rec?-1:a.rec>b.rec?1:0));
+  const nx=recordsToX(all);
+  applyDataset(nx);
+  uEl('u_save').disabled=false;
+  return {rows:nx.d.length,read:UP.recs.length,added:recs.length,before,newItems:UP.newItems.length,from:nx.dates[0],to:nx.dates[nx.dates.length-1]};
+}
+async function gSync(auto){
+  if(GS.busy)return;
+  GS.busy=true;const btn=gEl('g_sync');btn.disabled=true;
+  gHead('Menyinkronkan dengan Google Sheets…');gStat('Mengambil data dari Google Sheets…');
+  try{
+    const url=gCsvUrl(GS.url);
+    if(!url)throw new Error('tautan sheet belum diisi.');
+    let res;
+    try{res=await fetch(url+(url.includes('?')?'&':'?')+'_='+Date.now(),{cache:'no-store'})}
+    catch(e){throw new Error('tidak bisa terhubung ke Google. Periksa koneksi internet, atau sheet belum dipublikasikan ke web.')}
+    if(!res.ok)throw new Error('Google menolak permintaan (kode '+res.status+'). Pastikan sheet sudah dipublikasikan ke web dengan format CSV.');
+    const text=await res.text();
+    if(/^\s*<(!doctype|html)/i.test(text))throw new Error('tautan mengembalikan halaman web, bukan CSV. Pakai tautan hasil Publikasikan ke web dengan format CSV.');
+    gStat('Membaca '+(text.length/1048576).toFixed(1).replace('.',',')+' MB data…');
+    await new Promise(r=>setTimeout(r,20));
+    if(!DBC)await loadDb();
+    const rows=gParseRaw(text);
+    if(rows.length<2)throw new Error('sheet kosong.');
+    const h=detectHeader(rows),headers=rows[h.idx].map(x=>String(x||'')),map=autoMap(headers);
+    const miss=FIELDS.filter(f=>f[2]&&map[f[0]]<0).map(f=>f[1]);
+    if(miss.length)throw new Error('kolom wajib tidak ditemukan di sheet: '+miss.join(', ')+'. Baris pertama sheet harus berisi judul kolom seperti Report.csv.');
+    const ns=gConvertNumbers(rows,h.idx,map),ds=gConvertDates(rows,h.idx,map);
+    UP.file='Google Sheets';UP.raw={rows,sheet:'Google Sheets'};UP.hi=h.idx;UP.headers=headers;UP.map=map;
+    uMapUI();
+    gStat('Menghitung ulang seluruh angka dashboard…');
+    await new Promise(r=>setTimeout(r,20));
+    const pm=UP.mode;UP.mode=GS.mode;uPrepare();UP.mode=pm;
+    if(!UP.recs||!UP.recs.length)throw new Error('tidak ada baris yang bisa dibaca dari sheet. Periksa kolom Tanggal dan Items.');
+    const r=await gApplyRecs(GS.mode,auto);
+    uEl('u_detail').hidden=true;
+    const now=gFmtDT(new Date());
+    gHead('Sumber data: Google Sheets, disinkron '+now+' ('+nf.format(r.rows)+' baris, '+r.from+' s.d '+r.to+').',true);
+    gStat('Berhasil disinkron '+now+'. Terbaca <b>'+nf.format(r.read)+'</b> baris dari sheet, dashboard sekarang memakai <b>'+nf.format(r.rows)+'</b> baris ('+r.from+' s.d '+r.to+').'+
+      (r.newItems?'<br>'+r.newItems+' item baru dipetakan otomatis ke kelompok Quantity. Periksa di daftar Item baru bila perlu.':'')+
+      (()=>{const p=[...(UP.omap||new Map())].filter(([x,y])=>x!==y);return p.length?'<br>Nama outlet dirapikan: '+p.map(([x,y])=>'<i>'+x+'</i> menjadi <b>'+y+'</b>').join('; ')+'.':''})()+
+      (()=>{const n=[...new Set(UP.recs.map(r=>r.o))].filter(o=>!AREAS.jkt.o.includes(o)&&!AREAS.sby.o.includes(o));return n.length?'<br><b style="color:var(--bad)">Perhatian:</b> outlet '+n.join(', ')+' belum ada di daftar area Jakarta atau Surabaya, jadi belum masuk filter area.':''})()+
+      '<br>Format angka terdeteksi: '+(ns==='comma'?'koma sebagai desimal':'titik sebagai desimal')+', urutan tanggal: '+(ds==='month'?'bulan-hari':'hari-bulan')+'.');
+  }catch(err){
+    gHead('Sumber data: data tersimpan di berkas ini. Sinkron Google Sheets gagal: '+err.message,false);
+    gStat('<b style="color:var(--bad)">Sinkron gagal:</b> '+err.message+'<br>Dashboard tetap memakai data yang tersimpan.');
+  }
+  GS.busy=false;btn.disabled=false;
+}
+function initSheet(){
+  const su=gLS.get('abc_sheet_url'),sm=gLS.get('abc_sheet_mode'),sa=gLS.get('abc_sheet_auto');
+  if(su)GS.url=su;if(sm&&['replace','full','append'].includes(sm))GS.mode=sm;if(sa!==null)GS.auto=sa==='1';
+  const u=gEl('g_url'),a=gEl('g_auto'),chips=gEl('g_modeChips').querySelectorAll('button');
+  u.value=GS.url;a.checked=GS.auto;
+  const setMode=()=>chips.forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===GS.mode));setMode();
+  u.onchange=()=>{GS.url=u.value.trim();gLS.set('abc_sheet_url',GS.url)};
+  a.onchange=()=>{GS.auto=a.checked;gLS.set('abc_sheet_auto',GS.auto?'1':'0')};
+  chips.forEach(b=>b.onclick=()=>{GS.mode=b.dataset.m;gLS.set('abc_sheet_mode',GS.mode);setMode()});
+  gEl('g_sync').onclick=()=>{GS.url=u.value.trim();gLS.set('abc_sheet_url',GS.url);gSync(false)};
+  gEl('g_state').textContent=GS.auto?'Sinkron otomatis aktif':'Sinkron otomatis mati';
+  a.addEventListener('change',()=>{gEl('g_state').textContent=a.checked?'Sinkron otomatis aktif':'Sinkron otomatis mati'});
+  if(GS.auto)setTimeout(()=>gSync(true),150);
+  else gHead('Sumber data: data tersimpan di berkas ini. Sinkron Google Sheets belum dijalankan.');
+}
+
+period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initUpload();initSheet();showPage(1);
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
