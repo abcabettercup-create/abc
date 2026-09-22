@@ -133,8 +133,9 @@
   <header class="top">
     <span class="eyebrow">A Better Cup &middot; Loyalty Program</span>
     <h1>Dashboard Analisis Loyalty</h1>
-    <p>Ringkasan 2.397 data pelanggan program loyalty &mdash; pertumbuhan, retensi, konsentrasi revenue, dan pemakaian reward.</p>
-    <span class="asof">Per data: 22 September 2026 &middot; sumber: customer-export-22092026.csv</span>
+    <p>Ringkasan <span id="nTotalSpan">2.397</span> data pelanggan program loyalty &mdash; pertumbuhan, retensi, konsentrasi revenue, dan pemakaian reward.</p>
+    <span class="asof" id="asOfLine">Per data: 22 September 2026 &middot; sumber: customer-export-22092026.csv</span>
+    <span class="asof" id="dataStatus" style="display:block; margin-top:4px;">Memuat data live dari Google Sheets&hellip;</span>
   </header>
 
   <div class="kpi-grid" id="kpiGrid"></div>
@@ -142,7 +143,7 @@
   <div class="grid2">
     <div class="card full">
       <h2>Pertumbuhan Pelanggan &amp; Member</h2>
-      <p class="desc">Pelanggan baru vs member terdaftar poin per bulan (Jan&ndash;Sep 2026). Lonjakan Juni 2026 dari peluncuran program; tren melandai 3 bulan terakhir.</p>
+      <p class="desc">Pelanggan baru vs member terdaftar poin per bulan (<span id="trendMonthRange">Jan&ndash;Sep 2026</span>). Lonjakan Juni 2026 dari peluncuran program.</p>
       <div class="legend">
         <span><i style="background:var(--blue)"></i>Pelanggan baru</span>
         <span><i style="background:var(--accent)"></i>Member terdaftar poin</span>
@@ -151,7 +152,7 @@
     </div>
   </div>
 
-  <h2 class="section-title">Trend Bulanan per Kohort <span class="section-sub">(member dikelompokkan menurut bulan bergabung, Jan&ndash;Sep 2026)</span></h2>
+  <h2 class="section-title">Trend Bulanan per Kohort <span class="section-sub">(member dikelompokkan menurut bulan bergabung, <span id="cohortMonthRange">Jan&ndash;Sep 2026</span>)</span></h2>
   <div class="note" style="margin-bottom:14px;">
     <h3>Apa itu &ldquo;kohort&rdquo;?</h3>
     <p style="margin:0;">Sekelompok pelanggan yang transaksi pertamanya jatuh di bulan yang sama &mdash; misalnya &ldquo;kohort Juni 2026&rdquo; adalah 1.023 orang yang pertama kali order di bulan itu. Chart &amp; tabel di bawah menjumlahkan seluruh aktivitas <i>lifetime</i> tiap kohort (sampai 22 Sep 2026), bukan aktivitas historis per bulan kalender, karena file sumber tidak menyimpan log transaksi bertanggal &mdash; hanya ringkasan lifetime per pelanggan. <a href="https://claude.ai/artifact/UG6LuzB2BqAJsGtGn55LVQ" target="_blank" rel="noopener" style="color:var(--accent-ink); font-weight:600;">Penjelasan lengkap &amp; diagram &rarr;</a></p>
@@ -187,7 +188,7 @@
   <div class="grid2">
     <div class="card full">
       <h2>Rekapan Jumlah Member per Bulan</h2>
-      <p class="desc">Jan&ndash;Sep 2026 &middot; Member baru dari transaksi pertama; Total Order/Revenue/AOV/Poin/Redeem = akumulasi lifetime per kohort bulan gabung. Amount Lifetime &amp; Amount Average dari file sumber sudah terwakili di kolom Revenue &amp; Rata-rata/Order, tidak diduplikasi.</p>
+      <p class="desc"><span id="recapMonthRange">Jan&ndash;Sep 2026</span> &middot; Member baru dari transaksi pertama; Total Order/Revenue/AOV/Poin/Redeem = akumulasi lifetime per kohort bulan gabung. Amount Lifetime &amp; Amount Average dari file sumber sudah terwakili di kolom Revenue &amp; Rata-rata/Order, tidak diduplikasi.</p>
       <div class="table-scroll">
         <table id="memberRecapTable">
           <thead>
@@ -281,7 +282,9 @@
 </div>
 
 <script>
-const DATA = {
+/* Snapshot data (22 Sep 2026) — used as fallback if the live Google Sheet
+   can't be reached (offline, CORS, sheet unpublished, etc). */
+const FALLBACK_DATA = {
   "as_of": "2026-09-22",
   "kpi": {
     "n_total": 2397,
@@ -915,6 +918,232 @@ const DATA = {
   ]
 };
 
+/* the object the renderers below actually read; swapped for live data once loaded */
+let DATA = FALLBACK_DATA;
+
+/* ==========================================================================
+   LIVE DATA: fetch the published Google Sheet as CSV and recompute everything
+   client-side, using the exact same methodology as the snapshot above.
+   ========================================================================== */
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQWCDJgWN8RqnxqbMcEX0WQPXl_Z8RGDj3ROPsg8PPGP9uPEedc76YoAoBZ4V9cwxzn3SnoC918V0Hr/pub?output=csv';
+
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  for(let i=0; i<text.length; i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c === '"'){ if(text[i+1] === '"'){ field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ row.push(field); field = ''; }
+      else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  while(rows.length && rows[rows.length-1].every(f=>f.trim()==='')) rows.pop();
+  if(!rows.length) return [];
+  const header = rows[0].map(h=>h.trim());
+  const out = [];
+  for(let r=1; r<rows.length; r++){
+    const cells = rows[r];
+    if(cells.every(f=>f.trim()==='')) continue;
+    const obj = {};
+    for(let c=0; c<header.length; c++){
+      if(!header[c]) continue;
+      obj[header[c]] = cells[c] !== undefined ? cells[c].trim() : '';
+    }
+    out.push(obj);
+  }
+  return out;
+}
+
+function toNum(s){
+  if(s === undefined || s === null) return null;
+  s = String(s).trim();
+  if(s === '') return null;
+  const n = Number(s);
+  return isNaN(n) ? null : n;
+}
+function toInt(s){ const n = toNum(s); return n === null ? 0 : Math.round(n); }
+function parseDMY(s){
+  if(!s) return null;
+  s = String(s).trim();
+  if(!s) return null;
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(!m) return null;
+  const day = parseInt(m[1],10), mon = parseInt(m[2],10), yr = parseInt(m[3],10);
+  const d = new Date(yr, mon-1, day);
+  return isNaN(d.getTime()) ? null : d;
+}
+function ymKey(d){ return d ? (d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')) : null; }
+function daysBetween(a,b){ return Math.round((a.getTime() - b.getTime())/(24*3600*1000)); }
+function fmtDateShort(d){
+  if(!d) return null;
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return String(d.getDate()).padStart(2,'0') + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+}
+function fmtPhoneRaw(raw){
+  const n = toNum(raw);
+  if(n === null) return null;
+  let s = String(Math.round(n));
+  if(s.startsWith('62')) s = s.slice(2);
+  return '+62 ' + s;
+}
+
+function computeDashboardData(rawRows, asOfDate, opts){
+  opts = opts || {};
+  const cohortStart = opts.cohortStartYear ? new Date(opts.cohortStartYear,0,1) : new Date(2026,0,1);
+  const rows = rawRows.map(r=>({
+    name: (r['Name']||'').trim(),
+    phoneRaw: r['Phone'],
+    custSince: parseDMY(r['Customer Since']),
+    lastVisit: parseDMY(r['Last Visit']),
+    memberSince: parseDMY(r['Member Since']),
+    orders: toInt(r['Total # of orders']),
+    amtThisMonth: toNum(r['Amount This Month']),
+    amtLifetime: toNum(r['Amount Lifetime']) || 0,
+    pointBalance: toNum(r['Current Point Balance']),
+    rewardRedeemed: toNum(r['Reward Redeemed']) || 0,
+  }));
+
+  const nTotal = rows.length;
+  const members = rows.filter(r=>r.memberSince !== null);
+  const nMembers = members.length;
+  const nGuests = nTotal - nMembers;
+  const totalLifetime = rows.reduce((s,r)=>s+r.amtLifetime,0);
+  const totalOrders = rows.reduce((s,r)=>s+r.orders,0);
+  const kpi = {
+    n_total: nTotal, n_members: nMembers, n_guests: nGuests,
+    total_lifetime: totalLifetime, total_orders: totalOrders,
+    avg_order_value: totalOrders ? totalLifetime/totalOrders : 0,
+    avg_lifetime_per_cust: nTotal ? totalLifetime/nTotal : 0,
+    points_outstanding: rows.reduce((s,r)=>s+(r.pointBalance||0),0),
+    n_redeemers: rows.filter(r=>r.rewardRedeemed>0).length,
+    redemption_rate: nMembers ? rows.filter(r=>r.rewardRedeemed>0).length/nMembers : 0,
+    total_redemptions: rows.reduce((s,r)=>s+r.rewardRedeemed,0),
+    active_month: rows.filter(r=>(r.amtThisMonth||0) > 0).length,
+    amt_month_total: rows.reduce((s,r)=>s+(r.amtThisMonth||0),0)
+  };
+
+  const months = [];
+  { let y = cohortStart.getFullYear(), m = cohortStart.getMonth();
+    const endY = asOfDate.getFullYear(), endM = asOfDate.getMonth();
+    while(y < endY || (y === endY && m <= endM)){
+      months.push(String(y)+'-'+String(m+1).padStart(2,'0'));
+      m++; if(m>11){ m=0; y++; }
+    } }
+
+  const trend = months.map(mo=>({
+    month: mo,
+    customers: rows.filter(r=>ymKey(r.custSince)===mo).length,
+    members: rows.filter(r=>ymKey(r.memberSince)===mo).length
+  }));
+
+  const recBuckets = [['0-7 hari',d=>d<=7],['8-14 hari',d=>d<=14],['15-30 hari',d=>d<=30],['31-60 hari',d=>d<=60],['61-90 hari',d=>d<=90],['>90 hari',d=>true]];
+  const recCounts = {}; recBuckets.forEach(b=>recCounts[b[0]]=0);
+  let recNoData = 0;
+  rows.forEach(r=>{
+    if(!r.lastVisit){ recNoData++; return; }
+    const d = daysBetween(asOfDate, r.lastVisit);
+    for(const [label,test] of recBuckets){ if(test(d)){ recCounts[label]++; break; } }
+  });
+  const recency = recBuckets.map(b=>({bucket:b[0], count:recCounts[b[0]]}));
+  recency.push({bucket:'Belum ada data', count: recNoData});
+
+  const freqDefs = [['0 (belum order)',o=>o===0],['1x',o=>o===1],['2-3x',o=>o<=3],['4-5x',o=>o<=5],['6-10x',o=>o<=10],['11x+',o=>true]];
+  const freqCounts = {}; freqDefs.forEach(f=>freqCounts[f[0]]=0);
+  rows.forEach(r=>{ for(const [label,test] of freqDefs){ if(test(r.orders)){ freqCounts[label]++; break; } } });
+  const freq = freqDefs.map(f=>({bucket:f[0], count:freqCounts[f[0]]}));
+
+  const ptsDefs = [['0',p=>p===0],['1-25',p=>p<=25],['26-50',p=>p<=50],['51-75',p=>p<=75],['76-100',p=>p<=100],['101-150',p=>p<=150],['150+',p=>true]];
+  const ptsCounts = {}; ptsDefs.forEach(p=>ptsCounts[p[0]]=0);
+  let pointsNoData = 0;
+  rows.forEach(r=>{
+    if(r.pointBalance===null){ pointsNoData++; return; }
+    for(const [label,test] of ptsDefs){ if(test(r.pointBalance)){ ptsCounts[label]++; break; } }
+  });
+  const points = ptsDefs.map(p=>({bucket:p[0], count:ptsCounts[p[0]]}));
+
+  const segDefs = []; const used = new Set();
+  function assign(name, test){
+    let count=0, revenue=0;
+    rows.forEach((r,i)=>{ if(used.has(i)) return; if(test(r)){ used.add(i); count++; revenue += r.amtLifetime; } });
+    segDefs.push({segment:name, count, revenue});
+  }
+  assign('Belum Order', r=>r.orders===0);
+  assign('Member Baru (<30 hari)', r=>r.memberSince && daysBetween(asOfDate, r.memberSince) <= 30);
+  assign('One-timer', r=>r.orders===1);
+  assign('At-risk / Churn', r=>r.lastVisit && daysBetween(asOfDate, r.lastVisit) > 90);
+  assign('Repeat (2-5x)', r=>r.orders>=2 && r.orders<=5);
+  assign('Loyal (6x+)', r=>r.orders>=6);
+  const segOrder = ['Member Baru (<30 hari)','One-timer','Repeat (2-5x)','Loyal (6x+)','At-risk / Churn','Belum Order'];
+  const segments = segOrder.map(name=>{
+    const s = segDefs.find(x=>x.segment===name);
+    return { segment:name, count:s.count, revenue:s.revenue,
+      pct_count: nTotal ? s.count/nTotal*100 : 0,
+      pct_revenue: totalLifetime ? s.revenue/totalLifetime*100 : 0 };
+  });
+
+  const sortedLife = rows.map(r=>r.amtLifetime).sort((a,b)=>b-a);
+  const n = sortedLife.length;
+  const cum = []; let running=0;
+  sortedLife.forEach(v=>{ running+=v; cum.push(running); });
+  const totalRev = running || 1;
+  const pareto = [];
+  for(let pct=0; pct<=100; pct+=5){
+    if(pct===0){ pareto.push({x:0,y:0}); continue; }
+    const k = Math.round(n*pct/100);
+    const y = k>0 ? cum[k-1]/totalRev*100 : 0;
+    pareto.push({x:pct, y: pct===100?100:y});
+  }
+
+  const topSpenders = rows.slice().sort((a,b)=>b.amtLifetime - a.amtLifetime).slice(0,20).map(r=>({
+    name: r.name, phone: fmtPhoneRaw(r.phoneRaw), member_since: fmtDateShort(r.custSince),
+    orders: r.orders, lifetime: r.amtLifetime, avg: r.orders ? r.amtLifetime/r.orders : 0,
+    points: r.pointBalance, last_visit: fmtDateShort(r.lastVisit),
+    recency: r.lastVisit ? daysBetween(asOfDate, r.lastVisit) : null
+  }));
+
+  const preCohort = rows.filter(r=>r.custSince && r.custSince < cohortStart);
+  let cumMembers = preCohort.length;
+  let cumRevenue = preCohort.reduce((s,r)=>s+r.amtLifetime,0);
+  let cumPoints = preCohort.reduce((s,r)=>s+(r.pointBalance||0),0);
+  const memberRecap = months.map(mo=>{
+    const cohort = rows.filter(r=>ymKey(r.custSince)===mo);
+    const revenue = cohort.reduce((s,r)=>s+r.amtLifetime,0);
+    const orders = cohort.reduce((s,r)=>s+r.orders,0);
+    const ptsSum = cohort.reduce((s,r)=>s+(r.pointBalance||0),0);
+    const redeemed = cohort.reduce((s,r)=>s+r.rewardRedeemed,0);
+    const amtThisMonth = cohort.reduce((s,r)=>s+(r.amtThisMonth||0),0);
+    const activeMembers = rows.filter(r=>ymKey(r.lastVisit)===mo).length;
+    cumMembers += cohort.length; cumRevenue += revenue; cumPoints += ptsSum;
+    return { month: mo, members: cohort.length, revenue, aov: orders ? revenue/orders : 0,
+      points: ptsSum, cum_members: cumMembers, cum_revenue: cumRevenue, cum_points: cumPoints,
+      active_members: activeMembers, redeemed, orders, amt_this_month: amtThisMonth };
+  });
+
+  return {
+    as_of: asOfDate.getFullYear()+'-'+String(asOfDate.getMonth()+1).padStart(2,'0')+'-'+String(asOfDate.getDate()).padStart(2,'0'),
+    kpi, trend, recency, freq, points, points_no_data: pointsNoData,
+    segments, pareto, top_spenders: topSpenders, n_total: nTotal, member_recap: memberRecap
+  };
+}
+
+function monthRangeLabel(months){
+  if(!months.length) return '';
+  const MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  const first = months[0], last = months[months.length-1];
+  const [fy,fm] = first.split('-').map(Number);
+  const [ly,lm] = last.split('-').map(Number);
+  const a = MONTHS_ID[fm-1]+(fy!==ly?' '+fy:'');
+  const b = MONTHS_ID[lm-1]+' '+ly;
+  return a+'–'+b;
+}
+
 function fmtIDR(n){
   if(n==null) return '-';
   return 'Rp' + Math.round(n).toLocaleString('id-ID');
@@ -1417,20 +1646,71 @@ function renderMemberRecap(){
   tfoot.appendChild(tr);
 }
 
-renderKPI();
-renderTrend();
-renderMemberGrowth();
-renderAov();
-renderMonthlyBar('chartRevenue','revenue',{color:'var(--blue)', tipLabel:'Revenue', valueFmt:fmtIDR, axisFmt:fmtIDRShort, labelFmt:fmtIDRShort});
-renderMonthlyBar('chartActiveMembers','active_members',{color:'var(--aqua)', tipLabel:'Member transaksi', valueFmt:fmtNum});
-renderMonthlyBar('chartOrders','orders',{color:'var(--accent)', tipLabel:'Total order', valueFmt:fmtNum});
-renderMonthlyBar('chartPointsRecap','points',{color:'var(--yellow)', tipLabel:'Rekap poin', valueFmt:v=>fmtNum(v)+' pts', labelFmt:fmtNum});
-renderMemberRecap();
-renderRecency();
-renderFreq();
-renderPareto();
-renderSegment();
-renderPoints();
-renderRedeem();
-renderTop();
+function renderAll(){
+  renderKPI();
+  renderTrend();
+  renderMemberGrowth();
+  renderAov();
+  renderMonthlyBar('chartRevenue','revenue',{color:'var(--blue)', tipLabel:'Revenue', valueFmt:fmtIDR, axisFmt:fmtIDRShort, labelFmt:fmtIDRShort});
+  renderMonthlyBar('chartActiveMembers','active_members',{color:'var(--aqua)', tipLabel:'Member transaksi', valueFmt:fmtNum});
+  renderMonthlyBar('chartOrders','orders',{color:'var(--accent)', tipLabel:'Total order', valueFmt:fmtNum});
+  renderMonthlyBar('chartPointsRecap','points',{color:'var(--yellow)', tipLabel:'Rekap poin', valueFmt:v=>fmtNum(v)+' pts', labelFmt:fmtNum});
+  renderMemberRecap();
+  renderRecency();
+  renderFreq();
+  renderPareto();
+  renderSegment();
+  renderPoints();
+  renderRedeem();
+  renderTop();
+}
+
+function updateHeaderText(status){
+  const nEl = document.getElementById('nTotalSpan');
+  if(nEl) nEl.textContent = fmtNum(DATA.n_total);
+  const range = monthRangeLabel(DATA.member_recap.map(d=>d.month));
+  ['trendMonthRange','cohortMonthRange','recapMonthRange'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = range;
+  });
+  const asOfEl = document.getElementById('asOfLine');
+  if(asOfEl){
+    const [y,m,d] = DATA.as_of.split('-').map(Number);
+    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    asOfEl.textContent = 'Per data: ' + d + ' ' + MONTHS_ID[m-1] + ' ' + y;
+  }
+  const statusEl = document.getElementById('dataStatus');
+  if(statusEl){
+    if(status==='live'){
+      statusEl.textContent = 'Live dari Google Sheets · diperbarui otomatis setiap dibuka';
+      statusEl.style.color = 'var(--good)';
+    } else if(status==='fallback'){
+      statusEl.textContent = 'Gagal memuat data live dari Google Sheets — menampilkan data cadangan (snapshot 22 Sep 2026)';
+      statusEl.style.color = 'var(--warning)';
+    } else {
+      statusEl.style.display = 'none';
+    }
+  }
+}
+
+async function init(){
+  try{
+    const res = await fetch(SHEET_CSV_URL, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const csvText = await res.text();
+    const rows = parseCSV(csvText);
+    if(!rows.length) throw new Error('Sheet kosong / tidak terbaca');
+    const now = new Date();
+    const asOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    DATA = computeDashboardData(rows, asOfToday);
+    updateHeaderText('live');
+  } catch(err){
+    console.warn('Gagal memuat data live dari Google Sheets, pakai snapshot cadangan:', err);
+    DATA = FALLBACK_DATA;
+    updateHeaderText('fallback');
+  }
+  renderAll();
+}
+
+init();
 </script>
