@@ -1,0 +1,1436 @@
+<title>A Better Cup Loyalty</title>
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#f9f9f7; --surface:#fcfcfb; --surface-raised:#ffffff;
+    --text:#0b0b0b; --text-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --accent:#eb6834; --accent-ink:#a8431a; --blue:#2a78d6; --aqua:#1baf7a; --yellow:#eda100;
+    --good:#0ca30c; --warning:#c98214; --serious:#c85a2e; --critical:#d03b3b;
+    --seq-1:#cde2fb; --seq-2:#9ec5f4; --seq-3:#6da7ec; --seq-4:#3987e5; --seq-5:#256abf; --seq-6:#184f95;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg:#0d0d0d; --surface:#1a1a19; --surface-raised:#212120;
+      --text:#ffffff; --text-2:#c3c2b7; --muted:#8f8d86;
+      --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.12);
+      --accent:#e07a42; --accent-ink:#f3a878; --blue:#3987e5; --aqua:#199e70; --yellow:#c98500;
+      --good:#3dbf3d; --warning:#fab219; --serious:#ec835a; --critical:#e66767;
+      --seq-1:#16324f; --seq-2:#184f95; --seq-3:#1c5cab; --seq-4:#256abf; --seq-5:#3987e5; --seq-6:#86b6ef;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg:#0d0d0d; --surface:#1a1a19; --surface-raised:#212120;
+    --text:#ffffff; --text-2:#c3c2b7; --muted:#8f8d86;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.12);
+    --accent:#e07a42; --accent-ink:#f3a878; --blue:#3987e5; --aqua:#199e70; --yellow:#c98500;
+    --good:#3dbf3d; --warning:#fab219; --serious:#ec835a; --critical:#e66767;
+    --seq-1:#16324f; --seq-2:#184f95; --seq-3:#1c5cab; --seq-4:#256abf; --seq-5:#3987e5; --seq-6:#86b6ef;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Public Sans', system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-inline:16px;
+  }
+  h1,h2,h3{ font-family:'Fraunces', Georgia, serif; font-weight:600; text-wrap:balance; margin:0; }
+  .num{ font-variant-numeric: tabular-nums; }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding-block:28px 64px; }
+
+  header.top{ display:flex; flex-direction:column; gap:6px; margin-bottom:24px; }
+  .eyebrow{ font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; }
+  header.top h1{ font-size:38px; line-height:1.1; }
+  header.top p{ margin:4px 0 0; color:var(--text-2); font-size:15px; max-width:640px; line-height:1.5; }
+  .asof{ font-size:13px; color:var(--muted); }
+
+  .kpi-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:10px;
+    margin-bottom:28px;
+  }
+  .kpi{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:16px 16px 14px; display:flex; flex-direction:column; gap:6px; min-width:0;
+  }
+  .kpi .label{ font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; }
+  .kpi .value{ font-size:26px; font-weight:700; line-height:1.15; }
+  .kpi .sub{ font-size:12.5px; color:var(--text-2); }
+  .kpi.accent{ background:linear-gradient(155deg, var(--accent) 0%, var(--accent-ink) 100%); border-color:transparent; }
+  .kpi.accent .label{ color:rgba(255,255,255,0.82); }
+  .kpi.accent .value{ color:#fff; }
+  .kpi.accent .sub{ color:rgba(255,255,255,0.82); }
+
+  .grid2{ display:grid; grid-template-columns:repeat(auto-fit,minmax(430px,1fr)); gap:14px; margin-bottom:14px; }
+  .grid3{ display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:14px; margin-bottom:6px; }
+  .section-title{ font-size:16px; font-weight:600; margin:22px 0 10px; color:var(--text); }
+  .section-sub{ font-family:'Public Sans',sans-serif; font-weight:400; font-size:12.5px; color:var(--muted); }
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:20px 20px 16px; min-width:0;
+  }
+  .card.full{ grid-column:1/-1; }
+  .card h2{ font-size:19px; margin-bottom:2px; }
+  .card h3{ font-size:14.5px; margin-bottom:8px; }
+  .card .desc{ font-size:13px; color:var(--text-2); margin:0 0 14px; line-height:1.45; max-width:60ch; }
+  .card .foot{ font-size:12px; color:var(--muted); margin-top:10px; line-height:1.5; }
+
+  .legend{ display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--text-2); margin-bottom:10px; }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .legend i{ width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+  svg{ display:block; width:100%; height:auto; overflow:visible; }
+  .grid-line{ stroke:var(--grid); stroke-width:1; }
+  .axis-text{ fill:var(--muted); font-size:11px; font-family:'Public Sans',sans-serif; }
+  .mark{ cursor:pointer; }
+  .mark:hover{ opacity:0.85; }
+  .value-label{ fill:var(--text-2); font-size:10.5px; font-family:'Public Sans',sans-serif; font-variant-numeric:tabular-nums; }
+
+  #tooltip{
+    position:fixed; pointer-events:none; z-index:50; background:var(--surface-raised);
+    border:1px solid var(--border); border-radius:10px; padding:8px 11px; font-size:12.5px;
+    color:var(--text); box-shadow:0 6px 20px rgba(0,0,0,0.16); max-width:220px; line-height:1.5;
+    opacity:0; transform:translateY(4px); transition:opacity .1s ease, transform .1s ease;
+  }
+  #tooltip.show{ opacity:1; transform:translateY(0); }
+  #tooltip .tt-title{ font-weight:700; margin-bottom:2px; }
+
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  th{ text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:0.03em; color:var(--muted); font-weight:600; padding:0 10px 8px; border-bottom:1px solid var(--border); }
+  td{ padding:9px 10px; border-bottom:1px solid var(--grid); color:var(--text-2); }
+  td.name{ color:var(--text); font-weight:600; }
+  td.num, th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  tr:last-child td{ border-bottom:none; }
+  tfoot td{ font-weight:700; color:var(--text); border-top:2px solid var(--border); border-bottom:none; }
+  .rank{ color:var(--muted); font-variant-numeric:tabular-nums; width:26px; display:inline-block; }
+  .table-scroll{ overflow-x:auto; }
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:999px; }
+  .pill.crit{ background:color-mix(in srgb, var(--critical) 16%, transparent); color:var(--critical); }
+  .pill.good{ background:color-mix(in srgb, var(--good) 16%, transparent); color:var(--good); }
+  .pill.warn{ background:color-mix(in srgb, var(--warning) 22%, transparent); color:var(--warning); }
+
+  .note{
+    background:var(--surface); border:1px dashed var(--border); border-radius:14px;
+    padding:16px 18px; font-size:13px; color:var(--text-2); line-height:1.6;
+  }
+  .note h3{ font-size:14px; margin-bottom:6px; color:var(--text); }
+  .note ul{ margin:6px 0 0; padding-left:18px; }
+  .note li{ margin-bottom:4px; }
+
+  @media (max-width:480px){
+    header.top h1{ font-size:28px; }
+    .card{ padding:16px 14px 14px; }
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap">
+
+<div id="tooltip"></div>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">A Better Cup &middot; Loyalty Program</span>
+    <h1>Dashboard Analisis Loyalty</h1>
+    <p>Ringkasan 2.397 data pelanggan program loyalty &mdash; pertumbuhan, retensi, konsentrasi revenue, dan pemakaian reward.</p>
+    <span class="asof">Per data: 22 September 2026 &middot; sumber: customer-export-22092026.csv</span>
+  </header>
+
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="grid2">
+    <div class="card full">
+      <h2>Pertumbuhan Pelanggan &amp; Member</h2>
+      <p class="desc">Pelanggan baru vs member terdaftar poin per bulan (Jan&ndash;Sep 2026). Lonjakan Juni 2026 dari peluncuran program; tren melandai 3 bulan terakhir.</p>
+      <div class="legend">
+        <span><i style="background:var(--blue)"></i>Pelanggan baru</span>
+        <span><i style="background:var(--accent)"></i>Member terdaftar poin</span>
+      </div>
+      <svg id="chartTrend" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+  </div>
+
+  <h2 class="section-title">Trend Bulanan per Kohort <span class="section-sub">(member dikelompokkan menurut bulan bergabung, Jan&ndash;Sep 2026)</span></h2>
+  <div class="note" style="margin-bottom:14px;">
+    <h3>Apa itu &ldquo;kohort&rdquo;?</h3>
+    <p style="margin:0;">Sekelompok pelanggan yang transaksi pertamanya jatuh di bulan yang sama &mdash; misalnya &ldquo;kohort Juni 2026&rdquo; adalah 1.023 orang yang pertama kali order di bulan itu. Chart &amp; tabel di bawah menjumlahkan seluruh aktivitas <i>lifetime</i> tiap kohort (sampai 22 Sep 2026), bukan aktivitas historis per bulan kalender, karena file sumber tidak menyimpan log transaksi bertanggal &mdash; hanya ringkasan lifetime per pelanggan. <a href="https://claude.ai/artifact/UG6LuzB2BqAJsGtGn55LVQ" target="_blank" rel="noopener" style="color:var(--accent-ink); font-weight:600;">Penjelasan lengkap &amp; diagram &rarr;</a></p>
+  </div>
+  <div class="grid3">
+    <div class="card">
+      <h3>Member Baru (Kumulatif)</h3>
+      <svg id="chartMemberGrowth" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="card">
+      <h3>Rata-rata Order</h3>
+      <svg id="chartAov" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="card">
+      <h3>Revenue</h3>
+      <svg id="chartRevenue" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="card">
+      <h3>Member Transaksi*</h3>
+      <svg id="chartActiveMembers" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="card">
+      <h3>Total Order</h3>
+      <svg id="chartOrders" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="card">
+      <h3>Rekap Poin</h3>
+      <svg id="chartPointsRecap" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+  </div>
+  <p class="foot" style="margin:-4px 0 14px;">Semua chart di atas &mdash; kecuali Member Transaksi* (proksi dari bulan Last Visit) &mdash; adalah akumulasi lifetime per kohort bulan gabung, konsisten dengan tabel "Rekapan Jumlah Member per Bulan" di bawah.</p>
+
+  <div class="grid2">
+    <div class="card full">
+      <h2>Rekapan Jumlah Member per Bulan</h2>
+      <p class="desc">Jan&ndash;Sep 2026 &middot; Member baru dari transaksi pertama; Total Order/Revenue/AOV/Poin/Redeem = akumulasi lifetime per kohort bulan gabung. Amount Lifetime &amp; Amount Average dari file sumber sudah terwakili di kolom Revenue &amp; Rata-rata/Order, tidak diduplikasi.</p>
+      <div class="table-scroll">
+        <table id="memberRecapTable">
+          <thead>
+            <tr>
+              <th>Bulan</th><th class="num">Member Baru</th><th class="num">Kumulatif Member</th>
+              <th class="num">% dari Total</th><th class="num">Member Transaksi*</th><th class="num">Total Order</th><th class="num">Revenue</th><th class="num">Pengeluaran Bulan Ini&dagger;</th><th class="num">Rata-rata/Order</th><th class="num">Rekap Poin</th><th class="num">Jumlah Redeem**</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot></tfoot>
+        </table>
+      </div>
+      <p class="foot">*Member Transaksi = proksi dari Last Visit (bukan log bulanan penuh). **Jumlah Redeem = total kali reward ditukar oleh kohort member bulan itu (lifetime, bukan tanggal redeem asli karena tidak ada di sumber data) &mdash; 203x dari total 204x lifetime (1x dari member pra-2026 tidak tampil di tabel). &dagger;Pengeluaran Bulan Ini = total "Amount This Month" (snapshot pengeluaran September 2026) milik kohort member bulan itu, bukan pengeluaran historis di bulan tersebut.</p>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Resensi Kunjungan (Recency)</h2>
+      <p class="desc">Lama sejak kunjungan terakhir &mdash; makin merah, makin berisiko churn.</p>
+      <svg id="chartRecency" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="foot">1.018 pelanggan (43%) belum kembali &gt;60 hari &mdash; kandidat kampanye win-back.</p>
+    </div>
+    <div class="card">
+      <h2>Frekuensi Order</h2>
+      <p class="desc">Jumlah pelanggan menurut total order lifetime.</p>
+      <svg id="chartFreq" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="foot">57,6% pelanggan baru order 1x &mdash; peluang terbesar ada di konversi ke order kedua.</p>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Konsentrasi Revenue (Kurva Pareto)</h2>
+      <p class="desc">% kumulatif revenue vs % kumulatif pelanggan (spender terbesar dulu), vs garis "merata".</p>
+      <svg id="chartPareto" viewBox="0 0 560 320" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="card">
+      <h2>Segmen Pelanggan</h2>
+      <p class="desc">Pangsa pelanggan vs pangsa revenue per segmen.</p>
+      <div class="legend">
+        <span><i style="background:var(--blue)"></i>% jumlah pelanggan</span>
+        <span><i style="background:var(--accent)"></i>% revenue lifetime</span>
+      </div>
+      <svg id="chartSegment" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Sebaran Saldo Poin</h2>
+      <p class="desc">Saldo poin member aktif saat ini (424 non-member tidak termasuk).</p>
+      <svg id="chartPoints" viewBox="0 0 560 260" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+    <div class="card">
+      <h2>Pemakaian Reward</h2>
+      <p class="desc">Reward yang sudah ditukar (redeem) oleh member.</p>
+      <div id="redeemStat"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card full">
+      <h2>Top 20 Pelanggan (Revenue Lifetime)</h2>
+      <p class="desc">20 pelanggan dengan revenue lifetime tertinggi.</p>
+      <div class="table-scroll">
+        <table id="topTable">
+          <thead>
+            <tr>
+              <th>#</th><th>Nama</th><th>No. Telp</th><th>Member Sejak</th><th class="num">Order</th><th class="num">Revenue Lifetime</th>
+              <th class="num">Rata-rata/Order</th><th class="num">Poin</th><th>Kunjungan Terakhir</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="foot">*No. Telp tersimpan dalam notasi ilmiah di sumber (mis. 6.28123E+11) &mdash; sebagian digit hilang, jangan dipakai tanpa verifikasi ulang.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <h3>Catatan kualitas data &amp; metodologi</h3>
+    <ul>
+      <li>Email, Phone, Birthday, Sex, Address, City hampir semua kosong (&gt;95%) &mdash; belum bisa analisis per demografi/lokasi.</li>
+      <li>Tag lokasi manual di nama ("Untar", "Tunjungan") hanya ~5% baris &mdash; tidak dipakai, tidak konsisten.</li>
+      <li>Format tanggal campuran (dd/mm/yyyy &amp; dd-mm-yyyy) sudah dinormalisasi.</li>
+      <li>Recency &amp; segmentasi dihitung relatif terhadap 22 September 2026.</li>
+      <li>424 baris tanpa Member Since/saldo poin &mdash; dianggap belum jadi member poin, dikeluarkan dari analisis poin.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  "as_of": "2026-09-22",
+  "kpi": {
+    "n_total": 2397,
+    "n_members": 1973,
+    "n_guests": 424,
+    "total_lifetime": 217635035.0,
+    "total_orders": 6941.0,
+    "avg_order_value": 31354.997118570813,
+    "avg_lifetime_per_cust": 90794.75803087192,
+    "points_outstanding": 123351.0,
+    "n_redeemers": 152,
+    "redemption_rate": 0.07704004054738976,
+    "total_redemptions": 204.0,
+    "active_month": 706,
+    "amt_month_total": 47206975.0
+  },
+  "trend": [
+    {
+      "month": "2026-01",
+      "customers": 1,
+      "members": 0
+    },
+    {
+      "month": "2026-02",
+      "customers": 91,
+      "members": 0
+    },
+    {
+      "month": "2026-03",
+      "customers": 1,
+      "members": 0
+    },
+    {
+      "month": "2026-04",
+      "customers": 1,
+      "members": 0
+    },
+    {
+      "month": "2026-05",
+      "customers": 35,
+      "members": 36
+    },
+    {
+      "month": "2026-06",
+      "customers": 1023,
+      "members": 959
+    },
+    {
+      "month": "2026-07",
+      "customers": 535,
+      "members": 437
+    },
+    {
+      "month": "2026-08",
+      "customers": 362,
+      "members": 294
+    },
+    {
+      "month": "2026-09",
+      "customers": 346,
+      "members": 247
+    }
+  ],
+  "recency": [
+    {
+      "bucket": "0-7 hari",
+      "count": 369
+    },
+    {
+      "bucket": "8-14 hari",
+      "count": 176
+    },
+    {
+      "bucket": "15-30 hari",
+      "count": 307
+    },
+    {
+      "bucket": "31-60 hari",
+      "count": 455
+    },
+    {
+      "bucket": "61-90 hari",
+      "count": 462
+    },
+    {
+      "bucket": ">90 hari",
+      "count": 556
+    },
+    {
+      "bucket": "Belum ada data",
+      "count": 72
+    }
+  ],
+  "freq": [
+    {
+      "bucket": "0 (belum order)",
+      "count": 72
+    },
+    {
+      "bucket": "1x",
+      "count": 1381
+    },
+    {
+      "bucket": "2-3x",
+      "count": 519
+    },
+    {
+      "bucket": "4-5x",
+      "count": 155
+    },
+    {
+      "bucket": "6-10x",
+      "count": 152
+    },
+    {
+      "bucket": "11x+",
+      "count": 118
+    }
+  ],
+  "points": [
+    {
+      "bucket": "0",
+      "count": 0
+    },
+    {
+      "bucket": "1-25",
+      "count": 59
+    },
+    {
+      "bucket": "26-50",
+      "count": 33
+    },
+    {
+      "bucket": "51-75",
+      "count": 1626
+    },
+    {
+      "bucket": "76-100",
+      "count": 170
+    },
+    {
+      "bucket": "101-150",
+      "count": 69
+    },
+    {
+      "bucket": "150+",
+      "count": 16
+    }
+  ],
+  "points_no_data": 424,
+  "segments": [
+    {
+      "segment": "Member Baru (<30 hari)",
+      "count": 322,
+      "revenue": 18999147.5,
+      "pct_count": 13.433458489778891,
+      "pct_revenue": 8.729820315924778
+    },
+    {
+      "segment": "One-timer",
+      "count": 1147,
+      "revenue": 41140630.0,
+      "pct_count": 47.85148101793909,
+      "pct_revenue": 18.903495937591114
+    },
+    {
+      "segment": "Repeat (2-5x)",
+      "count": 492,
+      "revenue": 46050082.5,
+      "pct_count": 20.52565707133917,
+      "pct_revenue": 21.159314951289897
+    },
+    {
+      "segment": "Loyal (6x+)",
+      "count": 259,
+      "revenue": 102247175.0,
+      "pct_count": 10.80517313308302,
+      "pct_revenue": 46.98102720455831
+    },
+    {
+      "segment": "At-risk / Churn",
+      "count": 105,
+      "revenue": 9198000.0,
+      "pct_count": 4.380475594493117,
+      "pct_revenue": 4.226341590635901
+    },
+    {
+      "segment": "Belum Order",
+      "count": 72,
+      "revenue": 0.0,
+      "pct_count": 3.0037546933667083,
+      "pct_revenue": 0.0
+    }
+  ],
+  "pareto": [
+    {
+      "x": 0,
+      "y": 0
+    },
+    {
+      "x": 5,
+      "y": 34.8912526882448
+    },
+    {
+      "x": 10,
+      "y": 48.31340574370299
+    },
+    {
+      "x": 15,
+      "y": 57.2064212914984
+    },
+    {
+      "x": 20,
+      "y": 63.724016218252736
+    },
+    {
+      "x": 25,
+      "y": 69.0552534429946
+    },
+    {
+      "x": 30,
+      "y": 73.59876363656247
+    },
+    {
+      "x": 35,
+      "y": 77.55651336192263
+    },
+    {
+      "x": 40,
+      "y": 80.90454507933431
+    },
+    {
+      "x": 45,
+      "y": 83.81566644359444
+    },
+    {
+      "x": 50,
+      "y": 86.40677499374124
+    },
+    {
+      "x": 55,
+      "y": 88.77589722628989
+    },
+    {
+      "x": 60,
+      "y": 90.90062866027063
+    },
+    {
+      "x": 65,
+      "y": 92.80429734118866
+    },
+    {
+      "x": 70,
+      "y": 94.49268358837537
+    },
+    {
+      "x": 75,
+      "y": 95.94185283633216
+    },
+    {
+      "x": 80,
+      "y": 97.20778871839269
+    },
+    {
+      "x": 85,
+      "y": 98.30434929743733
+    },
+    {
+      "x": 90,
+      "y": 99.25069509144059
+    },
+    {
+      "x": 95,
+      "y": 99.95588945502271
+    },
+    {
+      "x": 100,
+      "y": 100.0
+    }
+  ],
+  "top_spenders": [
+    {
+      "name": "Ai",
+      "phone": "+62 85160000000",
+      "member_since": "05 Jun 2026",
+      "orders": 56,
+      "lifetime": 4272850.0,
+      "avg": 76300.89286,
+      "points": 236.0,
+      "last_visit": "22 Sep 2026",
+      "recency": 0
+    },
+    {
+      "name": "pujiono",
+      "phone": "+62 811332585",
+      "member_since": "30 Jul 2026",
+      "orders": 9,
+      "lifetime": 2376000.0,
+      "avg": 264000.0,
+      "points": null,
+      "last_visit": "18 Sep 2026",
+      "recency": 4
+    },
+    {
+      "name": "rini",
+      "phone": "+62 81930000000",
+      "member_since": "04 Jun 2026",
+      "orders": 32,
+      "lifetime": 1698670.0,
+      "avg": 53083.4375,
+      "points": 292.0,
+      "last_visit": "22 Sep 2026",
+      "recency": 0
+    },
+    {
+      "name": "Vera Untar",
+      "phone": "+62 8122000000",
+      "member_since": "03 Jun 2026",
+      "orders": 47,
+      "lifetime": 1657590.0,
+      "avg": 35267.87234,
+      "points": 153.0,
+      "last_visit": "22 Sep 2026",
+      "recency": 0
+    },
+    {
+      "name": "Fattah Untar",
+      "phone": "+62 881000000000",
+      "member_since": "29 May 2026",
+      "orders": 53,
+      "lifetime": 1600520.0,
+      "avg": 30198.49057,
+      "points": 28.0,
+      "last_visit": "21 Sep 2026",
+      "recency": 1
+    },
+    {
+      "name": "Ariz Untar",
+      "phone": "+62 82120000000",
+      "member_since": "02 Jun 2026",
+      "orders": 60,
+      "lifetime": 1530730.0,
+      "avg": 25512.16667,
+      "points": 153.0,
+      "last_visit": "22 Sep 2026",
+      "recency": 0
+    },
+    {
+      "name": "Meli",
+      "phone": "+62 81510000000",
+      "member_since": "10 Jun 2026",
+      "orders": 63,
+      "lifetime": 1515600.0,
+      "avg": 24057.14286,
+      "points": 80.0,
+      "last_visit": "22 Sep 2026",
+      "recency": 0
+    },
+    {
+      "name": "Awan",
+      "phone": "+62 85350000000",
+      "member_since": "02 Jun 2026",
+      "orders": 28,
+      "lifetime": 1357330.0,
+      "avg": 48476.07143,
+      "points": 183.0,
+      "last_visit": "22 Sep 2026",
+      "recency": 0
+    },
+    {
+      "name": "Icha",
+      "phone": "+62 83870000000",
+      "member_since": "04 Feb 2026",
+      "orders": 18,
+      "lifetime": 1324500.0,
+      "avg": 73583.33333,
+      "points": null,
+      "last_visit": "04 Sep 2026",
+      "recency": 18
+    },
+    {
+      "name": "bunga",
+      "phone": "+62 85220000000",
+      "member_since": "24 Jun 2026",
+      "orders": 8,
+      "lifetime": 1154460.0,
+      "avg": 144307.5,
+      "points": 157.0,
+      "last_visit": "12 Sep 2026",
+      "recency": 10
+    },
+    {
+      "name": "Bimo Untar",
+      "phone": "+62 81260000000",
+      "member_since": "08 Jun 2026",
+      "orders": 44,
+      "lifetime": 1097650.0,
+      "avg": 24946.59091,
+      "points": 29.0,
+      "last_visit": "09 Sep 2026",
+      "recency": 13
+    },
+    {
+      "name": "sadam",
+      "phone": "+62 89650000000",
+      "member_since": "06 Jun 2026",
+      "orders": 23,
+      "lifetime": 984750.0,
+      "avg": 42815.21739,
+      "points": 17.0,
+      "last_visit": "21 Sep 2026",
+      "recency": 1
+    },
+    {
+      "name": "Gilberto Arickson Untar",
+      "phone": "+62 81300000000",
+      "member_since": "29 May 2026",
+      "orders": 35,
+      "lifetime": 961330.0,
+      "avg": 27466.57143,
+      "points": 45.0,
+      "last_visit": "21 Sep 2026",
+      "recency": 1
+    },
+    {
+      "name": "Tiwi",
+      "phone": "+62 81900000000",
+      "member_since": "11 Jun 2026",
+      "orders": 24,
+      "lifetime": 956100.0,
+      "avg": 39837.5,
+      "points": 119.0,
+      "last_visit": "12 Sep 2026",
+      "recency": 10
+    },
+    {
+      "name": "junita",
+      "phone": "+62 85270000000",
+      "member_since": "04 Jun 2026",
+      "orders": 32,
+      "lifetime": 910300.0,
+      "avg": 28446.875,
+      "points": 94.0,
+      "last_visit": "21 Sep 2026",
+      "recency": 1
+    },
+    {
+      "name": "Aci",
+      "phone": "+62 87780000000",
+      "member_since": "01 Jun 2026",
+      "orders": 27,
+      "lifetime": 882500.0,
+      "avg": 32685.18519,
+      "points": 139.0,
+      "last_visit": "17 Sep 2026",
+      "recency": 5
+    },
+    {
+      "name": "odil",
+      "phone": "+62 87850000000",
+      "member_since": "15 Jun 2026",
+      "orders": 38,
+      "lifetime": 877000.0,
+      "avg": 23078.94737,
+      "points": 151.0,
+      "last_visit": "18 Sep 2026",
+      "recency": 4
+    },
+    {
+      "name": "Halim",
+      "phone": "+62 85780000000",
+      "member_since": "31 May 2026",
+      "orders": 38,
+      "lifetime": 820740.0,
+      "avg": 21598.42105,
+      "points": 83.0,
+      "last_visit": "19 Sep 2026",
+      "recency": 3
+    },
+    {
+      "name": "Ai",
+      "phone": "+62 8512000000",
+      "member_since": "03 Jun 2026",
+      "orders": 8,
+      "lifetime": 792900.0,
+      "avg": 99112.5,
+      "points": 33.0,
+      "last_visit": "20 Jun 2026",
+      "recency": 94
+    },
+    {
+      "name": "Raffen Kusuma Untar",
+      "phone": "+62 895600000000",
+      "member_since": "03 Jun 2026",
+      "orders": 40,
+      "lifetime": 764250.0,
+      "avg": 19106.25,
+      "points": 16.0,
+      "last_visit": "21 Sep 2026",
+      "recency": 1
+    }
+  ],
+  "n_total": 2397,
+  "member_recap": [
+    {
+      "month": "2026-01",
+      "members": 1,
+      "revenue": 147250.0,
+      "aov": 147250.0,
+      "points": 79.0,
+      "cum_members": 3,
+      "cum_revenue": 492200.0,
+      "cum_points": 163.0,
+      "active_members": 0,
+      "redeemed": 0,
+      "orders": 1,
+      "amt_this_month": 147250.0
+    },
+    {
+      "month": "2026-02",
+      "members": 91,
+      "revenue": 8530430.0,
+      "aov": 37913.02222222222,
+      "points": 1555.0,
+      "cum_members": 94,
+      "cum_revenue": 9022630.0,
+      "cum_points": 1718.0,
+      "active_members": 45,
+      "redeemed": 1,
+      "orders": 225,
+      "amt_this_month": 942600.0
+    },
+    {
+      "month": "2026-03",
+      "members": 1,
+      "revenue": 53000.0,
+      "aov": 26500.0,
+      "points": 0.0,
+      "cum_members": 95,
+      "cum_revenue": 9075630.0,
+      "cum_points": 1718.0,
+      "active_members": 1,
+      "redeemed": 0,
+      "orders": 2,
+      "amt_this_month": 0.0
+    },
+    {
+      "month": "2026-04",
+      "members": 1,
+      "revenue": 83500.0,
+      "aov": 20875.0,
+      "points": 0.0,
+      "cum_members": 96,
+      "cum_revenue": 9159130.0,
+      "cum_points": 1718.0,
+      "active_members": 0,
+      "redeemed": 0,
+      "orders": 4,
+      "amt_this_month": 0.0
+    },
+    {
+      "month": "2026-05",
+      "members": 35,
+      "revenue": 9818810.0,
+      "aov": 31170.825396825396,
+      "points": 2512.0,
+      "cum_members": 131,
+      "cum_revenue": 18977940.0,
+      "cum_points": 4230.0,
+      "active_members": 9,
+      "redeemed": 17,
+      "orders": 315,
+      "amt_this_month": 1425750.0
+    },
+    {
+      "month": "2026-06",
+      "members": 1023,
+      "revenue": 123822150.0,
+      "aov": 29168.939929328622,
+      "points": 62413.0,
+      "cum_members": 1154,
+      "cum_revenue": 142800090.0,
+      "cum_points": 66643.0,
+      "active_members": 602,
+      "redeemed": 138,
+      "orders": 4245,
+      "amt_this_month": 18107350.0
+    },
+    {
+      "month": "2026-07",
+      "members": 535,
+      "revenue": 35350945.0,
+      "aov": 33991.293269230766,
+      "points": 26494.0,
+      "cum_members": 1689,
+      "cum_revenue": 178151035.0,
+      "cum_points": 93137.0,
+      "active_members": 489,
+      "redeemed": 22,
+      "orders": 1040,
+      "amt_this_month": 4073625.0
+    },
+    {
+      "month": "2026-08",
+      "members": 362,
+      "revenue": 21801412.5,
+      "aov": 34118.01643192488,
+      "points": 16438.0,
+      "cum_members": 2051,
+      "cum_revenue": 199952447.5,
+      "cum_points": 109575.0,
+      "active_members": 470,
+      "redeemed": 13,
+      "orders": 639,
+      "amt_this_month": 4817362.5
+    },
+    {
+      "month": "2026-09",
+      "members": 346,
+      "revenue": 17682587.5,
+      "aov": 38440.407608695656,
+      "points": 13776.0,
+      "cum_members": 2397,
+      "cum_revenue": 217635035.0,
+      "cum_points": 123351.0,
+      "active_members": 709,
+      "redeemed": 12,
+      "orders": 460,
+      "amt_this_month": 17682587.5
+    }
+  ]
+};
+
+function fmtIDR(n){
+  if(n==null) return '-';
+  return 'Rp' + Math.round(n).toLocaleString('id-ID');
+}
+function fmtIDRShort(n){
+  if(n==null) return '-';
+  const abs = Math.abs(n);
+  if(abs>=1e12) return 'Rp'+(n/1e12).toLocaleString('id-ID',{maximumFractionDigits:1})+' T';
+  if(abs>=1e9) return 'Rp'+(n/1e9).toLocaleString('id-ID',{maximumFractionDigits:1})+' M';
+  if(abs>=1e6) return 'Rp'+(n/1e6).toLocaleString('id-ID',{maximumFractionDigits:1})+' Jt';
+  if(abs>=1e3) return 'Rp'+(n/1e3).toLocaleString('id-ID',{maximumFractionDigits:1})+' Rb';
+  return fmtIDR(n);
+}
+function fmtNum(n){ if(n==null) return '-'; return Math.round(n).toLocaleString('id-ID'); }
+function fmtPct(n,d=1){ return n.toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}) + '%'; }
+
+const tt = document.getElementById('tooltip');
+function showTip(evt, title, lines){
+  tt.innerHTML = '<div class="tt-title">'+title+'</div>' + lines.map(l=>'<div>'+l+'</div>').join('');
+  tt.classList.add('show');
+  moveTip(evt);
+}
+function moveTip(evt){
+  const pad = 14;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  const rect = tt.getBoundingClientRect();
+  if(x + rect.width > window.innerWidth - 8) x = evt.clientX - rect.width - pad;
+  if(y + rect.height > window.innerHeight - 8) y = evt.clientY - rect.height - pad;
+  tt.style.left = x+'px'; tt.style.top = y+'px';
+}
+function hideTip(){ tt.classList.remove('show'); }
+
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs){
+  const e = document.createElementNS(NS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function niceMax(v){
+  if(v<=0) return 10;
+  const mag = Math.pow(10, Math.floor(Math.log10(v)));
+  const n = v/mag;
+  let f;
+  if(n<=1) f=1; else if(n<=2) f=2; else if(n<=5) f=5; else f=10;
+  return f*mag;
+}
+
+/* ---------- KPI TILES ---------- */
+function renderKPI(){
+  const k = DATA.kpi;
+  const tiles = [
+    {label:'Total Pelanggan', value: fmtNum(k.n_total), sub: k.n_members+' member poin &middot; '+k.n_guests+' belum daftar poin', accent:true},
+    {label:'Revenue Lifetime', value: fmtIDRShort(k.total_lifetime), sub: 'dari '+fmtNum(k.total_orders)+' order tercatat'},
+    {label:'Rata-rata / Order', value: fmtIDR(k.avg_order_value), sub: 'AOV seluruh transaksi'},
+    {label:'Revenue / Pelanggan', value: fmtIDR(k.avg_lifetime_per_cust), sub: 'rata-rata lifetime value'},
+    {label:'Aktif Bulan Ini', value: fmtNum(k.active_month), sub: fmtIDR(k.amt_month_total)+' revenue Sep 2026'},
+    {label:'Poin Beredar', value: fmtNum(k.points_outstanding)+' pts', sub: 'liability program, belum ditukar'},
+    {label:'Tingkat Redemption', value: fmtPct(k.redemption_rate*100), sub: k.n_redeemers+' dari '+k.n_members+' member pernah redeem'},
+  ];
+  const grid = document.getElementById('kpiGrid');
+  tiles.forEach(t=>{
+    const d = document.createElement('div');
+    d.className = 'kpi'+(t.accent?' accent':'');
+    d.innerHTML = '<div class="label">'+t.label+'</div><div class="value num">'+t.value+'</div><div class="sub">'+t.sub+'</div>';
+    grid.appendChild(d);
+  });
+}
+
+/* ---------- GROUPED BAR: growth trend ---------- */
+function renderTrend(){
+  const svg = document.getElementById('chartTrend');
+  const W=1000,H=320, ml=48, mr=14, mt=28, mb=36;
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const data = DATA.trend;
+  const maxV = niceMax(Math.max(...data.map(d=>Math.max(d.customers,d.members)))*1.2);
+  const n = data.length;
+  const groupW = iw/n;
+  const barW = Math.min(26, groupW*0.34);
+  const gap = 3;
+
+  // gridlines + y labels
+  const steps=4;
+  for(let s=0;s<=steps;s++){
+    const v = maxV*s/steps;
+    const y = mt + ih - (v/maxV)*ih;
+    svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:y,y2:y}));
+    const t = el('text',{class:'axis-text',x:ml-8,y:y+3,'text-anchor':'end'});
+    t.textContent = Math.round(v).toLocaleString('id-ID');
+    svg.appendChild(t);
+  }
+  const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  data.forEach((d,i)=>{
+    const gx = ml + i*groupW;
+    const cx1 = gx + groupW/2 - barW - gap/2;
+    const cx2 = gx + groupW/2 + gap/2;
+    const h1 = (d.customers/maxV)*ih, h2=(d.members/maxV)*ih;
+    const y1 = mt+ih-Math.max(h1,d.customers>0?1:0), y2 = mt+ih-Math.max(h2,d.members>0?1:0);
+    const b1 = el('rect',{class:'mark',x:cx1,y:y1,width:barW,height:Math.max(h1,d.customers>0?1:0),rx:3,fill:'var(--blue)'});
+    const b2 = el('rect',{class:'mark',x:cx2,y:y2,width:barW,height:Math.max(h2,d.members>0?1:0),rx:3,fill:'var(--accent)'});
+    [[b1,'Pelanggan baru',d.customers],[b2,'Member terdaftar',d.members]].forEach(([b,label,val])=>{
+      b.addEventListener('pointerenter', e=>showTip(e, monthLabel(d.month), [label+': <b>'+fmtNum(val)+'</b>']));
+      b.addEventListener('pointermove', moveTip);
+      b.addEventListener('pointerleave', hideTip);
+    });
+    svg.appendChild(b1); svg.appendChild(b2);
+    if(d.customers>0){
+      const l1 = el('text',{class:'value-label',x:cx1+barW/2,y:y1-6,'text-anchor':'middle'});
+      l1.textContent = fmtNum(d.customers);
+      svg.appendChild(l1);
+    }
+    if(d.members>0){
+      const l2 = el('text',{class:'value-label',x:cx2+barW/2,y:y2-6,'text-anchor':'middle'});
+      l2.textContent = fmtNum(d.members);
+      svg.appendChild(l2);
+    }
+    const lbl = el('text',{class:'axis-text',x:gx+groupW/2,y:H-mb+16,'text-anchor':'middle'});
+    const mo = d.month.split('-')[1];
+    lbl.textContent = monthNames[parseInt(mo,10)-1];
+    svg.appendChild(lbl);
+  });
+  svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:mt+ih,y2:mt+ih,stroke:'var(--axis)'}));
+}
+
+/* ---------- LINE+AREA: cumulative member growth ---------- */
+function renderMemberGrowth(){
+  const svg = document.getElementById('chartMemberGrowth');
+  const W=560,H=300, ml=50, mr=48, mt=26, mb=34;
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const data = DATA.member_recap;
+  const n = data.length;
+  const maxV = niceMax(data[n-1].cum_members*1.15);
+  const stepX = n>1 ? iw/(n-1) : 0;
+  const xAt = i => ml + i*stepX;
+  const yAt = v => mt + ih - (v/maxV)*ih;
+
+  const steps=4;
+  for(let s=0;s<=steps;s++){
+    const v = maxV*s/steps;
+    const y = mt + ih - (v/maxV)*ih;
+    svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:y,y2:y}));
+    const t = el('text',{class:'axis-text',x:ml-8,y:y+3,'text-anchor':'end'});
+    t.textContent = Math.round(v).toLocaleString('id-ID');
+    svg.appendChild(t);
+  }
+
+  const linePts = data.map((d,i)=>xAt(i)+','+yAt(d.cum_members)).join(' L ');
+  const areaPts = data.map((d,i)=>xAt(i)+','+yAt(d.cum_members)).join(' L ');
+  const areaD = 'M '+xAt(0)+','+yAt(0)+' L '+areaPts+' L '+xAt(n-1)+','+(mt+ih)+' L '+xAt(0)+','+(mt+ih)+' Z';
+  svg.appendChild(el('path',{d:areaD, fill:'var(--blue)', 'fill-opacity':'0.10', stroke:'none'}));
+  svg.appendChild(el('path',{d:'M '+linePts, fill:'none', stroke:'var(--blue)', 'stroke-width':2, 'stroke-linejoin':'round', 'stroke-linecap':'round'}));
+
+  data.forEach((d,i)=>{
+    const x = xAt(i), y = yAt(d.cum_members);
+    const dot = el('circle',{class:'mark', cx:x, cy:y, r:5, fill:'var(--surface)', stroke:'var(--blue)', 'stroke-width':2});
+    dot.addEventListener('pointerenter', e=>showTip(e, monthLabel(d.month), [
+      'Kumulatif member: <b>'+fmtNum(d.cum_members)+'</b>',
+      'Member baru bulan ini: <b>'+fmtNum(d.members)+'</b>'
+    ]));
+    dot.addEventListener('pointermove', moveTip);
+    dot.addEventListener('pointerleave', hideTip);
+    svg.appendChild(dot);
+    const above = y-10 > mt;
+    const vlab = el('text',{class:'value-label',x:x,y: above? y-10 : y+16,'text-anchor':'middle'});
+    if(i===n-1){ vlab.setAttribute('font-weight','700'); vlab.setAttribute('font-size','12'); }
+    vlab.textContent = fmtNum(d.cum_members);
+    svg.appendChild(vlab);
+    const lbl = el('text',{class:'axis-text',x:x,y:H-mb+15,'text-anchor':'middle'});
+    lbl.textContent = monthLabel(d.month).slice(0,3);
+    svg.appendChild(lbl);
+  });
+
+  svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:mt+ih,y2:mt+ih,stroke:'var(--axis)'}));
+}
+
+/* ---------- LINE: rata-rata order (AOV) per bulan, per kohort ---------- */
+function renderAov(){
+  const svg = document.getElementById('chartAov');
+  const W=560,H=300, ml=50, mr=48, mt=26, mb=34;
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const data = DATA.member_recap;
+  const n = data.length;
+  const maxV = niceMax(Math.max(...data.map(d=>d.aov))*1.25);
+  const stepX = n>1 ? iw/(n-1) : 0;
+  const xAt = i => ml + i*stepX;
+  const yAt = v => mt + ih - (v/maxV)*ih;
+
+  const steps=4;
+  for(let s=0;s<=steps;s++){
+    const v = maxV*s/steps;
+    const y = mt + ih - (v/maxV)*ih;
+    svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:y,y2:y}));
+    const t = el('text',{class:'axis-text',x:ml-8,y:y+3,'text-anchor':'end'});
+    t.textContent = fmtIDRShort(v);
+    svg.appendChild(t);
+  }
+
+  const linePts = data.map((d,i)=>xAt(i)+','+yAt(d.aov)).join(' L ');
+  svg.appendChild(el('path',{d:'M '+linePts, fill:'none', stroke:'var(--accent)', 'stroke-width':2, 'stroke-linejoin':'round', 'stroke-linecap':'round'}));
+
+  data.forEach((d,i)=>{
+    const x = xAt(i), y = yAt(d.aov);
+    const dot = el('circle',{class:'mark', cx:x, cy:y, r:5, fill:'var(--surface)', stroke:'var(--accent)', 'stroke-width':2});
+    dot.addEventListener('pointerenter', e=>showTip(e, monthLabel(d.month), [
+      'Rata-rata order: <b>'+fmtIDR(d.aov)+'</b>',
+      'Kohort member: <b>'+fmtNum(d.members)+'</b> orang'
+    ]));
+    dot.addEventListener('pointermove', moveTip);
+    dot.addEventListener('pointerleave', hideTip);
+    svg.appendChild(dot);
+    const above = y-10 > mt;
+    const vlab = el('text',{class:'value-label',x:x,y: above? y-10 : y+16,'text-anchor':'middle'});
+    if(i===n-1){ vlab.setAttribute('font-weight','700'); vlab.setAttribute('font-size','12'); }
+    vlab.textContent = fmtIDRShort(d.aov);
+    svg.appendChild(vlab);
+    const lbl = el('text',{class:'axis-text',x:x,y:H-mb+15,'text-anchor':'middle'});
+    lbl.textContent = monthLabel(d.month).slice(0,3);
+    svg.appendChild(lbl);
+  });
+
+  svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:mt+ih,y2:mt+ih,stroke:'var(--axis)'}));
+}
+
+/* ---------- BAR: generic monthly kohort bar chart ---------- */
+function renderMonthlyBar(svgId, key, opts={}){
+  const svg = document.getElementById(svgId);
+  const W=560,H=300, ml=50, mr=14, mt=26, mb=34;
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const data = DATA.member_recap;
+  const n = data.length;
+  const maxV = niceMax(Math.max(...data.map(d=>d[key]))*1.22);
+  const groupW = iw/n;
+  const barW = Math.min(34, groupW*0.55);
+  const labelFmt = opts.labelFmt || opts.valueFmt || fmtNum;
+
+  const steps=4;
+  for(let s=0;s<=steps;s++){
+    const v = maxV*s/steps;
+    const y = mt + ih - (v/maxV)*ih;
+    svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:y,y2:y}));
+    const t = el('text',{class:'axis-text',x:ml-8,y:y+3,'text-anchor':'end'});
+    t.textContent = opts.axisFmt ? opts.axisFmt(v) : fmtNum(v);
+    svg.appendChild(t);
+  }
+
+  data.forEach((d,i)=>{
+    const gx = ml + i*groupW + groupW/2 - barW/2;
+    const v = d[key];
+    const h = (v/maxV)*ih;
+    const bar = el('rect',{class:'mark',x:gx,y:mt+ih-h,width:barW,height:Math.max(h,v>0?1:0),rx:3,fill:opts.color||'var(--blue)'});
+    bar.addEventListener('pointerenter', e=>showTip(e, monthLabel(d.month), [(opts.tipLabel||'Nilai')+': <b>'+(opts.valueFmt?opts.valueFmt(v):fmtNum(v))+'</b>']));
+    bar.addEventListener('pointermove', moveTip);
+    bar.addEventListener('pointerleave', hideTip);
+    svg.appendChild(bar);
+    if(v>0){
+      const barTop = mt+ih-Math.max(h,1);
+      const vlab = el('text',{class:'value-label',x:ml+i*groupW+groupW/2,y:Math.max(barTop-6, mt+9),'text-anchor':'middle'});
+      vlab.textContent = labelFmt(v);
+      svg.appendChild(vlab);
+    }
+    const lbl = el('text',{class:'axis-text',x:ml+i*groupW+groupW/2,y:H-mb+15,'text-anchor':'middle'});
+    lbl.textContent = monthLabel(d.month).slice(0,3);
+    svg.appendChild(lbl);
+  });
+
+  svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:mt+ih,y2:mt+ih,stroke:'var(--axis)'}));
+}
+
+function monthLabel(m){
+  const names=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const [y,mo] = m.split('-');
+  return names[parseInt(mo,10)-1]+' '+y;
+}
+
+/* ---------- HORIZONTAL BAR (generic) ---------- */
+function renderHBar(svgId, items, opts={}){
+  const svg = document.getElementById(svgId);
+  const W = svg.viewBox.baseVal.width || 560;
+  const H = svg.viewBox.baseVal.height || 300;
+  const ml = opts.labelWidth || 96, mr = opts.valueWidth || 56, mt = 8, mb = 8;
+  const iw = W-ml-mr, ih = H-mt-mb;
+  const n = items.length;
+  const gap = 10;
+  const barH = (ih - gap*(n-1))/n;
+  const maxV = niceMax(Math.max(...items.map(d=>d.value)) * 1.08);
+  items.forEach((d,i)=>{
+    const y = mt + i*(barH+gap);
+    const w = Math.max((d.value/maxV)*iw, d.value>0?2:0);
+    const lbl = el('text',{class:'axis-text',x:ml-10,y:y+barH/2+4,'text-anchor':'end'});
+    lbl.textContent = d.label;
+    svg.appendChild(lbl);
+    const track = el('rect',{x:ml,y:y,width:iw,height:barH,rx:barH/2,fill:'var(--grid)'});
+    svg.appendChild(track);
+    const bar = el('rect',{class:'mark',x:ml,y:y,width:w,height:barH,rx:barH/2,fill:d.color});
+    svg.appendChild(bar);
+    const vlab = el('text',{class:'value-label',x:ml+w+8,y:y+barH/2+4});
+    vlab.textContent = d.valueLabel!==undefined? d.valueLabel : fmtNum(d.value);
+    svg.appendChild(vlab);
+    bar.addEventListener('pointerenter', e=>showTip(e, d.label, [(d.tip||'Jumlah')+': <b>'+fmtNum(d.value)+'</b>'+(d.tipExtra?('<br>'+d.tipExtra):'')]));
+    bar.addEventListener('pointermove', moveTip);
+    bar.addEventListener('pointerleave', hideTip);
+  });
+}
+
+function renderRecency(){
+  const seq = [
+    {bucket:'0-7 hari', color:'var(--good)'},
+    {bucket:'8-14 hari', color:'var(--good)'},
+    {bucket:'15-30 hari', color:'var(--yellow)'},
+    {bucket:'31-60 hari', color:'var(--warning)'},
+    {bucket:'61-90 hari', color:'var(--serious)'},
+    {bucket:'>90 hari', color:'var(--critical)'},
+    {bucket:'Belum ada data', color:'var(--muted)'},
+  ];
+  const total = DATA.n_total;
+  const items = DATA.recency.map(r=>{
+    const s = seq.find(x=>x.bucket===r.bucket);
+    return {label:r.bucket, value:r.count, color:s.color, tip:'Pelanggan',
+      valueLabel: fmtNum(r.count)+' ('+fmtPct(r.count/total*100)+')',
+      tipExtra: fmtPct(r.count/total*100)+' dari total pelanggan'};
+  });
+  renderHBar('chartRecency', items, {labelWidth:92, valueWidth:96});
+}
+
+function renderFreq(){
+  const colors = ['var(--seq-1)','var(--seq-2)','var(--seq-3)','var(--seq-4)','var(--seq-5)','var(--seq-6)'];
+  const total = DATA.n_total;
+  const items = DATA.freq.map((r,i)=>({label:r.bucket, value:r.count, color:colors[i], tip:'Pelanggan',
+    valueLabel: fmtNum(r.count)+' ('+fmtPct(r.count/total*100)+')',
+    tipExtra: fmtPct(r.count/total*100)+' dari total pelanggan'}));
+  renderHBar('chartFreq', items, {labelWidth:104, valueWidth:104});
+}
+
+function renderPoints(){
+  const colors = ['var(--seq-1)','var(--seq-1)','var(--seq-2)','var(--seq-3)','var(--seq-4)','var(--seq-5)','var(--seq-6)'];
+  const base = DATA.kpi.n_members;
+  const items = DATA.points.filter(p=>p.bucket!=='0').map((r,i)=>({label:r.bucket+' pts', value:r.count, color:colors[i+1], tip:'Member',
+    valueLabel: fmtNum(r.count)+' ('+fmtPct(r.count/base*100)+')',
+    tipExtra: fmtPct(r.count/base*100)+' dari member berpoin'}));
+  renderHBar('chartPoints', items, {labelWidth:80, valueWidth:96});
+}
+
+/* ---------- SEGMENT paired bars ---------- */
+function renderSegment(){
+  const svg = document.getElementById('chartSegment');
+  const W=560,H=300, ml=150, mr=52, mt=6, mb=6;
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const data = DATA.segments.filter(s=>s.segment!=='Belum Order');
+  const n = data.length;
+  const gap=16, rowH=(ih-gap*(n-1))/n;
+  const barH = rowH*0.38;
+  const maxV = 100;
+  data.forEach((d,i)=>{
+    const y = mt + i*(rowH+gap);
+    const lbl = el('text',{class:'axis-text',x:ml-10,y:y+rowH/2+4,'text-anchor':'end'});
+    lbl.textContent = d.segment;
+    svg.appendChild(lbl);
+    const w1 = (d.pct_count/maxV)*iw, w2=(d.pct_revenue/maxV)*iw;
+    const b1 = el('rect',{class:'mark',x:ml,y:y,width:Math.max(w1,2),height:barH,rx:barH/2,fill:'var(--blue)'});
+    const b2 = el('rect',{class:'mark',x:ml,y:y+barH+4,width:Math.max(w2,2),height:barH,rx:barH/2,fill:'var(--accent)'});
+    svg.appendChild(b1); svg.appendChild(b2);
+    const l1 = el('text',{class:'value-label',x:ml+w1+8,y:y+barH/2+4}); l1.textContent = fmtPct(d.pct_count);
+    const l2 = el('text',{class:'value-label',x:ml+w2+8,y:y+barH+4+barH/2+4}); l2.textContent = fmtPct(d.pct_revenue);
+    svg.appendChild(l1); svg.appendChild(l2);
+    [[b1,'% jumlah pelanggan',d.pct_count,d.count+' pelanggan'],[b2,'% revenue lifetime',d.pct_revenue,fmtIDR(d.revenue)]].forEach(([b,label,val,extra])=>{
+      b.addEventListener('pointerenter', e=>showTip(e, d.segment, [label+': <b>'+fmtPct(val)+'</b>', extra]));
+      b.addEventListener('pointermove', moveTip);
+      b.addEventListener('pointerleave', hideTip);
+    });
+  });
+}
+
+/* ---------- PARETO ---------- */
+function renderPareto(){
+  const svg = document.getElementById('chartPareto');
+  const W=560,H=320, ml=40, mr=14, mt=14, mb=32;
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const pts = DATA.pareto;
+  const X = x => ml + (x/100)*iw;
+  const Y = y => mt + ih - (y/100)*ih;
+
+  [0,25,50,75,100].forEach(v=>{
+    const y = Y(v);
+    svg.appendChild(el('line',{class:'grid-line',x1:ml,x2:W-mr,y1:y,y2:y}));
+    const t = el('text',{class:'axis-text',x:ml-8,y:y+3,'text-anchor':'end'}); t.textContent=v+'%';
+    svg.appendChild(t);
+  });
+  [0,20,40,60,80,100].forEach(v=>{
+    const t = el('text',{class:'axis-text',x:X(v),y:H-mb+16,'text-anchor':'middle'}); t.textContent=v+'%';
+    svg.appendChild(t);
+  });
+
+  svg.appendChild(el('line',{x1:X(0),y1:Y(0),x2:X(100),y2:Y(100),stroke:'var(--axis)','stroke-width':1.5,'stroke-dasharray':'4 4'}));
+
+  const areaPath = 'M'+X(0)+','+Y(0)+' ' + pts.map(p=>'L'+X(p.x)+','+Y(p.y)).join(' ') + ' L'+X(100)+','+Y(0)+' Z';
+  svg.appendChild(el('path',{d:areaPath, fill:'var(--accent)', opacity:'0.12', stroke:'none'}));
+  const linePath = 'M' + pts.map(p=>X(p.x)+','+Y(p.y)).join(' L');
+  svg.appendChild(el('path',{d:linePath, fill:'none', stroke:'var(--accent)', 'stroke-width':2.5, 'stroke-linecap':'round','stroke-linejoin':'round'}));
+
+  [10,20,50].forEach(mark=>{
+    const p = pts.find(pp=>pp.x===mark);
+    const cx=X(p.x), cy=Y(p.y);
+    const dot = el('circle',{class:'mark',cx:cx,cy:cy,r:5,fill:'var(--accent)',stroke:'var(--surface)','stroke-width':2});
+    svg.appendChild(dot);
+    const above = p.y > 90;
+    const t = el('text',{class:'value-label',x:cx, y: above? cy+16 : cy-10, 'text-anchor':'middle'});
+    t.setAttribute('fill','var(--text)');
+    t.textContent = 'top '+mark+'% = '+fmtPct(p.y);
+    svg.appendChild(t);
+    dot.addEventListener('pointerenter', e=>showTip(e, 'Top '+mark+'% pelanggan', ['Kontribusi revenue: <b>'+fmtPct(p.y)+'</b>']));
+    dot.addEventListener('pointermove', moveTip);
+    dot.addEventListener('pointerleave', hideTip);
+  });
+
+  const capt = el('text',{class:'axis-text',x:X(78),y:Y(58),'text-anchor':'start'});
+  capt.textContent = 'garis merata';
+  capt.setAttribute('fill','var(--muted)');
+  svg.appendChild(capt);
+}
+
+/* ---------- Redemption stat block ---------- */
+function renderRedeem(){
+  const k = DATA.kpi;
+  const pct = k.redemption_rate*100;
+  const el2 = document.getElementById('redeemStat');
+  el2.innerHTML = `
+    <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+      <div style="font-family:'Fraunces',serif; font-size:44px; font-weight:600;">${fmtPct(pct)}</div>
+      <div style="color:var(--text-2); font-size:13px;">member pernah redeem reward</div>
+    </div>
+    <div style="height:10px; border-radius:999px; background:var(--grid); overflow:hidden; margin-bottom:16px;">
+      <div style="height:100%; width:${pct}%; background:var(--critical); border-radius:999px;"></div>
+    </div>
+    <div style="display:flex; gap:24px; flex-wrap:wrap;">
+      <div><div class="label" style="font-size:12px;color:var(--muted);text-transform:uppercase;">Member redeem</div><div class="num" style="font-size:20px;font-weight:700;">${fmtNum(k.n_redeemers)}</div></div>
+      <div><div class="label" style="font-size:12px;color:var(--muted);text-transform:uppercase;">Total redemption</div><div class="num" style="font-size:20px;font-weight:700;">${fmtNum(k.total_redemptions)}</div></div>
+      <div><div class="label" style="font-size:12px;color:var(--muted);text-transform:uppercase;">Poin beredar</div><div class="num" style="font-size:20px;font-weight:700;">${fmtNum(k.points_outstanding)}</div></div>
+    </div>
+    <p class="foot" style="margin-top:16px;">92% member belum pernah redeem poin &mdash; katalog reward mungkin kurang menarik.</p>
+  `;
+}
+
+/* ---------- Top spenders table ---------- */
+function renderTop(){
+  const tbody = document.querySelector('#topTable tbody');
+  DATA.top_spenders.forEach((r,i)=>{
+    const tr = document.createElement('tr');
+    let recPill = '';
+    if(r.recency!=null){
+      const cls = r.recency<=14?'good':(r.recency<=60?'warn':'crit');
+      recPill = ' <span class="pill '+cls+'">'+r.recency+'h lalu</span>';
+    }
+    tr.innerHTML = `
+      <td class="num rank">${i+1}</td>
+      <td class="name">${r.name}</td>
+      <td class="num">${r.phone? r.phone+'*' : '&ndash;'}</td>
+      <td>${r.member_since}</td>
+      <td class="num">${fmtNum(r.orders)}</td>
+      <td class="num">${fmtIDR(r.lifetime)}</td>
+      <td class="num">${fmtIDR(r.avg)}</td>
+      <td class="num">${r.points!=null?fmtNum(r.points):'&ndash;'}</td>
+      <td>${r.last_visit}${recPill}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ---------- Rekapan member per bulan (dari transaksi pertama) ---------- */
+function renderMemberRecap(){
+  const tbody = document.querySelector('#memberRecapTable tbody');
+  const tfoot = document.querySelector('#memberRecapTable tfoot');
+  const total = DATA.n_total;
+  let totalRevenue = 0, totalOrders = 0, totalPoints = 0, totalActive = 0, totalRedeem = 0, totalAmtMonth = 0;
+  DATA.member_recap.forEach(d=>{
+    totalOrders += d.orders;
+    totalRevenue += d.revenue;
+    totalPoints += d.points;
+    totalActive += d.active_members;
+    totalRedeem += d.redeemed;
+    totalAmtMonth += d.amt_this_month;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${monthLabel(d.month)}</td>
+      <td class="num">${d.members>0? '+'+fmtNum(d.members) : '&ndash;'}</td>
+      <td class="num">${fmtNum(d.cum_members)}</td>
+      <td class="num">${fmtPct(d.cum_members/total*100)}</td>
+      <td class="num">${d.active_members>0? fmtNum(d.active_members) : '&ndash;'}</td>
+      <td class="num">${d.orders>0? fmtNum(d.orders) : '&ndash;'}</td>
+      <td class="num">${d.revenue>0? fmtIDR(d.revenue) : '&ndash;'}</td>
+      <td class="num">${d.amt_this_month>0? fmtIDR(d.amt_this_month) : '&ndash;'}</td>
+      <td class="num">${d.aov>0? fmtIDR(d.aov) : '&ndash;'}</td>
+      <td class="num">${d.points>0? fmtNum(d.points)+' pts' : '&ndash;'}</td>
+      <td class="num">${d.redeemed>0? fmtNum(d.redeemed)+'x' : '&ndash;'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  const tr = document.createElement('tr');
+  const overallAov = totalOrders>0 ? totalRevenue/totalOrders : 0;
+  tr.innerHTML = `<td>Total</td><td class="num">${fmtNum(total)}</td><td class="num">${fmtNum(total)}</td>
+    <td class="num">100.0%</td><td class="num">${fmtNum(totalActive)}</td><td class="num">${fmtNum(totalOrders)}</td><td class="num">${fmtIDR(totalRevenue)}</td><td class="num">${fmtIDR(totalAmtMonth)}</td><td class="num">${fmtIDR(overallAov)}</td><td class="num">${fmtNum(totalPoints)} pts</td><td class="num">${fmtNum(totalRedeem)}x</td>`;
+  tfoot.appendChild(tr);
+}
+
+renderKPI();
+renderTrend();
+renderMemberGrowth();
+renderAov();
+renderMonthlyBar('chartRevenue','revenue',{color:'var(--blue)', tipLabel:'Revenue', valueFmt:fmtIDR, axisFmt:fmtIDRShort, labelFmt:fmtIDRShort});
+renderMonthlyBar('chartActiveMembers','active_members',{color:'var(--aqua)', tipLabel:'Member transaksi', valueFmt:fmtNum});
+renderMonthlyBar('chartOrders','orders',{color:'var(--accent)', tipLabel:'Total order', valueFmt:fmtNum});
+renderMonthlyBar('chartPointsRecap','points',{color:'var(--yellow)', tipLabel:'Rekap poin', valueFmt:v=>fmtNum(v)+' pts', labelFmt:fmtNum});
+renderMemberRecap();
+renderRecency();
+renderFreq();
+renderPareto();
+renderSegment();
+renderPoints();
+renderRedeem();
+renderTop();
+</script>
