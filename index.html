@@ -211,8 +211,6 @@
   <header class="top">
     <span class="eyebrow">A Better Cup &middot; Loyalty Program</span>
     <h1>Dashboard Analisis Loyalty</h1>
-    <p>Ringkasan <span id="nTotalSpan">2.397</span> data pelanggan program loyalty &mdash; pertumbuhan, retensi, konsentrasi revenue, dan pemakaian reward.</p>
-    <span class="asof" id="asOfLine">Periode data: Januari&ndash;September 2026 &middot; Per data: 22 September 2026 &middot; sumber: customer-export-22092026.csv</span>
     <span class="status-badge loading" id="dataStatus"><i></i><span id="dataStatusText">Memuat data live dari Google Sheets&hellip;</span></span>
 
     <div class="toolbar" id="toolbar" style="display:none;">
@@ -223,6 +221,7 @@
         <select id="periodSelect" aria-label="Pilih periode bulan"></select>
         <button type="button" class="btn-chip" id="btnThisMonth">Bulan Ini</button>
         <button type="button" class="btn-chip" id="btnLastMonth">Bulan Lalu</button>
+        <button type="button" class="btn-chip" id="btnResetFilter" title="Kembalikan Tahun ke Semua Tahun &amp; periode ke Live (hari ini)">&#8635; Reset Filter</button>
       </div>
       <button type="button" class="btn-export" id="btnExport">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>
@@ -231,17 +230,6 @@
     </div>
     <div class="period-note" id="periodNote" style="display:none;"></div>
   </header>
-
-  <div class="note" id="completenessNote" style="margin-bottom:20px; display:none;">
-    <h3>Kelengkapan Data &mdash; basis hitung Total Pelanggan</h3>
-    <p style="margin:0 0 12px;">Satu baris data dihitung sebagai <b>pelanggan/member</b> hanya jika <b>Nama</b> dan <b>Nomor Telepon</b>-nya sama-sama terisi. Baris yang salah satunya kosong dikeluarkan dari seluruh angka di dashboard ini (KPI, chart, tabel) &mdash; bukan cuma dari total di atas.</p>
-    <div class="table-scroll" style="padding:2px 10px;">
-      <table id="completenessTable">
-        <thead><tr><th>Status</th><th class="num">Jumlah Baris</th><th class="num">% dari File</th><th>Keterangan</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
 
   <div class="kpi-grid" id="kpiGrid"></div>
 
@@ -258,10 +246,6 @@
   </div>
 
   <h2 class="section-title">Trend Bulanan per Kohort <span class="section-sub">(member dikelompokkan menurut bulan bergabung, <span id="cohortMonthRange">Jan&ndash;Sep 2026</span>)</span></h2>
-  <div class="note" style="margin-bottom:14px;">
-    <h3>Apa itu &ldquo;kohort&rdquo;?</h3>
-    <p style="margin:0;">Sekelompok pelanggan yang transaksi pertamanya jatuh di bulan yang sama &mdash; misalnya &ldquo;kohort Juni 2026&rdquo; adalah 1.023 orang yang pertama kali order di bulan itu. Chart &amp; tabel di bawah menjumlahkan seluruh aktivitas <i>lifetime</i> tiap kohort (sampai 22 Sep 2026), bukan aktivitas historis per bulan kalender, karena file sumber tidak menyimpan log transaksi bertanggal &mdash; hanya ringkasan lifetime per pelanggan. <a href="kohort.html" target="_blank" rel="noopener" style="color:var(--accent-ink); font-weight:600;">Penjelasan lengkap &amp; diagram &rarr;</a></p>
-  </div>
   <div class="grid3">
     <div class="card">
       <h3>Member Baru (Kumulatif)</h3>
@@ -277,7 +261,6 @@
     </div>
     <div class="card">
       <h3>Member Transaksi*</h3>
-      <p class="desc" style="margin:-2px 0 4px;">Dihitung dari Loyalty Member (punya poin) saja. Angka di bawah tiap bar = % dari Loyalty Member kumulatif bulan itu yang benar-benar bertransaksi.</p>
       <svg id="chartActiveMembers" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
@@ -290,16 +273,13 @@
     </div>
     <div class="card">
       <h3>Pelanggan Redeem Poin per Bulan</h3>
-      <p class="desc" style="margin:-2px 0 4px;">Jumlah pelanggan (bukan jumlah kali redeem) yang pernah menukar poin, diproksi dari bulan kunjungan terakhirnya.</p>
       <svg id="chartRedeemersMonthly" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
   </div>
-  <p class="foot" style="margin:-4px 0 14px;">Semua chart di atas &mdash; kecuali Member Transaksi* dan Pelanggan Redeem Poin per Bulan (keduanya proksi dari bulan Last Visit) &mdash; adalah akumulasi lifetime per kohort bulan gabung, konsisten dengan tabel "Rekapan Jumlah Member per Bulan" di bawah.</p>
 
   <div class="grid2">
     <div class="card full">
       <h2>Rekapan Jumlah Member per Bulan</h2>
-      <p class="desc"><span id="recapMonthRange">Jan&ndash;Sep 2026</span> &middot; Member baru dari transaksi pertama, dipisah Loyalty Member (punya poin) dan Non Loyalty Member (tidak punya poin); Total Order/Revenue/AOV/Poin/Redeem = akumulasi lifetime per kohort bulan gabung. Amount Lifetime &amp; Amount Average dari file sumber sudah terwakili di kolom Revenue &amp; Rata-rata/Order, tidak diduplikasi.</p>
       <div class="scroll-hint" data-hint-for="memberRecapTable">Geser tabel ke kanan untuk kolom lainnya &rarr;</div>
       <div class="table-scroll">
         <table id="memberRecapTable">
@@ -314,7 +294,6 @@
           <tfoot></tfoot>
         </table>
       </div>
-      <p class="foot">*Member Transaksi = proksi dari Last Visit, khusus Loyalty Member yang punya poin (bukan log bulanan penuh, dan tidak menghitung Non Loyalty Member). **Jumlah Redeem = total kali reward ditukar oleh kohort member bulan itu (lifetime, bukan tanggal redeem asli karena tidak ada di sumber data). &dagger;Pengeluaran Bulan Ini = total "Amount This Month" (snapshot pengeluaran September 2026) milik kohort member bulan itu, bukan pengeluaran historis di bulan tersebut.</p>
     </div>
   </div>
 
@@ -426,6 +405,7 @@ let ACTIVE_PERIOD_YM = ''; // '' = live/today; 'YYYY-MM' = viewing a historical 
 let ACTIVE_YEAR = null; // null = Semua Tahun; angka (mis. 2025) = difilter ke 1 tahun itu saja
 let PROGRAM_START_YM = null; // 'YYYY-MM' Customer Since paling awal yang benar-benar ada di data
 let AVAILABLE_YEARS = []; // daftar tahun (angka) yang muncul di kolom Customer Since, terurut naik
+let COMPLETENESS_STATS = null; // { total, complete, incomplete, noName, noPhone, noBoth } dari seluruh baris mentah di file
 
 /* ==========================================================================
    LIVE DATA: fetch the published Google Sheet as CSV and recompute everything
@@ -789,23 +769,10 @@ function computeCompleteness(rawRows){
   return { total, complete, incomplete, noName, noPhone, noBoth };
 }
 
+// Kelengkapan data (Nama + No. Telepon) ditampilkan sebagai 2 kartu KPI saja
+// (lihat renderKPI), bukan tabel rekapan — stats-nya disimpan di sini.
 function renderCompleteness(stats){
-  const note = document.getElementById('completenessNote');
-  const tbody = document.querySelector('#completenessTable tbody');
-  if(!note || !tbody) return;
-  const pct = n => stats.total ? fmtPct(n/stats.total*100) : '-';
-  const rows = [
-    { label:'Data Lengkap (Nama + No. Telepon)', n: stats.complete, ket: 'Dihitung sebagai pelanggan/member — basis semua angka di dashboard ini' },
-  ];
-  if(stats.noName)  rows.push({ label:'Tidak Lengkap — Nama kosong', n: stats.noName, ket: 'Dikeluarkan dari perhitungan' });
-  if(stats.noPhone) rows.push({ label:'Tidak Lengkap — No. Telepon kosong', n: stats.noPhone, ket: 'Dikeluarkan dari perhitungan' });
-  if(stats.noBoth)  rows.push({ label:'Tidak Lengkap — Nama & No. Telepon kosong', n: stats.noBoth, ket: 'Dikeluarkan dari perhitungan' });
-  rows.push({ label:'Total Baris di File', n: stats.total, ket: 'Seluruh baris data mentah, sebelum disaring', strong:true });
-  tbody.innerHTML = rows.map(r=>
-    '<tr'+(r.strong ? ' style="font-weight:700; border-top:1.5px solid var(--border);"' : '')+'>'
-    + '<td>'+r.label+'</td><td class="num">'+fmtNum(r.n)+'</td><td class="num">'+pct(r.n)+'</td><td>'+r.ket+'</td></tr>'
-  ).join('');
-  note.style.display = 'block';
+  COMPLETENESS_STATS = stats;
 }
 
 /* Redemption-rate health read: <10% dianggap perlu perhatian (katalog reward
@@ -861,20 +828,27 @@ function renderKPI(){
   const realCurMonth = ymOf(todayDateOnly());
   const isHistorical = !!ACTIVE_PERIOD_YM;
   const redemp = redemptionStatus(k.redemption_rate);
+  const cs = COMPLETENESS_STATS;
   const tiles = [
     {label:'Total Pelanggan', value: fmtNum(k.n_total), sub: k.n_members+' member poin &middot; '+k.n_guests+' belum daftar poin &middot; data lengkap saja', tone:'accent'},
-    {label:'Loyalty Member', value: fmtNum(k.n_members), sub: fmtPct(k.n_total? k.n_members/k.n_total*100 : 0)+' dari total &middot; punya saldo poin', tone:'good'},
+  ];
+  if(cs){
+    tiles.push({label:'Data Lengkap', value: fmtNum(cs.complete), sub: (cs.total? fmtPct(cs.complete/cs.total*100) : '-')+' dari total baris di file &middot; ada Nama &amp; No. Telepon', tone:'good'});
+    tiles.push({label:'Data Tidak Lengkap', value: fmtNum(cs.incomplete), sub: (cs.total? fmtPct(cs.incomplete/cs.total*100) : '-')+' dari total baris &middot; Nama/No. Telepon kosong, dikeluarkan dari perhitungan'});
+  }
+  tiles.push(
+    {label:'Loyalty Member', value: fmtNum(k.n_members), sub: fmtPct(k.n_total? k.n_members/k.n_total*100 : 0)+' dari total &middot; punya saldo poin', tone:'aqua'},
     {label:'Non Loyalty Member', value: fmtNum(k.n_guests), sub: fmtPct(k.n_total? k.n_guests/k.n_total*100 : 0)+' dari total &middot; belum punya poin'},
     {label:'Revenue Lifetime', value: fmtIDRShort(k.total_lifetime), sub: 'dari '+fmtNum(k.total_orders)+' order tercatat', tone:'blue'},
     {label:'Rata-rata / Order', value: fmtIDR(k.avg_order_value), sub: 'AOV seluruh transaksi'},
     {label:'Revenue / Pelanggan', value: fmtIDR(k.avg_lifetime_per_cust), sub: 'rata-rata lifetime value'},
     {label:'Aktif Bulan Ini', value: fmtNum(k.active_month), sub: fmtIDR(k.amt_month_total)+' revenue '+monthNameID(realCurMonth)+(isHistorical?' (real-time, di luar periode)':''), tone:'aqua'},
     {label:'Poin Beredar', value: fmtNum(k.points_outstanding)+' pts', sub: 'liability program, belum ditukar', tone:'yellow'},
-    {label:'Pelanggan Redeem Poin', value: fmtNum(k.n_redeemers), sub: fmtPct(k.redemption_rate*100)+' dari Loyalty Member pernah redeem', tone:'good'},
+    {label:'Pelanggan Redeem Poin', value: fmtNum(k.n_redeemers), sub: fmtPct(k.redemption_rate*100)+' dari Loyalty Member pernah redeem', tone:'serious'},
     {label:'Tingkat Redemption', value: fmtPct(k.redemption_rate*100),
       sub: k.n_redeemers+' dari '+k.n_members+' member pernah redeem',
-      tone: redemp.tone, chip: redemp.label},
-  ];
+      tone: redemp.tone, chip: redemp.label}
+  );
   const grid = document.getElementById('kpiGrid');
   grid.innerHTML = '';
   tiles.forEach(t=>{
@@ -1531,6 +1505,14 @@ function setYear(yearStr){
   if(sel) sel.value = yearStr || '';
 }
 
+/* Reset semua filter (Tahun + Periode bulan) balik ke default: Semua Tahun & Live (hari ini). */
+function resetFilters(){
+  ACTIVE_YEAR = null;
+  const yearSel = document.getElementById('yearSelect');
+  if(yearSel) yearSel.value = '';
+  setPeriod('');
+}
+
 /* ---------- Export ke Excel (semua data, satu sheet per tabel) ---------- */
 function exportToExcel(){
   const btn = document.getElementById('btnExport');
@@ -1679,6 +1661,8 @@ async function init(){
   });
   const btnExport = document.getElementById('btnExport');
   if(btnExport) btnExport.addEventListener('click', exportToExcel);
+  const btnReset = document.getElementById('btnResetFilter');
+  if(btnReset) btnReset.addEventListener('click', resetFilters);
 }
 
 init();
