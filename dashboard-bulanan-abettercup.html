@@ -2367,7 +2367,7 @@ function renderDaily(){
     DS.outlet=DS.outlet===tr.dataset.o?'all':tr.dataset.o;renderDaily()});
   $('d5_hDay').textContent='Penjualan harian, '+olabel;
   $('d5_tbl').innerHTML='<thead><tr class="psp"><th colspan="'+(DSCOL.length+1)+'"></th></tr><tr><th>Tanggal</th>'+DSCOL.map(c=>`<th>${c[0]}</th>`).join('')+'</tr></thead><tbody>'+
-    days.map(({d,r})=>`<tr${dsEmpty(r)?' class="dz"':''}><td>${dFull(d)}</td>`+DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(r),ty)}</td>`).join('')+'</tr>').join('')+
+    (days.filter(x=>!dsEmpty(x.r)).map(({d,r})=>`<tr><td>${dFull(d)}</td>`+DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(r),ty)}</td>`).join('')+'</tr>').join('')||`<tr><td colspan="${DSCOL.length+1}" style="text-align:left;color:var(--mute)">Belum ada transaksi pada periode ini</td></tr>`)+
     '</tbody><tfoot><tr><td>Total</td>'+DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(tot),ty)}</td>`).join('')+'</tr></tfoot>';
 }
 
