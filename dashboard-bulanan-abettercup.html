@@ -277,6 +277,7 @@ tr.psp{display:none}
   body.pr-daily tr{break-inside:avoid}
   body.pr-daily thead{display:table-header-group}
   body.pr-daily tfoot{display:table-row-group}
+  body.pr-daily tr.dz{display:none!important}
   body.pr-daily tr.psp{display:table-row!important}
   body.pr-daily tr.psp th{display:table-cell!important;height:6mm;padding:0;border:0}
   body.pr-daily *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -2366,7 +2367,7 @@ function renderDaily(){
     DS.outlet=DS.outlet===tr.dataset.o?'all':tr.dataset.o;renderDaily()});
   $('d5_hDay').textContent='Penjualan harian, '+olabel;
   $('d5_tbl').innerHTML='<thead><tr class="psp"><th colspan="'+(DSCOL.length+1)+'"></th></tr><tr><th>Tanggal</th>'+DSCOL.map(c=>`<th>${c[0]}</th>`).join('')+'</tr></thead><tbody>'+
-    days.map(({d,r})=>`<tr><td>${dFull(d)}</td>`+DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(r),ty)}</td>`).join('')+'</tr>').join('')+
+    days.map(({d,r})=>`<tr${dsEmpty(r)?' class="dz"':''}><td>${dFull(d)}</td>`+DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(r),ty)}</td>`).join('')+'</tr>').join('')+
     '</tbody><tfoot><tr><td>Total</td>'+DSCOL.map(([t,get,ty])=>`<td>${dsFmt(get(tot),ty)}</td>`).join('')+'</tr></tfoot>';
 }
 
