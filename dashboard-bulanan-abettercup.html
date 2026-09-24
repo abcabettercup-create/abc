@@ -2043,7 +2043,7 @@ function renderWeekly(){
   $('w_show').textContent=dLong(WS.from)+' s.d '+dLong(WS.to)+' ('+nd+' hari, '+n+' minggu), '+olabel;
   const LB=s=>{const k=isoWeekKey(s),w=WK[k],a=w&&w.a>WS.from?w.a:WS.from,b=w&&w.b<WS.to?w.b:WS.to;return 'Minggu '+(+k.split('-W')[1])+' ('+dShort(a)+' s.d '+dShort(b)+')'};
   const XL=s=>'W'+(+isoWeekKey(s).split('-W')[1]);
-  const lbl=nd>0&&nd<=92;
+  const lbl=n>0;
   const rpS=v=>v>=1e6?(v/1e6).toLocaleString('id-ID',{maximumFractionDigits:1})+' jt':Math.round(v/1e3)+' rb';
   const pc=v=>v.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
   const GR=r=>r[0]+r[9];
