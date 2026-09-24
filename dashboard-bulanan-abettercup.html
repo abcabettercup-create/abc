@@ -255,6 +255,23 @@ body[data-pg="4"]{--pg:var(--c4)}body[data-pg="5"]{--pg:var(--c5)}body[data-pg="
 th{border-bottom-color:var(--pg)}
 tfoot td{border-top-color:var(--pg)}
 .sub:empty{display:none}
+#b_bars .l button{font:inherit;color:var(--ink);background:none;border:0;padding:0;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:3px}
+#b_bars .r .t b{background:var(--pg)}
+.mtx td small{display:block;color:var(--mute);font-size:11px;font-weight:400}
+.mtx td.z{color:var(--mute)}
+.mtx tr.sech td{background:color-mix(in srgb,var(--pg) 10%,transparent);font-weight:700;text-align:left;padding-top:9px}
+.mtx tr.subt td{font-weight:600;border-bottom:2px solid var(--rule)}
+.mtx tr.subo td{font-weight:700;background:color-mix(in srgb,var(--off) 8%,transparent)}
+.mtx tr.grp th{text-align:center;border-bottom:1px solid var(--rule);font-size:11.5px;letter-spacing:.02em}
+.mtx tr.grp th.gof{background:color-mix(in srgb,var(--off) 12%,transparent)}
+.mtx tr.grp th.gon{background:color-mix(in srgb,var(--on) 12%,transparent)}
+.mtx .bl{border-left:2px solid var(--rule)}
+.mtx td.mm{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad);font-weight:700}
+.mtx td.mm small{color:var(--bad)}
+.mmk{display:inline-block;width:11px;height:11px;border-radius:2px;background:color-mix(in srgb,var(--bad) 35%,transparent);border:1px solid var(--bad);vertical-align:-1px}
+#page10 .tw:has(.stbl){max-height:600px;overflow:auto}
+:root{--c10:#8A4B9C}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c10:#C99BD6}}:root[data-theme="dark"]{--c10:#C99BD6}
+body[data-pg="10"]{--pg:var(--c10)}#tab10{--pg:var(--c10)}
 svg text{font-family:var(--bd)}
 .phead{display:none}
 tr.psp{display:none}
@@ -344,6 +361,7 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
     <button type="button" class="tab" role="tab" id="tab3" data-p="3" aria-controls="page3" aria-selected="false" tabindex="-1">Trend</button>
     <button type="button" class="tab" role="tab" id="tab4" data-p="4" aria-controls="page4" aria-selected="false" tabindex="-1">Trafic</button>
     <button type="button" class="tab" role="tab" id="tab8" data-p="8" aria-controls="page8" aria-selected="false" tabindex="-1">Product</button>
+    <button type="button" class="tab" role="tab" id="tab10" data-p="10" aria-controls="page10" aria-selected="false" tabindex="-1">Bank</button>
     <button type="button" class="tab" role="tab" id="tab7" data-p="7" aria-controls="page7" aria-selected="false" tabindex="-1">Report</button>
     <button type="button" class="tab" role="tab" id="tab6" data-p="6" aria-controls="page6" aria-selected="false" tabindex="-1">Import-Export</button>
   </nav>
@@ -855,6 +873,54 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
       </div>
       <p class="note" id="p8_cmNote"></p>
       <div class="tw"><table id="p8_cmTbl" class="cmtbl"></table></div>
+    </section>
+  </div>
+
+  <div id="page10" role="tabpanel" aria-labelledby="tab10" hidden>
+    <div class="fpanel" role="group" aria-label="Filter bank">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="b_areaChips" role="group" aria-label="Filter area bank"></div></div>
+        <div class="fgrp"><span class="fl">Outlet</span><div class="chips" id="b_outletChips" role="group" aria-label="Filter outlet bank"></div></div>
+      </div>
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Bulan</span><select id="b_month" aria-label="Pilih bulan"></select></div>
+        <div class="fgrp"><span class="fl">Periode</span>
+          <label>Dari <input type="date" id="b_from"></label>
+          <label>s.d <input type="date" id="b_to"></label></div>
+        <div class="fgrp"><span class="fl">Periode cepat</span><div class="chips" id="b_presetChips" role="group" aria-label="Periode cepat bank"></div></div>
+      </div>
+      <div class="frow fend">
+        <div class="fgrp"><span class="fshow">Ditampilkan: <b id="b_show"></b></span>
+          <button type="button" class="chip" id="b_all" hidden>Semua periode</button></div>
+      </div>
+    </div>
+    <p class="note" id="b_status"></p>
+
+    <section id="p10-bri" aria-labelledby="b_hBri" style="border-top:0">
+      <h2 id="b_hBri">Rekap BRI per outlet</h2>
+      <p class="note">Transaksi BRI saja. % Net outlet = porsi BRI dari Net Sales outlet.</p>
+      <div class="tw"><table id="b_briTbl"></table></div>
+    </section>
+
+    <section id="p10-klaim" aria-labelledby="b_hKl">
+      <h2 id="b_hKl">Rekap Klaim BRI budget 15%</h2>
+      <p class="note">Budget = 15% Gross (Inc Tax) BRI. Klaim = diskon BRI. Ikut filter periode saja.</p>
+      <div class="tw"><table id="b_klTbl"></table></div>
+    </section>
+
+    <section id="p10-rekap" aria-labelledby="b_hRk">
+      <h2 id="b_hRk">Rekap per metode bayar</h2>
+      <p class="note">Top 10 Net Sales, sisanya digabung jadi Other.</p>
+      <div class="rows" id="b_bars" style="margin-top:14px"></div>
+      <div class="tw"><table id="b_tbl" class="stbl"></table></div>
+    </section>
+
+    <section id="p10-st" aria-labelledby="b_hSt">
+      <h2 id="b_hSt">Sales Type vs Metode bayar</h2>
+      <div class="ptools"><div class="chips" id="b_stM" role="group" aria-label="Nilai matriks"></div></div>
+      <p class="note">Online = GrabFood, GoFood, ShopeeFood. Angka kecil = porsi per baris.</p>
+      <p class="note" id="b_stMis"></p>
+      <div class="tw"><table id="b_stTbl" class="mtx"></table></div>
     </section>
   </div>
 
@@ -1962,16 +2028,16 @@ function renderPage1(){
   }finally{PFX='';Object.assign(S,saved)}
 }
 function showPage(n){
-  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;
+  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===2)render();
+  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===2)render();
   if(n===6)exFilterText();
   window.scrollTo(0,0);
 }
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>{b.onclick=()=>showPage(+b.dataset.p);
-    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,7,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
+    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,10,7,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
 }
 /* ===== Halaman 9: Weekly ===== */
 const WS={area:'all',outlet:'all',from:'',to:''};
@@ -2071,6 +2137,152 @@ function renderWeekly(){
   $('w_tbl').innerHTML='<thead><tr><th>Minggu</th><th>Gross Sales</th><th>Discounts</th><th>Net Sales</th><th>% Discounts</th><th>Better Cup (Cup)</th><th>Pastry (Pcs)</th><th>Better 1 L (Btl)</th><th>Tumbler</th><th>Mineral (Btl)</th><th>Biscuit With Ice Cream (Pcs)</th></tr></thead><tbody>'+
     dates.map((d,i)=>'<tr><td>'+LB(d)+'</td>'+ord.map(j=>cell(rows[i],j)).join('')+'</tr>').join('')+
     '</tbody><tfoot><tr><td>Total</td>'+ord.map(j=>cell(tot,j)).join('')+'</tr></tfoot>';
+}
+
+/* ===== Halaman 10: Bank (metode bayar) ===== */
+const BK={area:'all',outlet:'all',from:'',to:'',pm:'',tm:'nt',tg:'w',sm:'nt',rs:{k:'nt',d:-1}};
+let Bbusy=false,Berr='';
+function bChips(){
+  const mk=(box,list,cur,fn)=>{const el=$(box);if(!el)return;el.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);el.appendChild(b)})};
+  mk('b_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],BK.area,v=>{BK.area=v;if(BK.outlet!=='all'&&v!=='all'&&!AREAS[v].o.includes(BK.outlet))BK.outlet='all';renderBank()});
+  const list=BK.area==='all'?OUT:OUT.filter(x=>AREAS[BK.area].o.includes(x));
+  mk('b_outletChips',[['all','Semua outlet']].concat(list.map(x=>[x,x])),BK.outlet,v=>{BK.outlet=v;renderBank()});
+  mk('b_trM',[['nt','Net Sales'],['g','Gross Sales'],['bill','Bill Transaction']],BK.tm,v=>{BK.tm=v;renderBank()});
+  mk('b_trG',[['d','Harian'],['w','Mingguan'],['m','Bulanan']],BK.tg,v=>{BK.tg=v;renderBank()});
+  mk('b_stM',[['nt','Net Sales'],['bill','Bill Transaction']],BK.sm,v=>{BK.sm=v;renderBank()});
+  const p=$('b_presetChips');p.innerHTML='';
+  addMonthChips(p,dOn(BK),dSet(BK,renderBank));
+}
+function initBank(){
+  BK.from=TMIN;BK.to=TMAX;if(BK.outlet!=='all'&&!D.outlets.includes(BK.outlet))BK.outlet='all';Berr='';
+  const mo=$('b_month');
+  mo.innerHTML='<option value="all">Semua bulan</option>'+D.months.map(m=>`<option value="${m}">${mlabel(m)}</option>`).join('')+'<option value="kustom">Rentang kustom</option>';
+  mo.onchange=e=>{const v=e.target.value;if(v==='all'){BK.from=TMIN;BK.to=TMAX}else if(v!=='kustom'){const r=monthRange(v);BK.from=r.from<TMIN?TMIN:r.from;BK.to=r.to}renderBank()};
+  const f=$('b_from'),g=$('b_to');[f,g].forEach(x=>{x.min=TMIN;x.max=TMAX});
+  f.onchange=e=>{if(!e.target.value)return;BK.from=e.target.value<TMIN?TMIN:e.target.value;if(BK.from>BK.to)BK.to=BK.from;renderBank()};
+  g.onchange=e=>{if(!e.target.value)return;BK.to=e.target.value>TMAX?TMAX:e.target.value;if(BK.to<BK.from)BK.from=BK.to;renderBank()};
+  $('b_all').onclick=()=>{BK.from=TMIN;BK.to=TMAX;renderBank()};
+}
+function renderBank(){
+  if(!BK.from){BK.from=TMIN;BK.to=TMAX}
+  bChips();
+  const isAll=BK.from===TMIN&&BK.to===TMAX;
+  const mk=D.months.find(m=>{const r=monthRange(m);return r.from===BK.from&&r.to===BK.to});
+  $('b_month').value=isAll?'all':(mk||'kustom');$('b_from').value=BK.from;$('b_to').value=BK.to;$('b_all').hidden=isAll;
+  const i0=TD.indexOf(BK.from),i1=TD.indexOf(BK.to),nd=i1-i0+1;
+  const olabel=BK.outlet!=='all'?BK.outlet:(BK.area==='all'?'Semua outlet':AREAS[BK.area].name);
+  $('b_show').textContent=dLong(BK.from)+' s.d '+dLong(BK.to)+' ('+nd+' hari), '+olabel;
+  if(!DBC){
+    $('b_status').textContent=Berr?'Data transaksi tidak bisa dibaca: '+Berr:'Menyiapkan data dari basis data transaksi, mohon tunggu sebentar…';
+    ['b_bars','b_tbl','b_stTbl'].forEach(id=>$(id).innerHTML='');
+    if(!Bbusy&&!Berr){Bbusy=true;loadDb().catch(e=>{Berr=e.message}).then(()=>{Bbusy=false;if(PAGE===10)renderBank()})}
+    return;
+  }
+  $('b_status').textContent='';
+  const X=DBC,outs=new Set(BK.outlet!=='all'?[BK.outlet]:(BK.area==='all'?OUT:OUT.filter(o=>AREAS[BK.area].o.includes(o))));
+  const oIn=X.outlets.map(o=>outs.has(o)),di=X.dates.map(d=>TD.indexOf(d)),SLn=X.sl.map(normStype);
+  const PM=new Map(),ST=new Set(),MX=new Map(),TR=new Map(),BR=new Map(),ON=new Map(),KL=new Map(),KLO=['Kelapa Dua','Tunjungan','Petra University','Mulyosari'];
+  const pBRI=X.pl.indexOf('BRI');
+  const E0=()=>({bill:0,g:0,dc:0,nt:0,tx:0});
+  for(let i=0;i<X.d.length;i++){
+    const d=di[X.d[i]];if(d<i0||d>i1||d<0)continue;
+    if(X.p[i]===pBRI){const on0=X.outlets[X.o[i]];if(KLO.includes(on0)){let z=KL.get(on0);if(!z){z={bill:0,g:0,dc:0,nt:0};KL.set(on0,z)}z.bill+=X.bf[i];z.g+=X.g[i]-X.rf[i]+X.tx[i];z.dc+=X.dc[i];z.nt+=X.nt[i]}}
+    if(!oIn[X.o[i]])continue;
+    const pm=X.pl[X.p[i]]||'Other',st=SLn[X.s[i]]||'-';
+    let a=PM.get(pm);if(!a){a=E0();PM.set(pm,a)}
+    const g=X.g[i]-X.rf[i],b=X.bf[i],on=X.outlets[X.o[i]];
+    ON.set(on,(ON.get(on)||0)+X.nt[i]);
+    if(pm==='BRI'){let z=BR.get(on);if(!z){z={bill:0,g:0,dc:0,nt:0,tx:0,days:new Set()};BR.set(on,z)}z.bill+=b;z.g+=g;z.dc+=X.dc[i];z.nt+=X.nt[i];z.tx+=X.tx[i];if(b)z.days.add(d)}
+    a.bill+=b;a.g+=g;a.dc+=X.dc[i];a.nt+=X.nt[i];a.tx+=X.tx[i];
+    ST.add(st);const mk2=pm+'\u0000'+st;let m=MX.get(mk2);if(!m){m={nt:0,bill:0};MX.set(mk2,m)}m.nt+=X.nt[i];m.bill+=b;
+    const tk=pm+'\u0000'+d;let t=TR.get(tk);if(!t){t={nt:0,g:0,bill:0};TR.set(tk,t)}t.nt+=X.nt[i];t.g+=g;t.bill+=b;
+  }
+  const rows=[...PM.entries()].map(([pm,a])=>({pm,...a})).filter(r=>r.bill>0||Math.abs(r.nt)>=1);
+  const T=rows.reduce((s,r)=>{for(const k in E0())s[k]+=r[k];return s},E0());
+  rows.forEach(r=>{r.pn=T.nt?r.nt/T.nt:0;r.pb=T.bill?r.bill/T.bill:0;r.ab=r.bill?r.nt/r.bill:0;r.pd=r.g>0?r.dc/r.g:0});
+  const pf=v=>(v*100).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+  $('b_hRk').textContent='Rekap per metode bayar, '+olabel;
+  const byNt=[...rows].sort((a,b)=>b.nt-a.nt);
+  let disp=byNt;
+  if(byNt.length>10){const rest=byNt.slice(10),o={pm:'Other ('+rest.length+' metode)',grp:true,members:rest.map(r=>r.pm)};
+    for(const k of ['bill','g','dc','nt','tx'])o[k]=rest.reduce((a,r)=>a+r[k],0);
+    o.pn=T.nt?o.nt/T.nt:0;o.pb=T.bill?o.bill/T.bill:0;o.ab=o.bill?o.nt/o.bill:0;o.pd=o.g>0?o.dc/o.g:0;
+    disp=byNt.slice(0,10).concat([o])}
+  const mx=Math.max(1,...disp.map(r=>r.nt));
+  $('b_bars').innerHTML=disp.length?disp.map(r=>`<div class="r"><span class="l">${r.grp?`<span title="${r.members.join(', ')}">${r.pm}</span>`:r.pm}</span><span class="t"><b style="width:${Math.max(0,r.nt/mx*100)}%"></b></span><span class="n">${cmp(r.nt)}<small>${pf(r.pn)}</small></span></div>`).join(''):'<div class="empty">Tidak ada transaksi pada periode ini.</div>';
+  
+  const BCOLS=[
+    {t:'Metode bayar',k:'pm',cls:'pn',f:r=>r.grp?`${r.pm}<small style="display:block;color:var(--mute);font-size:11px">${r.members.join(', ')}</small>`:r.pm},{t:'Bill Transaction',k:'bill',f:r=>nf.format(r.bill)},{t:'% Bill',k:'pb',f:r=>pf(r.pb)},
+    {t:'Gross Sales',k:'g',f:r=>nf.format(r.g)},{t:'Diskon',k:'dc',f:r=>nf.format(r.dc)},{t:'% Diskon',k:'pd',f:r=>pf(r.pd)},
+    {t:'Net Sales',k:'nt',f:r=>nf.format(r.nt)},{t:'% Net Sales',k:'pn',f:r=>pf(r.pn)},{t:'Tax',k:'tx',f:r=>nf.format(r.tx)},
+    {t:'Rata-rata Net per bill',k:'ab',f:r=>rp(r.ab)}];
+  pSortTable('b_tbl',BCOLS,disp.filter(r=>!r.grp),BK.rs,
+    `<td class="pn">Total</td><td>${nf.format(T.bill)}</td><td>100%</td><td>${nf.format(T.g)}</td><td>${nf.format(T.dc)}</td><td>${T.g>0?pf(T.dc/T.g):'-'}</td><td>${nf.format(T.nt)}</td><td>100%</td><td>${nf.format(T.tx)}</td><td>${T.bill?rp(T.nt/T.bill):'-'}</td>`);
+  {const g=disp.find(r=>r.grp);if(g)$('b_tbl').tBodies[0].insertAdjacentHTML('beforeend','<tr style="border-top:2px solid var(--rule)">'+BCOLS.map(c=>`<td class="${c.cls||''}">${c.f(g)}</td>`).join('')+'</tr>')}
+  $('b_tbl').querySelectorAll('th button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(BK.rs.k===k)BK.rs.d=-BK.rs.d;else{BK.rs.k=k;BK.rs.d=k==='pm'?1:-1}renderBank()});
+  // BRI per outlet
+  {const pf2=v=>(v*100).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+   const ol=OUT.filter(o=>BR.has(o)),Z={bill:0,g:0,dc:0,nt:0,tx:0,d:0},onT=[...ON.values()].reduce((a,b)=>a+b,0);
+   $('b_hBri').textContent='Rekap BRI per outlet, '+olabel;
+   const row=(o,z,d,tot)=>`<tr><td>${o}</td><td>${nf.format(d)}</td><td>${nf.format(z.bill)}</td><td>${nf.format(z.g)}</td><td>${nf.format(z.dc)}</td><td>${z.g>0?pf2(z.dc/z.g):'-'}</td><td>${nf.format(z.nt)}</td><td>${nf.format(z.tx)}</td><td>${nf.format(z.nt+z.tx)}</td><td>${z.bill?rp(z.nt/z.bill):'-'}</td><td>${tot>0?pf2(z.nt/tot):'-'}</td></tr>`;
+   const body=ol.map(o=>{const z=BR.get(o);for(const k of ['bill','g','dc','nt','tx'])Z[k]+=z[k];Z.d+=z.days.size;return row(o,z,z.days.size,ON.get(o)||0)}).join('');
+   $('b_briTbl').innerHTML='<thead><tr><th>Outlet</th><th>Hari ada BRI</th><th>Bill Transaction</th><th>Gross Sales</th><th>Diskon</th><th>% Diskon</th><th>Net Sales</th><th>Tax</th><th>Net (Inc Tax)</th><th>Rata-rata Net per bill</th><th>% Net outlet</th></tr></thead><tbody>'+
+     (body||'<tr><td colspan="11" style="text-align:left;color:var(--mute)">Tidak ada transaksi BRI pada periode ini</td></tr>')+'</tbody>'+
+     (ol.length?'<tfoot>'+row('Total',Z,Z.d,onT).replace('<tr>','<tr>').replace(/<td>([\d.]+)<\/td>/, '<td>–</td>')+'</tfoot>':'');}
+  // klaim BRI budget 15%
+  {const pf3=v=>(v*100).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+   const Z={bill:0,g:0,dc:0,nt:0};
+   const sg=v=>`<span style="color:${v<0?'var(--bad)':'var(--good)'};font-weight:600">${v<0?'−':''}${nf.format(Math.abs(Math.round(v)))}</span>`;
+   const row=(o,z,b)=>{const bud=z.g*0.15,sel=bud-z.dc;return `<tr${b?' style="font-weight:600"':''}><td>${o}</td><td>${nf.format(z.bill)}</td><td>${nf.format(z.g)}</td><td>${nf.format(bud)}</td><td>${nf.format(z.dc)}</td><td>${z.g>0?pf3(z.dc/z.g):'-'}</td><td>${bud>0?pf3(z.dc/bud):'-'}</td><td>${sg(sel)}</td><td>${sel<0?'Melebihi budget':z.bill?'Dalam budget':'-'}</td></tr>`};
+   const body=KLO.map(o=>{const z=KL.get(o)||{bill:0,g:0,dc:0,nt:0};for(const k in Z)Z[k]+=z[k];return row(o,z)}).join('');
+   $('b_klTbl').innerHTML='<thead><tr><th>Outlet</th><th>Bill BRI</th><th>Gross (Inc Tax) BRI</th><th>Budget 15%</th><th>Diskon BRI (klaim)</th><th>% Diskon thd Gross (Inc Tax)</th><th>Pemakaian budget</th><th>Sisa budget</th><th>Status</th></tr></thead><tbody>'+body+'</tbody><tfoot>'+row('Total',Z).replace('<tr>','<tr>')+'</tfoot>';}
+  // trend (bagian dihapus dari halaman)
+  const names=byNt.map(r=>r.pm);
+  if($('b_trChart')){const sel=$('b_pm');
+  if(BK.pm&&BK.pm!=='all'&&!names.includes(BK.pm))BK.pm='all';if(!BK.pm)BK.pm='all';
+  sel.innerHTML='<option value="all">Semua metode</option>'+names.map(n=>`<option>${n}</option>`).join('');sel.value=BK.pm;
+  const kf=BK.tg==='d'?(s=>s):BK.tg==='w'?isoWeekKey:(s=>s.slice(0,7));
+  const keys=[],vals=[],idx=new Map();
+  for(let d=i0;d<=i1;d++){const s=TD[d],k=kf(s);if(!idx.has(k)){idx.set(k,keys.length);keys.push(s);vals.push(0)}
+    const j=idx.get(k);(BK.pm==='all'?names:[BK.pm]).forEach(pm=>{const t=TR.get(pm+'\u0000'+d);if(t)vals[j]+=t[BK.tm]})}
+  const mn=BK.tm==='nt'?'Net Sales':BK.tm==='g'?'Gross Sales':'Bill Transaction',per=BK.tg==='d'?'hari':BK.tg==='w'?'minggu':'bulan';
+  const LB=BK.tg==='d'?dFull:BK.tg==='w'?(s=>{const k=isoWeekKey(s),w=WK[k],a=w&&w.a>BK.from?w.a:BK.from,b=w&&w.b<BK.to?w.b:BK.to;return 'Minggu '+(+k.split('-W')[1])+' ('+dShort(a)+' s.d '+dShort(b)+')'}):(s=>mlabel(s.slice(0,7)));
+  const XL=BK.tg==='d'?dShort:BK.tg==='w'?(s=>'W'+(+isoWeekKey(s).split('-W')[1])):(s=>MS[+s.slice(5,7)-1]);
+  const fm=BK.tm==='bill'?(v=>nf.format(v)+' bill'):rp,fn=BK.tm==='bill'?(v=>nf.format(v)+' bill'):cmp;
+  const rpS=v=>v>=1e6?(v/1e6).toLocaleString('id-ID',{maximumFractionDigits:1})+' jt':Math.round(v/1e3)+' rb';
+  $('b_hTr').textContent=mn+' per '+per+', '+(BK.pm==='all'?'semua metode':BK.pm)+', '+olabel;
+  $('b_trNote').textContent=trendNote(keys,vals,fn,'',per,LB);
+  const opt={H:260,color:'var(--pg)',axis:BK.tm==='bill'?qax:axis,fmt:fm,xl:XL,tl:LB,aria:mn+' per '+per,
+    labels:BK.tg!=='d'||nd<=92,lfmt:BK.tm==='bill'?undefined:rpS,rotGap:BK.tm==='bill'?26:40};
+  if(BK.tg==='d')drawTrend('b_trChart',keys,vals,{...opt,ma:false});else drawBars('b_trChart',keys,vals,opt);}
+  // matrix gabungan: baris & kolom dipisah Offline/Online, sel tidak cocok diberi tanda merah
+  const vk=BK.sm,fv=v=>nf.format(v),isOn=pm=>ONL.has(pm),ONST=new Set(['GrabFood','GoFood','ShopeeFood']);
+  $('b_hSt').textContent='Sales Type vs Metode bayar ('+(vk==='nt'?'Net Sales':'Bill Transaction')+'), '+olabel;
+  const val=(pm,st)=>(MX.get(pm+'\u0000'+st)||{})[vk]||0;
+  const stTot=st=>names.reduce((s,pm)=>s+val(pm,st),0);
+  const sOff=[...ST].filter(st=>!ONST.has(st)&&Math.abs(stTot(st))>=0.5).sort((a,b)=>stTot(b)-stTot(a));
+  const sOn=[...ST].filter(st=>ONST.has(st)&&Math.abs(stTot(st))>=0.5).sort((a,b)=>stTot(b)-stTot(a));
+  const cols=sOff.concat(sOn),pOff=names.filter(pm=>!isOn(pm)),pOn=names.filter(isOn);
+  const rowT=pm=>cols.reduce((s,st)=>s+val(pm,st),0),gT=names.reduce((s,pm)=>s+rowT(pm),0);
+  let mis=0;
+  const cell=(pm,st,rt)=>{const v=val(pm,st);if(Math.abs(v)<0.5)return '<td class="z">–</td>';
+    const bad=isOn(pm)!==ONST.has(st);if(bad)mis+=v;
+    return `<td class="${bad?'mm':''}"${bad?' title="Metode bayar '+(isOn(pm)?'online':'offline')+' tetapi Sales Type '+(ONST.has(st)?'online':'offline')+'"':''}>${fv(v)}<small>${pf(rt?v/rt:0)}</small></td>`};
+  const ECOM=new Set(['gopay','dana','shopeepay','ovo','linkaja','link aja']),isE=pm=>ECOM.has(String(pm).toLowerCase().trim());
+  const subRow=(lab,L,cls)=>{const sub=cols.map(st=>L.reduce((s,pm)=>s+val(pm,st),0)),t=sub.reduce((a,b)=>a+b,0);return `<tr class="${cls}"><td>${lab}</td>`+sub.map(v=>`<td>${Math.abs(v)>=0.5?fv(v):'–'}</td>`).join('')+`<td>${fv(t)}<small>${pf(gT?t/gT:0)}</small></td></tr>`};
+  const sec=(label,list,subLab)=>{const L=list.filter(pm=>Math.abs(rowT(pm))>=1);if(!L.length)return '';
+    const sub=cols.map(st=>L.reduce((s,pm)=>s+val(pm,st),0)),st2=sub.reduce((a,b)=>a+b,0);
+    return `<tr class="sech"><td colspan="${cols.length+2}">${label}</td></tr>`+
+      L.map(pm=>{const rt=rowT(pm);return `<tr><td>${pm}</td>`+cols.map(st=>cell(pm,st,rt)).join('')+`<td><b>${fv(rt)}</b></td></tr>`}).join('')+
+      subRow('Subtotal '+(subLab||label.split(' ').pop()),L,'subt')};
+  const pE=pOff.filter(isE),pB=pOff.filter(pm=>!isE(pm)),pOffL=pOff.filter(pm=>Math.abs(rowT(pm))>=1);
+  const body=sec('Offline – E-Com Payment',pE,'E-Com Payment')+sec('Offline – Bank',pB,'Bank')+(pOffL.length?subRow('Subtotal Offline',pOffL,'subt subo'):'')+sec('Metode bayar Online',pOn,'Online');
+  const colT=cols.map(stTot);
+  $('b_stTbl').innerHTML=names.length&&gT?'<thead><tr class="grp"><th></th>'+(sOff.length?`<th colspan="${sOff.length}" class="gof">Sales Type Offline</th>`:'')+(sOn.length?`<th colspan="${sOn.length}" class="gon">Sales Type Online</th>`:'')+'<th></th></tr>'+
+    '<tr><th>Metode bayar</th>'+cols.map((s,k)=>`<th class="${k===sOff.length?'bl':''}">${s}</th>`).join('')+'<th>Total</th></tr></thead><tbody>'+body+
+    '</tbody><tfoot><tr><td>Total</td>'+colT.map(v=>`<td>${fv(v)}<small>${pf(gT?v/gT:0)}</small></td>`).join('')+`<td>${fv(gT)}</td></tr></tfoot>`:'<tbody><tr><td class="empty">Tidak ada transaksi pada periode ini.</td></tr></tbody>';
+  $('b_stTbl').querySelectorAll('tbody tr:not(.sech)').forEach(tr=>{const c=tr.cells[sOff.length+1];if(c&&sOn.length&&sOff.length)c.classList.add('bl')});
+  $('b_stMis').innerHTML=mis?`<span class="mmk"></span> Merah = online/offline tidak cocok: <b>${fv(mis)}${vk==='nt'?'':' bill'}</b> (${pf(gT?mis/gT:0)}).`:'Semua metode bayar cocok dengan Sales Type.';
 }
 
 /* ===== Halaman 8: Product ===== */
@@ -2749,7 +2961,7 @@ function applyDataset(newX){
   [T,H].forEach(st=>{st.from=TMIN;st.to=TMAX;if(st.outlet!=='all'&&!D.outlets.includes(st.outlet))st.outlet='all'});
   builtRange=null;DSD=null;DSbusy=false;DSapprox=false;DSerr='';
   DS.from=TMIN;DS.to=TMAX;
-  period();initFilters();initTrend();initTraffic();initDaily();initProduct();initWeekly();PX=null;PXsrc=null;Perr='';
+  period();initFilters();initTrend();initTraffic();initDaily();initProduct();initWeekly();initBank();PX=null;PXsrc=null;Perr='';
   showPage(PAGE);
 }
 
@@ -3230,8 +3442,8 @@ function exFilterText(){
 function initExport(){
   const g=document.getElementById('ex_goto');if(g)g.onclick=()=>showPage(2);
 }
-period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initProduct();initWeekly();initReport();initExport();initUpload();initSheet();showPage(1);
-let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
+period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initProduct();initWeekly();initBank();initReport();initExport();initUpload();initSheet();showPage(1);
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
 </html>
