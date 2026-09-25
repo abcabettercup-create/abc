@@ -520,6 +520,7 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
       <div class="frow">
         <div class="fgrp"><span class="fl">Area</span><div class="chips" id="w_areaChips" role="group" aria-label="Filter area weekly"></div></div>
         <div class="fgrp"><span class="fl">Outlet</span><div class="chips" id="w_outletChips" role="group" aria-label="Filter outlet weekly"></div></div>
+        <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="w_chChips" role="group" aria-label="Filter penjualan online atau offline weekly"></div></div>
       </div>
       <div class="frow">
         <div class="fgrp"><span class="fl">Bulan</span><select id="w_month" aria-label="Pilih bulan"></select></div>
@@ -2047,7 +2048,7 @@ function initTabs(){
     b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,10,7,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
 }
 /* ===== Halaman 9: Weekly ===== */
-const WS={area:'all',outlet:'all',from:'',to:''};
+const WS={area:'all',outlet:'all',ch:'all',from:'',to:''};
 function drawBars(elId,dates,vals,o){
   const el=$(elId);
   if(!vals.length){el.innerHTML='<div class="empty">Tidak ada data pada periode ini.</div>';return}
@@ -2092,6 +2093,7 @@ function wChips(){
   mk('w_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],WS.area,v=>{WS.area=v;if(WS.outlet!=='all'&&v!=='all'&&!AREAS[v].o.includes(WS.outlet))WS.outlet='all';renderWeekly()});
   const list=WS.area==='all'?OUT:OUT.filter(x=>AREAS[WS.area].o.includes(x));
   mk('w_outletChips',[['all','Semua outlet']].concat(list.map(x=>[x,x])),WS.outlet,v=>{WS.outlet=v;renderWeekly()});
+  mk('w_chChips',[['all','Semua'],['off','Offline'],['on','Online']],WS.ch||'all',v=>{WS.ch=v;renderWeekly()});
   const p=$('w_presetChips');p.innerHTML='';
   addMonthChips(p,dOn(WS),dSet(WS,renderWeekly));
   PRESETS.forEach(pr=>{const r=presetRange(pr),b=document.createElement('button');b.type='button';b.className='chip';b.textContent=pr.n;
@@ -2110,9 +2112,11 @@ function renderWeekly(){
   const outs2=WS.outlet!=='all'?[WS.outlet]:(WS.area==='all'?OUT:OUT.filter(o=>AREAS[WS.area].o.includes(o)));
   const m=new Map(),dates=[],rows=[];
   for(let d=i0;d<=i1;d++){const k=isoWeekKey(TD[d]);let j=m.get(k);if(j===undefined){j=dates.length;m.set(k,j);dates.push(TD[d]);rows.push(new Array(10).fill(0))}
-    outs2.forEach(o=>{const v=D.daily.o[o][d];if(v)for(let c=0;c<10;c++)rows[j][c]+=(v[c]||0)})}
+    outs2.forEach(o=>{const v=D.daily.o[o][d],w=D.daily.on&&D.daily.on[o]?D.daily.on[o][d]:null,ch=WS.ch||'all';
+      if(ch==='on'){if(w)for(let c=0;c<10;c++)rows[j][c]+=(w[c]||0)}
+      else if(v)for(let c=0;c<10;c++)rows[j][c]+=(v[c]||0)-(ch==='off'&&w?(w[c]||0):0)})}
   const n=dates.length;
-  const olabel=WS.outlet!=='all'?WS.outlet:(WS.area==='all'?'Semua outlet':AREAS[WS.area].name);
+  const olabel=(WS.outlet!=='all'?WS.outlet:(WS.area==='all'?'Semua outlet':AREAS[WS.area].name))+(WS.ch==='on'?', Online':WS.ch==='off'?', Offline':'');
   $('w_show').textContent=dLong(WS.from)+' s.d '+dLong(WS.to)+' ('+nd+' hari, '+n+' minggu), '+olabel;
   const LB=s=>{const k=isoWeekKey(s),w=WK[k],a=w&&w.a>WS.from?w.a:WS.from,b=w&&w.b<WS.to?w.b:WS.to;return 'Minggu '+(+k.split('-W')[1])+' ('+dShort(a)+' s.d '+dShort(b)+')'};
   const XL=s=>'W'+(+isoWeekKey(s).split('-W')[1]);
