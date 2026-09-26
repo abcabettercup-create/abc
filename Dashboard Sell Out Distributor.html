@@ -157,6 +157,10 @@ tfoot td{font-weight:700;background:var(--surface2);border-top:1px solid var(--l
 .ins .b{font-weight:700;font-size:15px}
 .ins .d{font-size:12.5px;color:var(--ink2)}
 
+.master-edit input{border:1px solid var(--line);background:var(--surface2);border-radius:6px;padding:5px 7px;width:100%;min-width:140px;font-size:13px}
+.master-edit input.num{text-align:right;min-width:110px;font-variant-numeric:tabular-nums}
+.master-edit td{padding:5px 6px;vertical-align:middle}
+.master-edit th.grp{text-align:center;background:var(--accent-soft);color:var(--ink)}
 .empty-state{padding:30px;text-align:center;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.2);z-index:50}
 .dist-pick{display:flex;gap:8px;flex-wrap:wrap}
@@ -176,6 +180,10 @@ tfoot td{font-weight:700;background:var(--surface2);border-top:1px solid var(--l
       <div class="src" id="srcInfo">Memuat data…</div>
     </div>
     <div class="actions">
+      <button class="btn" id="exportBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 10l6 6 6-6M4 20h16"/></svg>
+        Export Excel
+      </button>
       <input type="file" id="fileIn" accept=".xlsx,.xls" hidden>
       <button class="btn primary" id="uploadBtn" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>
@@ -186,6 +194,7 @@ tfoot td{font-weight:700;background:var(--surface2);border-top:1px solid var(--l
 
   <section class="filters" aria-label="Filter">
     <div class="fgroup"><span class="flabel">Distributor</span><div class="chips" id="distChips"></div></div>
+    <div class="fgroup"><span class="flabel">Tahun</span><select id="yearSel" aria-label="Tahun"></select></div>
     <div class="fgroup"><span class="flabel">Periode</span>
       <select id="fromSel" aria-label="Dari bulan"></select><span class="note">s/d</span><select id="toSel" aria-label="Sampai bulan"></select>
     </div>
@@ -198,6 +207,11 @@ tfoot td{font-weight:700;background:var(--surface2);border-top:1px solid var(--l
     <button class="tab" role="tab" data-tab="produk">Produk / SKU</button>
     <button class="tab" role="tab" data-tab="customer">Customer</button>
     <button class="tab" role="tab" data-tab="area">Area &amp; Sales</button>
+    <button class="tab" role="tab" data-tab="master">Master PIC</button>
+    <button class="tab" role="tab" data-tab="target">Target Bulanan</button>
+    <button class="tab" role="tab" data-tab="pencapaian">Pencapaian Bulanan</button>
+    <button class="tab" role="tab" data-tab="rekap">Rekap Pencapaian</button>
+    <button class="tab" role="tab" data-tab="ytd">YTD</button>
   </nav>
 
   <main id="view" class="panel"></main>
@@ -240,7 +254,7 @@ function stdProduct(name){
 }
 
 /* ============ state ============ */
-const S={rows:[],dists:[],periods:[],dist:'ALL',from:null,to:null,kat:'ALL',tab:'ringkasan',
+const S={targets:{},tg:{year:null,dist:null},rk:{year:null,dist:'ALL',metric:'Rp'},rows:[],dists:[],periods:[],year:'ALL',dist:'ALL',from:null,to:null,kat:'ALL',tab:'ringkasan',
   metric:'o',cust:{q:'',sort:'o',dir:-1,page:0},pic:{},meta:null,db:null,canWrite:true};
 const charts={};
 
@@ -293,12 +307,19 @@ function pack(rows){
     r.push(+o.q||0,Math.round((+o.kg||0)*1000)/1000,Math.round((+o.o||0)*100)/100);out.push(r);}
   return {cols:PCOLS.concat(['Qty','Kg','Omset']),dict,rows:out};}
 
+/* Adyaceda dipisah per wilayah; kode 3 huruf di depan nama sales dibuang (mis. "HWI HASAN WANI" -> "HASAN WANI") */
+const JABAR=['BDG','BANDUNG','PWK','PURWAKARTA','CIREBON','TASIK','GARUT','SUMEDANG','CIMAHI'];
+function splitDist(d,a){d=String(d||'').toUpperCase();if(d.indexOf('ADYACEDA')!==0)return d;
+  return JABAR.includes(String(a||'').toUpperCase().trim())?'ADYACEDA JAWA BARAT':'ADYACEDA JABOTABEK';}
+function cleanSales(s){const t=String(s||'').trim().split(/\s+/);
+  if(t.length>=3&&/^[A-Z]{3}$/.test(t[0])&&t[0][0]===t[1][0])return t.slice(1).join(' ');return t.join(' ');}
 function setData(rows){
+  rows.forEach(r=>{r.d=splitDist(r.d,r.a);if(r.d.indexOf('ADYACEDA')===0)r.s=cleanSales(r.s);});
   S.rows=rows;
   S.dists=[...new Set(rows.map(r=>r.d))].sort();
   S.periods=[...new Set(rows.map(r=>r.p))].sort();
   if(S.dist!=='ALL'&&!S.dists.includes(S.dist)) S.dist='ALL';
-  S.from=S.periods[0];S.to=S.periods[S.periods.length-1];
+  S.year='ALL';S.from=S.periods[0];S.to=S.periods[S.periods.length-1];
   buildFilters();render();
 }
 
@@ -308,20 +329,29 @@ function base(opt){opt=opt||{};
 function periodsIn(){return S.periods.filter(p=>p>=S.from&&p<=S.to);}
 
 /* ============ filters UI ============ */
+function yearPeriods(){return S.year==='ALL'?S.periods:S.periods.filter(p=>p.slice(0,4)===S.year);}
+function fillPeriodSel(){
+  const opts=yearPeriods().map(p=>'<option value="'+p+'">'+plabelFull(p)+'</option>').join('');
+  $('#fromSel').innerHTML=opts;$('#toSel').innerHTML=opts;
+  $('#fromSel').value=S.from;$('#toSel').value=S.to;
+}
 function buildFilters(){
   const dc=$('#distChips');
   dc.innerHTML='<button class="chip" data-d="ALL">Semua</button>'+S.dists.map(d=>'<button class="chip" data-d="'+esc(d)+'"><span class="dot" style="background:'+distVar(d)+'"></span>'+esc(titleCase(d))+'</button>').join('');
   dc.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{S.dist=b.dataset.d;S.cust.page=0;render();});
-  const opts=S.periods.map(p=>'<option value="'+p+'">'+plabelFull(p)+'</option>').join('');
-  $('#fromSel').innerHTML=opts;$('#toSel').innerHTML=opts;
-  $('#fromSel').value=S.from;$('#toSel').value=S.to;
+  const years=[...new Set(S.periods.map(p=>p.slice(0,4)))];
+  $('#yearSel').innerHTML='<option value="ALL">Semua tahun</option>'+years.map(y=>'<option>'+y+'</option>').join('');
+  $('#yearSel').value=S.year;
+  $('#yearSel').onchange=e=>{S.year=e.target.value;const ps=yearPeriods();S.from=ps[0];S.to=ps[ps.length-1];fillPeriodSel();S.cust.page=0;render();};
+  fillPeriodSel();
   $('#fromSel').onchange=e=>{S.from=e.target.value;if(S.from>S.to){S.to=S.from;$('#toSel').value=S.to;}S.cust.page=0;render();};
   $('#toSel').onchange=e=>{S.to=e.target.value;if(S.to<S.from){S.from=S.to;$('#fromSel').value=S.from;}S.cust.page=0;render();};
   const kats=[...new Set(S.rows.map(r=>r.kt))].sort();
   $('#katSel').innerHTML='<option value="ALL">Semua kategori</option>'+kats.map(k=>'<option>'+esc(k)+'</option>').join('');
   $('#katSel').value=S.kat;$('#katSel').onchange=e=>{S.kat=e.target.value;S.cust.page=0;render();};
 }
-function titleCase(s){return String(s).toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()).replace(/\bIam\b/,'IAM').replace(/\bIpm\b/,'IPM');}
+function titleCase(s){const x=S.pic&&S.pic[s];if(x&&x.alias)return x.alias;return baseTitle(s);}
+function baseTitle(s){return String(s).toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()).replace(/\bIam\b/,'IAM').replace(/\bIpm\b/,'IPM').replace(/\bPt\b/g,'PT').replace(/\bCv\b/g,'CV').replace(/\bTbk\b/g,'Tbk');}
 function syncChips(){document.querySelectorAll('#distChips .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===S.dist));
   document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===S.tab));}
 
@@ -499,13 +529,283 @@ function picForm(d){const p=S.pic[d]||{};const dis=S.db?'':' disabled';
    '</div><div class="note" id="picNote">'+(S.db?(p.updatedAt?'Terakhir diubah '+new Date(p.updatedAt).toLocaleString('id-ID'):(S.local?'PIC tersimpan di browser ini.':'PIC tersimpan untuk semua yang membuka dashboard ini.')):'Penyimpanan PIC belum tersedia di tampilan ini.')+'</div>';}
 function picCard(d){return '<div class="card">'+picForm(d)+'</div>';}
 function bindPic(d){const b=$('#picSave');if(!b)return;b.onclick=async()=>{
-  const data={distributor:d,nama:$('#picNama').value.trim(),hp:$('#picHp').value.trim(),catatan:$('#picCat').value.trim(),updatedAt:Date.now()};
+  const data=Object.assign({},S.pic[d]||{},{distributor:d,nama:$('#picNama').value.trim(),hp:$('#picHp').value.trim(),catatan:$('#picCat').value.trim(),updatedAt:Date.now()});
   if(!S.db){toast('Penyimpanan tidak tersedia.');return;}
   b.disabled=true;
   try{await S.db.doc('pic/'+slug(d)).set(data);S.pic[d]=data;toast('PIC '+titleCase(d)+' tersimpan.');$('#picNote').textContent='Terakhir diubah '+new Date(data.updatedAt).toLocaleString('id-ID');}
   catch(e){toast('Gagal menyimpan PIC: '+(e&&e.code==='not_granted'?'Anda tidak punya akses edit.':(e&&e.message||'coba lagi')),5000);}
   finally{b.disabled=false;}};}
 function slug(s){return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'x';}
+
+/* ============ MASTER PIC & TARGET ============ */
+const MF=[['nama','TSR / PIC SPK','text'],['hp','No. HP TSR','text'],['picDist','PIC distributor','text'],['picDistHp','No. HP PIC dist.','text'],['catatan','Catatan','text']];
+function realisasi(d,p){
+  const a=S.rows.filter(r=>r.d===d&&r.p===p&&(S.kat==='ALL'||r.kt===S.kat));
+  const cl=new Set(S.rows.filter(r=>r.d===d&&r.p<=p).map(r=>r.kc)).size;
+  return {Rp:sum(a,r=>r.o),Kg:sum(a,r=>r.kg),Pcs:sum(a,r=>r.q),OA:uniqCount(a,r=>r.kc),CL:cl};
+}
+function capPill(real,tgt){if(!tgt)return '<span class="note">–</span>';const c=real/tgt;const cls=c>=1?'good':c>=0.7?'warn':'bad';return '<span class="pill '+cls+'">'+pct(c)+'</span>';}
+function masterList(){const extra=Object.keys(S.pic).filter(d=>!S.dists.includes(d)).sort();return S.dists.concat(extra);}
+function mDot(d){return S.dists.includes(d)?distVar(d):'var(--muted)';}
+function renderMaster(v){
+  const p=S.to;const dis=S.db?'':' disabled';const LIST=masterList();
+  const head1='<tr><th rowspan="2">Distributor</th><th rowspan="2">Nama distributor (bisa diedit)</th><th class="grp" colspan="4">PIC</th><th rowspan="2">Catatan</th><th rowspan="2"></th></tr>';
+  const head2='<tr>'+MF.slice(0,4).map(f=>'<th class="'+(f[2]==='num'?'n':'')+'">'+f[1]+'</th>').join('')+'</tr>';
+  const body=LIST.map(d=>{const x=S.pic[d]||{};const manual=!S.dists.includes(d);
+    return '<tr><td><span class="dname"><i style="background:'+mDot(d)+'"></i>'+esc(titleCase(d))+'</span>'+(manual?'<div class="note">Ditambah manual · belum ada data sell out</div>':(x.alias?'<div class="note">Nama di data: '+esc(baseTitle(d))+'</div>':''))+'</td>'+
+      '<td><input'+dis+' type="text" id="m_'+slug(d)+'__name" data-d="'+esc(d)+'" value="'+esc(titleCase(d))+'" aria-label="Nama distributor '+esc(titleCase(d))+'"></td>'+
+      MF.map(f=>'<td><input'+dis+' class="'+(f[2]==='num'?'num':'')+'" id="m_'+slug(d)+'_'+f[0]+'" data-d="'+esc(d)+'" data-f="'+f[0]+'" '+(f[2]==='num'?'type="number" min="0" step="any" inputmode="decimal"':'type="text"')+' value="'+esc(x[f[0]]==null?'':x[f[0]])+'" aria-label="'+esc(f[1]+' '+titleCase(d))+'"></td>').join('')+
+      '<td>'+(manual?'<button class="btn mdel" type="button" data-d="'+esc(d)+'"'+dis+' aria-label="Hapus '+esc(titleCase(d))+'">Hapus</button>':'')+'</td></tr>';}).join('');
+  v.innerHTML=
+  '<div class="card"><div class="card-h"><div><h3>Master PIC distributor</h3><div class="sub">Isi sekali, ubah bila ada perubahan. '+(S.db?(S.local?'Tersimpan di browser ini.':'Tersimpan untuk semua yang membuka dashboard ini.'):'Penyimpanan belum tersedia di tampilan ini.')+'</div></div>'+
+   '<button class="btn primary" id="masterSave" type="button"'+dis+'>Simpan semua</button></div>'+
+   '<div class="tools"><div class="field" style="flex:1;min-width:0"><label for="newDist">Tambah distributor baru</label>'+
+   '<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="newDist" class="search" style="flex:1;width:auto" placeholder="mis. PT SURYA NASIONAL"'+dis+'>'+
+   '<button class="btn" id="addDist" type="button"'+dis+'>+ Tambah</button></div></div></div>'+
+   '<div class="tbl-wrap master-edit"><table><thead>'+head1+head2+'</thead><tbody>'+body+'</tbody></table></div>'+
+   '<div class="note">Target diisi di tab Target Bulanan. Pencapaian per bulan ada di tab Pencapaian Bulanan.</div></div>';
+  v.querySelectorAll('.master-edit input').forEach(i=>i.addEventListener('input',()=>{S.masterDirty=true;}));
+  const nd=$('#newDist'),ab=$('#addDist');
+  const addFn=async()=>{
+    const name=nd.value.trim().replace(/\s+/g,' ').toUpperCase();
+    if(!name){toast('Isi nama distributor dulu.');nd.focus();return;}
+    if(masterList().includes(name)){toast(titleCase(name)+' sudah ada di daftar.');return;}
+    if(!S.db){toast('Penyimpanan tidak tersedia.');return;}
+    ab.disabled=true;
+    const doc={distributor:name,manual:true,updatedAt:Date.now()};
+    try{await S.db.doc('pic/'+slug(name)).set(doc);S.pic[name]=doc;S.masterDirty=false;toast(titleCase(name)+' ditambahkan. Isi PIC & targetnya, lalu Simpan semua.',5000);render();
+      const f=document.getElementById('m_'+slug(name)+'_nama');if(f)f.focus();}
+    catch(e){ab.disabled=false;toast('Gagal menambah: '+(e.code==='not_granted'?'Anda tidak punya akses edit.':(e.message||'coba lagi')),5000);}
+  };
+  if(ab)ab.onclick=addFn;
+  if(nd)nd.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addFn();}});
+  v.querySelectorAll('.mdel').forEach(btn=>btn.onclick=async()=>{
+    const d=btn.dataset.d;
+    if(btn.dataset.arm!=='1'){btn.dataset.arm='1';btn.textContent='Yakin hapus?';setTimeout(()=>{if(btn.isConnected){btn.dataset.arm='';btn.textContent='Hapus';}},4000);return;}
+    btn.disabled=true;
+    try{await S.db.doc('pic/'+slug(d)).delete();delete S.pic[d];toast(titleCase(d)+' dihapus dari Master PIC.');render();}
+    catch(e){btn.disabled=false;toast('Gagal menghapus: '+(e.message||'coba lagi'),5000);}
+  });
+  const b=$('#masterSave');if(b)b.onclick=async()=>{
+    if(!S.db){toast('Penyimpanan tidak tersedia.');return;}
+    b.disabled=true;let n=0,err=null;
+    const all=masterList();
+    for(const d of all){
+      const cur=Object.assign({},S.pic[d]||{});const nx=Object.assign({},cur,{distributor:d});let changed=false;
+      for(const f of MF){const el=document.getElementById('m_'+slug(d)+'_'+f[0]);if(!el)continue;
+        let val=el.value.trim();if(f[2]==='num')val=val===''?'':+val;
+        if(String(cur[f[0]]==null?'':cur[f[0]])!==String(val)){nx[f[0]]=val;changed=true;}}
+      // nama distributor
+      const ne=document.getElementById('m_'+slug(d)+'__name');let newKey=null;
+      if(ne){const nm=ne.value.trim().replace(/\s+/g,' ');
+        if(!nm){toast('Nama distributor tidak boleh kosong ('+baseTitle(d)+').',5000);err={message:'nama kosong'};break;}
+        if(S.dists.includes(d)){ // distributor dari data: simpan sebagai nama tampilan
+          const alias=(nm===baseTitle(d)||nm.toUpperCase()===d)?'':nm;
+          if((cur.alias||'')!==alias){nx.alias=alias;changed=true;}
+        }else if(nm.toUpperCase()!==d){ // distributor manual: ganti nama sebenarnya
+          newKey=nm.toUpperCase();
+          if(all.includes(newKey)&&newKey!==d){toast(nm+' sudah ada di daftar.',5000);err={message:'duplikat'};break;}
+          nx.distributor=newKey;changed=true;
+        }}
+      if(!changed)continue;nx.updatedAt=Date.now();
+      try{
+        if(newKey){await S.db.doc('pic/'+slug(newKey)).set(nx);await S.db.doc('pic/'+slug(d)).delete();delete S.pic[d];S.pic[newKey]=nx;
+          for(const key of Object.keys(S.targets)){const t=S.targets[key];if(t&&t.distributor===d){const nt=Object.assign({},t,{distributor:newKey});
+            await S.db.doc('targets/'+slug(newKey)+'_'+t.year).set(nt);await S.db.doc('targets/'+slug(d)+'_'+t.year).delete();delete S.targets[key];S.targets[newKey+'|'+t.year]=nt;}}}
+        else{await S.db.doc('pic/'+slug(d)).set(nx);S.pic[d]=nx;}
+        n++;
+      }catch(e){err=e;break;}
+    }
+    S.masterDirty=false;b.disabled=false;buildFilters();
+    if(err)toast('Gagal menyimpan: '+(err.code==='not_granted'?'Anda tidak punya akses edit.':(err.message||'coba lagi')),5000);
+    else toast(n?n+' distributor tersimpan.':'Tidak ada perubahan.');
+    render();
+  };
+}
+
+/* ============ TARGET BULANAN ============ */
+const TK=[['Rp','Value (Rp)'],['Kg','Volume (kg)'],['Pcs','Pcs / zak'],['OA','OA (outlet aktif)'],['CL','CL (customer list)']];
+const MM=['01','02','03','04','05','06','07','08','09','10','11','12'];
+const tnum=v=>v===''||v==null||isNaN(+v)?0:+v;
+function tgtDoc(d,y){return S.targets[d+'|'+y]||null;}
+function tgtFor(d,p,k){ // target bulanan dari tab Target Bulanan
+  const T=tgtDoc(d,p.slice(0,4));const v=T&&T.m&&T.m[p.slice(5)]?T.m[p.slice(5)][k]:'';
+  if(v!==''&&v!=null&&!isNaN(+v))return +v;
+  return 0;
+}
+function tgtCum(d,y,k,uptoM,fromData){ // akumulasi target s/d bulan uptoM ('12' = 1 tahun); fromData: mulai bulan pertama distributor punya data
+  const f=fromData?firstPeriod(d):null;const ms=MM.filter(m=>m<=uptoM&&(!f||(y+'-'+m)>=f));const vals=ms.map(m=>tgtFor(d,y+'-'+m,k));
+  if(k==='OA'){const nz=vals.filter(v=>v>0);return nz.length?nz.reduce((a,b)=>a+b,0)/nz.length:0;}
+  if(k==='CL'){for(let i=vals.length-1;i>=0;i--)if(vals[i]>0)return vals[i];return 0;}
+  return vals.reduce((a,b)=>a+b,0);
+}
+function firstPeriod(d){return S.rows.filter(r=>r.d===d).reduce((mn,r)=>(!mn||r.p<mn)?r.p:mn,null);}
+function lastPeriod(d,y){const ps=S.rows.filter(r=>r.d===d&&r.p.slice(0,4)===y).map(r=>r.p).sort();return ps[ps.length-1]||null;}
+function actCum(d,y,k,uptoM){ // akumulasi actual s/d bulan uptoM, hanya bulan sejak distributor punya data
+  const f=firstPeriod(d);const ps=MM.filter(m=>m<=uptoM).map(m=>y+'-'+m).filter(p=>!f||p>=f);
+  const rs=ps.map(p=>realisasi(d,p));if(!rs.length)return 0;
+  if(k==='OA')return rs.reduce((a,r)=>a+r.OA,0)/rs.length;
+  if(k==='CL')return rs[rs.length-1].CL;
+  return rs.reduce((a,r)=>a+r[k],0);
+}
+function tgtYears(){const ys=new Set(S.periods.map(p=>p.slice(0,4)));Object.values(S.targets).forEach(t=>t&&t.year&&ys.add(String(t.year)));
+  const mx=Math.max(...[...ys].map(Number),new Date().getFullYear());ys.add(String(mx+1));return [...ys].sort();}
+function fmtK(k,v){if(v==null||v===''||isNaN(v))return '–';if(k==='Rp')return rpShort(v);if(k==='Kg')return kgf(v);return nf0.format(Math.round(v));}
+function statusOf(c){return c==null?'':c>=1?'<span class="pill good">Tercapai</span>':c>=0.7?'<span class="pill warn">Perlu dorong</span>':'<span class="pill bad">Di bawah target</span>';}
+
+function renderPencapaian(v){
+  const LIST=masterList();
+  const months=[...new Set(S.periods.concat(Object.values(S.targets).flatMap(t=>t&&t.m?MM.filter(m=>t.m[m]&&TK.some(k=>t.m[m][k[0]]!==''&&t.m[m][k[0]]!=null)).map(m=>t.year+'-'+m):[])))].sort();
+  if(!S.pc)S.pc={};if(!S.pc.month||!months.includes(S.pc.month))S.pc.month=S.to&&months.includes(S.to)?S.to:months[months.length-1];
+  const p=S.pc.month;
+  const rows=LIST.filter(d=>S.dist==='ALL'||d===S.dist).map(d=>{const x=S.pic[d]||{};const r=realisasi(d,p);
+    const cell=(k,fmt)=>{const t=tgtFor(d,p,k);return '<td class="n">'+fmt(r[k])+'</td><td class="n">'+(t?fmt(t):'<span class="note">–</span>')+'</td><td class="n">'+capPill(r[k],t)+'</td>';};
+    return '<tr><td><span class="dname"><i style="background:'+mDot(d)+'"></i>'+esc(titleCase(d))+'</span><div class="note">'+esc(x.nama||'PIC belum diisi')+(S.dists.includes(d)?'':' · belum ada data')+'</div></td>'+
+      cell('Rp',rpShort)+cell('Kg',kgf)+cell('Pcs',q=>nf0.format(q))+cell('OA',q=>nf0.format(q))+cell('CL',q=>nf0.format(q))+'</tr>';}).join('');
+  v.innerHTML='<div class="card"><div class="card-h"><div><h3>Pencapaian '+plabelFull(p)+' vs target bulanan</h3><div class="sub">Target dari tab Target Bulanan'+(S.kat==='ALL'?'':' · kategori '+esc(S.kat))+(S.dist==='ALL'?'':' · '+esc(titleCase(S.dist)))+'</div></div>'+
+    '<div class="actions"><label class="flabel" for="pcMonth">Bulan</label><select id="pcMonth">'+months.map(m=>'<option value="'+m+'"'+(m===p?' selected':'')+'>'+plabelFull(m)+'</option>').join('')+'</select></div></div>'+
+    '<div class="tbl-wrap"><table><thead><tr><th rowspan="2">Distributor</th><th class="n" colspan="3">Value</th><th class="n" colspan="3">Volume</th><th class="n" colspan="3">Pcs / zak</th><th class="n" colspan="3">OA</th><th class="n" colspan="3">CL</th></tr>'+
+    '<tr>'+Array(5).fill('<th class="n">Real</th><th class="n">Target</th><th class="n">%</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="note">OA = outlet aktif (customer unik yang membeli di bulan itu). CL = customer list, jumlah customer unik yang pernah membeli sampai bulan itu. Pcs = qty pcs untuk retail, zak untuk 25 kg. Warna: hijau ≥ 100%, kuning 70–99%, merah &lt; 70%.</div></div>';
+  $('#pcMonth').onchange=e=>{S.pc.month=e.target.value;render();};
+}
+
+function renderTarget(v){
+  const LIST=masterList();const years=tgtYears();
+  if(!S.tg.year)S.tg.year=(S.year!=='ALL'?S.year:(S.to||'').slice(0,4))||years[0];
+  if(!S.tg.dist||!LIST.includes(S.tg.dist))S.tg.dist=S.dist!=='ALL'&&LIST.includes(S.dist)?S.dist:LIST[0];
+  const d=S.tg.dist,y=S.tg.year;const T=tgtDoc(d,y)||{};const x=S.pic[d]||{};const dis=S.db?'':' disabled';
+  const cellV=(m,k)=>{const val=T.m&&T.m[m]&&T.m[m][k]!=null?T.m[m][k]:'';return val;};
+  const rows=MM.map((m,i)=>'<tr><td><b>'+BLN_FULL[i]+'</b></td>'+TK.map(k=>'<td><input'+dis+' class="num" type="number" min="0" step="any" inputmode="decimal" id="t_'+m+'_'+k[0]+'" data-m="'+m+'" data-k="'+k[0]+'" value="'+esc(cellV(m,k[0]))+'" aria-label="Target '+k[1]+' '+BLN_FULL[i]+'"></td>').join('')+'</tr>').join('');
+  const tot='<tr><td><b>Akumulasi 1 tahun</b></td>'+TK.map(k=>'<td class="n"><b id="tt_'+k[0]+'">'+fmtK(k[0],tgtCum(d,y,k[0],'12'))+'</b></td>').join('')+'</tr>';
+  // overview semua distributor
+  const ov=LIST.map(dd=>'<tr><td><span class="dname"><i style="background:'+mDot(dd)+'"></i>'+esc(titleCase(dd))+'</span></td>'+TK.map(k=>'<td class="n">'+fmtK(k[0],tgtCum(dd,y,k[0],'12'))+'</td>').join('')+
+    '<td class="n">'+MM.filter(m=>{const t=tgtDoc(dd,y);return t&&t.m&&t.m[m]&&TK.some(k=>t.m[m][k[0]]!==''&&t.m[m][k[0]]!=null);}).length+' / 12</td></tr>').join('');
+  v.innerHTML=
+  '<div class="card"><div class="card-h"><div><h3>Target bulanan per distributor</h3><div class="sub">Isi target Januari–Desember untuk tiap distributor. Bulan yang dikosongkan dianggap belum ada target.</div></div>'+
+   '<div class="actions"><select id="tgYear" aria-label="Tahun target">'+years.map(yy=>'<option'+(yy===y?' selected':'')+'>'+yy+'</option>').join('')+'</select>'+
+   '<select id="tgDist" aria-label="Distributor">'+LIST.map(dd=>'<option value="'+esc(dd)+'"'+(dd===d?' selected':'')+'>'+esc(titleCase(dd))+'</option>').join('')+'</select></div></div>'+
+   '<div class="tools"><div class="actions">'+(TK.some(k=>x['tgt'+k[0]])?'<button class="btn" id="tgFill" type="button"'+dis+'>Pakai target lama (Master PIC) untuk semua bulan</button>':'')+'<button class="btn" id="tgCopy" type="button"'+dis+'>Salin Januari ke semua bulan</button><button class="btn" id="tgClear" type="button"'+dis+'>Kosongkan</button></div>'+
+   '<button class="btn primary" id="tgSave" type="button"'+dis+'>Simpan target '+esc(titleCase(d))+' '+y+'</button></div>'+
+   '<div class="tbl-wrap master-edit"><table><thead><tr><th>Bulan</th>'+TK.map(k=>'<th class="n">'+k[1]+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody><tfoot>'+tot+'</tfoot></table></div>'+
+   '<div class="note">Akumulasi 1 tahun: Value, Volume, Pcs = jumlah 12 bulan. OA = rata-rata target bulanan. CL = target bulan terakhir yang diisi (posisi akhir tahun).</div></div>'+
+  '<div class="card"><div class="card-h"><div><h3>Ringkasan target '+y+' semua distributor</h3><div class="sub">Akumulasi 1 tahun per distributor</div></div></div>'+
+   '<div class="tbl-wrap"><table><thead><tr><th>Distributor</th>'+TK.map(k=>'<th class="n">'+k[1]+'</th>').join('')+'<th class="n">Bulan terisi</th></tr></thead><tbody>'+ov+'</tbody></table></div></div>';
+  $('#tgYear').onchange=e=>{S.tg.year=e.target.value;S.masterDirty=false;render();};
+  $('#tgDist').onchange=e=>{S.tg.dist=e.target.value;S.masterDirty=false;render();};
+  const inputs=[...v.querySelectorAll('input[data-m]')];
+  const recalc=()=>{S.masterDirty=true;const tmp={};inputs.forEach(i=>{(tmp[i.dataset.m]=tmp[i.dataset.m]||{})[i.dataset.k]=i.value.trim();});
+    const saveT=S.targets[d+'|'+y];S.targets[d+'|'+y]={distributor:d,year:+y,m:tmp};TK.forEach(k=>{$('#tt_'+k[0]).textContent=fmtK(k[0],tgtCum(d,y,k[0],'12'));});
+    if(saveT)S.targets[d+'|'+y]=saveT;else delete S.targets[d+'|'+y];};
+  inputs.forEach(i=>i.addEventListener('input',recalc));
+  const setAll=fn=>{inputs.forEach(i=>{const val=fn(i);if(val!==undefined)i.value=val;});recalc();};
+  if($('#tgFill'))$('#tgFill').onclick=()=>setAll(i=>{const f=x['tgt'+i.dataset.k];return f===''||f==null?'':String(f);});
+  $('#tgCopy').onclick=()=>setAll(i=>i.dataset.m==='01'?undefined:$('#t_01_'+i.dataset.k).value);
+  $('#tgClear').onclick=()=>setAll(()=> '');
+  $('#tgSave').onclick=async()=>{
+    if(!S.db){toast('Penyimpanan tidak tersedia.');return;}
+    const m={};inputs.forEach(i=>{const val=i.value.trim();(m[i.dataset.m]=m[i.dataset.m]||{})[i.dataset.k]=val===''?'':+val;});
+    const doc={distributor:d,year:+y,m,updatedAt:Date.now()};
+    const b=$('#tgSave');b.disabled=true;
+    try{await S.db.doc('targets/'+slug(d)+'_'+y).set(doc);S.targets[d+'|'+y]=doc;S.masterDirty=false;toast('Target '+titleCase(d)+' '+y+' tersimpan.');render();}
+    catch(e){b.disabled=false;toast('Gagal menyimpan: '+(e.code==='not_granted'?'Anda tidak punya akses edit.':(e.message||'coba lagi')),5000);}
+  };
+}
+
+function renderRekap(v){
+  const LIST=masterList();const years=tgtYears().filter(yy=>S.periods.some(p=>p.slice(0,4)===yy)||Object.values(S.targets).some(t=>String(t.year)===yy));
+  if(!S.rk.year||!years.includes(S.rk.year))S.rk.year=(S.year!=='ALL'?S.year:(S.to||'').slice(0,4))||years[years.length-1];
+  const y=S.rk.year,k=S.rk.metric,kl=TK.find(t=>t[0]===k)[1];
+  const lastM=(()=>{const ps=S.periods.filter(p=>p.slice(0,4)===y);return ps.length?ps[ps.length-1].slice(5):'00';})();
+  const sel='<div class="actions"><select id="rkYear" aria-label="Tahun">'+years.map(yy=>'<option'+(yy===y?' selected':'')+'>'+yy+'</option>').join('')+'</select>'+
+    '<select id="rkDist" aria-label="Distributor"><option value="ALL">Semua distributor</option>'+LIST.map(dd=>'<option value="'+esc(dd)+'"'+(dd===S.rk.dist?' selected':'')+'>'+esc(titleCase(dd))+'</option>').join('')+'</select>'+
+    '<div class="seg" id="rkMetric">'+TK.map(t=>'<button data-k="'+t[0]+'" aria-pressed="'+(t[0]===k)+'">'+t[0].replace('Rp','Value').replace('Kg','Volume')+'</button>').join('')+'</div></div>';
+  let html='';
+  if(S.rk.dist==='ALL'){
+    const rows=LIST.filter(d=>lastPeriod(d,y)||tgtCum(d,y,'Rp','12')||tgtCum(d,y,k,'12')).map(d=>{const lm=(lastPeriod(d,y)||'').slice(5)||lastM;const tY=tgtCum(d,y,k,'12'),tYTD=tgtCum(d,y,k,lm,true),aYTD=actCum(d,y,k,lm);
+      const c=tYTD?aYTD/tYTD:null,cy=tY?aYTD/tY:null;const pic=(S.pic[d]||{}).nama||'';
+      return '<tr style="cursor:pointer" data-d="'+esc(d)+'"><td><span class="dname"><i style="background:'+mDot(d)+'"></i>'+esc(titleCase(d))+'</span><div class="note">'+esc(pic||'PIC belum diisi')+'</div></td>'+
+        '<td class="n">'+fmtK(k,tY)+'</td><td>'+(lm&&lm!=='00'?BLN[+lm-1]:'–')+'</td><td class="n">'+fmtK(k,tYTD)+'</td><td class="n">'+fmtK(k,aYTD)+'</td><td class="n">'+(c==null?'–':pct(c))+'</td><td class="n">'+(cy==null?'–':pct(cy))+'</td><td>'+(c==null?'<span class="note">target belum diisi</span>':statusOf(c))+'</td></tr>';}).join('');
+    html='<div class="card"><div class="card-h"><div><h3>Rekap pencapaian '+y+' · '+kl+'</h3><div class="sub">YTD = bulan pertama data (maks. Januari) s/d bulan data terakhir tiap distributor; target YTD dihitung di rentang yang sama. Klik baris untuk detail per bulan.</div></div>'+sel+'</div>'+
+      '<div class="tbl-wrap"><table><thead><tr><th>Distributor</th><th class="n">Target 1 tahun</th><th>YTD s/d</th><th class="n">Target YTD</th><th class="n">Actual YTD</th><th class="n">% YTD</th><th class="n">% target tahunan</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      '<div class="note">OA: rata-rata per bulan. CL: posisi bulan terakhir. Bulan sebelum distributor mulai punya data tidak dihitung di actual.</div></div>';
+    v.innerHTML=html;
+    v.querySelectorAll('tbody tr[data-d]').forEach(tr=>tr.onclick=()=>{S.rk.dist=tr.dataset.d;render();});
+  }else{
+    const d=S.rk.dist;const f=firstPeriod(d);
+    let cT=0,cA=0,nA=0,nT=0,lastA=0,lastT=0;
+    const data=MM.map((m,i)=>{const p=y+'-'+m;const t=tgtFor(d,p,k);const has=S.periods.includes(p)&&(!f||p>=f);const a=has?realisasi(d,p)[k]:null;
+      const inT=!f||p>=f;
+      if(k==='OA'){if(t>0&&inT){nT++;cT+=t;}if(a!=null){nA++;cA+=a;}}else if(k==='CL'){if(t>0&&inT)lastT=t;if(a!=null)lastA=a;}else{if(inT)cT+=t;if(a!=null)cA+=a;}
+      const ct=k==='OA'?(nT?cT/nT:0):k==='CL'?lastT:cT;const ca=k==='OA'?(nA?cA/nA:null):k==='CL'?(a!=null?lastA:null):(a!=null?cA:null);
+      return {m,i,p,t,a,ct,ca};});
+    const rows=data.map(r=>'<tr><td><b>'+BLN_FULL[r.i]+'</b></td><td class="n">'+(r.t?fmtK(k,r.t):'–')+'</td><td class="n">'+(r.a==null?'<span class="note">–</span>':fmtK(k,r.a))+'</td><td class="n">'+(r.a!=null&&r.t?pct(r.a/r.t):'–')+'</td>'+
+      '<td class="n">'+(r.ct?fmtK(k,r.ct):'–')+'</td><td class="n">'+(r.ca==null?'–':fmtK(k,r.ca))+'</td><td class="n">'+(r.ca!=null&&r.ct?pct(r.ca/r.ct):'–')+'</td><td>'+(r.a!=null&&r.t?statusOf(r.a/r.t):'')+'</td></tr>').join('');
+    const tY=tgtCum(d,y,k,'12');const lastRow=[...data].reverse().find(r=>r.ca!=null);
+    html='<div class="card"><div class="card-h"><div><h3>'+esc(titleCase(d))+' · '+kl+' · '+y+'</h3><div class="sub">PIC: '+esc((S.pic[d]||{}).nama||'belum diisi')+' · Target 1 tahun '+fmtK(k,tY)+(lastRow&&tY?' · tercapai '+pct(lastRow.ca/tY)+' dari target tahunan':'')+'</div></div>'+sel+'</div>'+
+      '<div class="grid2"><div><div class="chartbox"><canvas id="cRkM"></canvas></div><div id="lgRkM"></div></div><div><div class="chartbox"><canvas id="cRkC"></canvas></div><div id="lgRkC"></div></div></div>'+
+      '<div class="tbl-wrap"><table><thead><tr><th>Bulan</th><th class="n">Target</th><th class="n">Actual</th><th class="n">%</th><th class="n">Target akumulasi</th><th class="n">Actual akumulasi</th><th class="n">% akumulasi</th><th>Status bulan</th></tr></thead><tbody>'+rows+'</tbody>'+
+      '<tfoot><tr><td>Target 1 tahun</td><td class="n">'+fmtK(k,tY)+'</td><td colspan="6"></td></tr></tfoot></table></div>'+
+      '<button class="btn" id="rkBack" type="button">← Semua distributor</button></div>';
+    v.innerHTML=html;
+    $('#rkBack').onclick=()=>{S.rk.dist='ALL';render();};
+    const tc=cssv('--muted'),ac=S.dists.includes(d)?distColor(d):cssv('--s1');
+    charts.rkm=new Chart($('#cRkM'),{type:'bar',data:{labels:BLN,datasets:[{label:'Target',data:data.map(r=>r.t||null),backgroundColor:tc,borderRadius:3,maxBarThickness:22},{label:'Actual',data:data.map(r=>r.a),backgroundColor:ac,borderRadius:3,maxBarThickness:22}]},
+      options:baseOpts({scales:{x:{grid:{display:false},ticks:{color:cssv('--muted')}},y:{beginAtZero:true,grid:{color:cssv('--grid')},border:{display:false},ticks:{color:cssv('--muted'),callback:axisFmt(k==='Rp'?'o':k==='Kg'?'kg':'c')}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fmtK(k,c.parsed.y)}}}})});
+    $('#lgRkM').innerHTML=legendHtml([{l:'Target per bulan',c:tc},{l:'Actual per bulan',c:ac}]);
+    charts.rkc=new Chart($('#cRkC'),{type:'line',data:{labels:BLN,datasets:[{label:'Target akumulasi',data:data.map(r=>r.ct||null),borderColor:tc,borderDash:[6,4],borderWidth:2,pointRadius:0,tension:.2},{label:'Actual akumulasi',data:data.map(r=>r.ca),borderColor:ac,backgroundColor:ac,borderWidth:2,pointRadius:4,pointBackgroundColor:ac,pointBorderColor:cssv('--surface'),pointBorderWidth:2,tension:.2}]},
+      options:baseOpts({scales:{x:{grid:{display:false},ticks:{color:cssv('--muted')}},y:{beginAtZero:true,grid:{color:cssv('--grid')},border:{display:false},ticks:{color:cssv('--muted'),callback:axisFmt(k==='Rp'?'o':k==='Kg'?'kg':'c')}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fmtK(k,c.parsed.y)}}}})});
+    $('#lgRkC').innerHTML=legendHtml([{l:'Target akumulasi (YTD)',c:tc},{l:'Actual akumulasi (YTD)',c:ac}]);
+  }
+  $('#rkYear').onchange=e=>{S.rk.year=e.target.value;render();};
+  $('#rkDist').onchange=e=>{S.rk.dist=e.target.value;render();};
+  v.querySelectorAll('#rkMetric button').forEach(b=>b.onclick=()=>{S.rk.metric=b.dataset.k;render();});
+}
+
+/* ============ YTD (1 Januari s/d bulan terpilih, 1 tahun saja) ============ */
+function ytdState(){
+  if(!S.ytd)S.ytd={};
+  const yrs=[...new Set(S.periods.map(p=>p.slice(0,4)).concat(Object.values(S.targets).map(t=>String(t.year))))].sort();
+  if(!S.ytd.year||!yrs.includes(S.ytd.year))S.ytd.year=(S.to||yrs[yrs.length-1]||'').slice(0,4);
+  if(!S.ytd.m){const ps=S.periods.filter(p=>p.slice(0,4)===S.ytd.year);S.ytd.m=ps.length?ps[ps.length-1].slice(5):'12';}
+  return {yrs,y:S.ytd.year,m:S.ytd.m};
+}
+function ytdRows(d,y,m){ // baris data distributor d, tahun y, bulan <= m (filter kategori berlaku)
+  return S.rows.filter(r=>r.d===d&&r.p.slice(0,4)===y&&r.p.slice(5)<=m&&(S.kat==='ALL'||r.kt===S.kat));
+}
+function ytdCalc(d,y,m){
+  const rs=ytdRows(d,y,m);const nM=+m;const ms=MM.filter(x=>x<=m);
+  const oaSum=ms.reduce((a,mm)=>a+uniqCount(rs.filter(r=>r.p.slice(5)===mm),r=>r.kc),0);
+  const act={Rp:sum(rs,r=>r.o),Kg:sum(rs,r=>r.kg),Pcs:sum(rs,r=>r.q),OA:oaSum/nM,CL:uniqCount(rs,r=>r.kc)};
+  const tv=k=>ms.map(mm=>tgtFor(d,y+'-'+mm,k));
+  const tgt={Rp:tv('Rp').reduce((a,b)=>a+b,0),Kg:tv('Kg').reduce((a,b)=>a+b,0),Pcs:tv('Pcs').reduce((a,b)=>a+b,0),
+    OA:(()=>{const nz=tv('OA').filter(x=>x>0);return nz.length?nz.reduce((a,b)=>a+b,0)/nz.length:0;})(),CL:Math.max(0,...tv('CL'))};
+  const year={};TK.forEach(k=>year[k[0]]=tgtCum(d,y,k[0],'12'));
+  return {act,tgt,year};
+}
+function renderYTD(v){
+  const {yrs,y,m}=ytdState();const LIST=masterList().filter(d=>S.dist==='ALL'||d===S.dist);
+  const res=LIST.map(d=>({d,...ytdCalc(d,y,m)}));
+  const tot={act:{},tgt:{},year:{},actT:{},actY:{}};TK.forEach(k=>{['act','tgt','year'].forEach(g=>tot[g][k[0]]=res.reduce((a,r)=>a+r[g][k[0]],0));
+    tot.actT[k[0]]=res.filter(r=>r.tgt[k[0]]>0).reduce((a,r)=>a+r.act[k[0]],0);tot.actY[k[0]]=res.filter(r=>r.year[k[0]]>0).reduce((a,r)=>a+r.act[k[0]],0);});
+  const cell=(r,k)=>'<td class="n">'+(r.tgt[k]?fmtK(k,r.tgt[k]):'<span class="note">–</span>')+'</td><td class="n">'+fmtK(k,r.act[k])+'</td><td class="n">'+capPill(r.actT?r.actT[k]:r.act[k],r.tgt[k])+'</td>';
+  const row=(r,isTot)=>'<tr'+(isTot?' style="font-weight:700;background:var(--surface2)"':'')+'><td>'+(isTot?'TOTAL':'<span class="dname"><i style="background:'+mDot(r.d)+'"></i>'+esc(titleCase(r.d))+'</span><div class="note">'+esc((S.pic[r.d]||{}).nama||'PIC belum diisi')+'</div>')+'</td>'+
+    cell(r,'Rp')+'<td class="n">'+(r.year.Rp?fmtK('Rp',r.year.Rp):'–')+'</td><td class="n">'+(r.year.Rp?pct((r.actY?r.actY.Rp:r.act.Rp)/r.year.Rp):'–')+'</td>'+
+    cell(r,'Kg')+cell(r,'Pcs')+cell(r,'OA')+cell(r,'CL')+'<td>'+(r.tgt.Rp?statusOf((r.actT?r.actT.Rp:r.act.Rp)/r.tgt.Rp):'<span class="note">target belum diisi</span>')+'</td></tr>';
+  v.innerHTML='<div class="card"><div class="card-h"><div><h3>Pencapaian YTD '+y+' · 1 Januari s/d '+BLN_FULL[+m-1]+' '+y+'</h3><div class="sub">Hanya periode 1 tahun: YTD selalu mulai 1 Januari dan berhenti di akhir Desember tahun yang sama'+(S.kat==='ALL'?'':' · kategori '+esc(S.kat))+'</div></div>'+
+    '<div class="actions"><label class="flabel" for="ytdYear">Tahun</label><select id="ytdYear">'+yrs.map(yy=>'<option'+(yy===y?' selected':'')+'>'+yy+'</option>').join('')+'</select>'+
+    '<label class="flabel" for="ytdM">s/d bulan</label><select id="ytdM">'+MM.map((mm,i)=>'<option value="'+mm+'"'+(mm===m?' selected':'')+'>'+BLN_FULL[i]+'</option>').join('')+'</select></div></div>'+
+    '<div class="tbl-wrap"><table><thead><tr><th rowspan="2">Distributor</th><th class="n" colspan="5">Value (Rp)</th><th class="n" colspan="3">Volume (kg)</th><th class="n" colspan="3">Pcs / zak</th><th class="n" colspan="3">OA</th><th class="n" colspan="3">CL</th><th rowspan="2">Status YTD</th></tr>'+
+    '<tr><th class="n">Target YTD</th><th class="n">Actual YTD</th><th class="n">%</th><th class="n">Target 1 thn</th><th class="n">% thn</th>'+Array(4).fill('<th class="n">Target YTD</th><th class="n">Actual YTD</th><th class="n">%</th>').join('')+'</tr></thead>'+
+    '<tbody>'+res.map(r=>row(r)).join('')+'</tbody><tfoot>'+row(tot,true)+'</tfoot></table></div>'+
+    '<div class="note"><b>Formula YTD</b> (bulan ke-n = bulan terpilih): '+
+    'Value/Volume/Pcs: Target YTD = Σ target Jan..n · Actual YTD = Σ actual Jan..n. '+
+    'OA: Actual = Σ outlet aktif per bulan Jan..n ÷ n · Target = rata-rata target OA bulan yang diisi. '+
+    'CL: Actual = jumlah customer unik yang membeli Jan..n tahun ini · Target = target CL tertinggi s/d bulan n. '+
+    '% = Actual ÷ Target. Baris TOTAL: actual semua distributor, sedangkan % hanya dari distributor yang sudah punya target.</div></div>';
+  $('#ytdYear').onchange=e=>{S.ytd.year=e.target.value;S.ytd.m=null;render();};
+  $('#ytdM').onchange=e=>{S.ytd.m=e.target.value;render();};
+}
 
 /* ============ PRODUK ============ */
 function renderProduk(v){
@@ -602,6 +902,11 @@ function render(){
     else if(S.tab==='distributor')renderDistributor(v);
     else if(S.tab==='produk')renderProduk(v);
     else if(S.tab==='customer')renderCustomer(v);
+    else if(S.tab==='master')renderMaster(v);
+    else if(S.tab==='target')renderTarget(v);
+    else if(S.tab==='pencapaian')renderPencapaian(v);
+    else if(S.tab==='rekap')renderRekap(v);
+    else if(S.tab==='ytd')renderYTD(v);
     else renderArea(v);
   }catch(e){console.error(e);v.innerHTML='<div class="card empty-state">Terjadi kesalahan saat menampilkan data: '+esc(e.message)+'</div>';}
   renderSrc();
@@ -612,7 +917,8 @@ function renderSrc(){
   $('#srcInfo').textContent=(m&&m.fileName?('Data: '+m.fileName+' · diupload '+new Date(m.uploadedAt).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})):'Data: SELL-OUT DISTRIBUTOR.xlsx')+' · '+per+' · '+nf0.format(S.rows.length)+' baris';
   $('#foot').innerHTML='<b>Definisi.</b> Omset: Adyaceda = Values (Rp); Aries = Netto (setelah potongan, sebelum PPN); IPM/IAM = Omset (qty × harga). '+
    'Volume (kg) = qty pcs/zak × berat kemasan (500 gr = 0,5; 1 kg = 1; zak = 25). Karton Aries dikonversi 24 pcs (500 gr) / 12 pcs (1 kg). '+
-   'Customer aktif = customer unik yang membeli di bulan tersebut (customer tanpa kode dihitung dari namanya). Status customer dihitung dari bulan terakhir data tiap distributor.<br>'+
+   'Adyaceda dipisah: <b>Jabotabek</b> (area JKT & BGR) dan <b>Jawa Barat</b> (area BDG). Customer aktif = customer unik yang membeli di bulan tersebut (customer tanpa kode dihitung dari namanya). Status customer dihitung dari bulan terakhir data tiap distributor.<br>'+
+   '<b>Export.</b> Tombol Export Excel mengunduh data sesuai filter aktif (tahun, periode, distributor, kategori): ringkasan, bulanan, produk, customer, area, sales, data detail, Master PIC, Pencapaian bulan terpilih, Actual vs Target per bulan, Rekap Pencapaian, YTD (dengan rumus Excel; Tahun & Bulan bisa diubah di sheet), dan Target Bulanan. Semua rekap memakai nama distributor dari Master PIC.<br>'+
    '<b>Update data.</b> Klik "Upload data Excel" dan pilih file mentah (sheet TOTAL ADYACEDA / ARIES / IPM-IAM) atau file gabungan (sheet DATA). Data lama diganti seluruhnya oleh isi file baru.';
 }
 
@@ -696,6 +1002,207 @@ async function loadDataset(m){
   const rows=unpack(JSON.parse(s));S.meta=m;S.loadedVersion=m.version;setData(rows);
 }
 
+/* ============ export excel ============ */
+function filterLabel(){
+  return {
+    distributor:S.dist==='ALL'?'Semua distributor':titleCase(S.dist),
+    tahun:S.year==='ALL'?'Semua tahun':S.year,
+    periode:plabelFull(S.from)+' s/d '+plabelFull(S.to),
+    kategori:S.kat==='ALL'?'Semua kategori':S.kat};
+}
+function sheet(aoa,widths){const ws=XLSX.utils.aoa_to_sheet(aoa);if(widths)ws['!cols']=widths.map(w=>({wch:w}));return ws;}
+function buildExport(){
+  const rows=base();const f=filterLabel();const ps=periodsIn();const om=sum(rows,r=>r.o);
+  const ds=S.dist==='ALL'?S.dists:[S.dist];
+  const wb=XLSX.utils.book_new();
+  // Info
+  XLSX.utils.book_append_sheet(wb,sheet([
+    ['EXPORT DASHBOARD SELL OUT DISTRIBUTOR'],[],
+    ['Distributor',f.distributor],['Tahun',f.tahun],['Periode',f.periode],['Kategori',f.kategori],
+    ['Diekspor',new Date().toLocaleString('id-ID')],['Sumber data',(S.meta&&S.meta.fileName)||'SELL-OUT DISTRIBUTOR.xlsx'],[],
+    ['Total omset (Rp)',Math.round(om)],['Total volume (kg)',Math.round(sum(rows,r=>r.kg)*10)/10],['Total qty (pcs/zak)',sum(rows,r=>r.q)],
+    ['Customer unik',uniqCount(rows,custKey)],['Baris transaksi',rows.length],[],
+    ['Definisi: omset Adyaceda = Values (Rp); Aries = Netto (sebelum PPN); IPM/IAM = Omset. Volume kg = qty × berat kemasan (500 gr = 0,5; 1 kg = 1; zak = 25).']
+  ],[24,40]),'Info');
+  // Ringkasan distributor
+  const r1=[['Distributor','PIC','No. HP PIC','Periode data','Omset (Rp)','% Kontribusi','Volume (kg)','Qty (pcs/zak)','Customer unik','Transaksi','Omset bulan terakhir (Rp)','Customer aktif bulan terakhir']];
+  for(const d of ds){const a=rows.filter(r=>r.d===d);if(!a.length)continue;const dp=[...new Set(a.map(r=>r.p))].sort();const l=dp[dp.length-1];const al=a.filter(r=>r.p===l);const o=sum(a,r=>r.o);const pic=S.pic[d]||{};
+    r1.push([titleCase(d),pic.nama||'',pic.hp||'',plabel(dp[0])+' – '+plabel(l),Math.round(o),om?Math.round(o/om*10000)/10000:0,Math.round(sum(a,r=>r.kg)*10)/10,sum(a,r=>r.q),uniqCount(a,r=>r.kc),a.length,Math.round(sum(al,r=>r.o)),uniqCount(al,r=>r.kc)]);}
+  XLSX.utils.book_append_sheet(wb,sheet(r1,[20,18,14,18,16,12,12,12,12,10,20,20]),'Ringkasan Distributor');
+  // Bulanan
+  const r2=[['Tahun','Bulan','Periode','Distributor','Omset (Rp)','Volume (kg)','Qty (pcs/zak)','Customer aktif','Transaksi']];
+  for(const p of ps)for(const d of ds){const a=rows.filter(r=>r.p===p&&r.d===d);if(!a.length)continue;const [y,m]=p.split('-');
+    r2.push([+y,BLN_FULL[+m-1],p,titleCase(d),Math.round(sum(a,r=>r.o)),Math.round(sum(a,r=>r.kg)*10)/10,sum(a,r=>r.q),uniqCount(a,r=>r.kc),a.length]);}
+  XLSX.utils.book_append_sheet(wb,sheet(r2,[8,12,10,20,16,12,12,14,10]),'Bulanan');
+  // Produk
+  const r3=[['Produk','Kategori','Omset (Rp)','% Omset','Volume (kg)','Qty (pcs/zak)','Customer',...ds.map(d=>'Omset '+titleCase(d))]];
+  [...group(rows,r=>r.pr)].map(([k,a])=>({k,a,o:sum(a,r=>r.o)})).sort((x,y)=>y.o-x.o).forEach(x=>{
+    r3.push([x.k,x.a[0].kt,Math.round(x.o),om?Math.round(x.o/om*10000)/10000:0,Math.round(sum(x.a,r=>r.kg)*10)/10,sum(x.a,r=>r.q),uniqCount(x.a,custKey),...ds.map(d=>Math.round(sum(x.a.filter(r=>r.d===d),r=>r.o)))]);});
+  XLSX.utils.book_append_sheet(wb,sheet(r3,[36,20,16,10,12,12,10,...ds.map(()=>18)]),'Produk');
+  // Customer
+  const lastOf={};for(const d of S.dists){const p=S.rows.filter(r=>r.d===d&&r.p<=S.to).map(r=>r.p).sort();lastOf[d]=p[p.length-1];}
+  const r4=[['Distributor','Kode customer','Nama customer','Area/Depo','Segmen','Omset (Rp)','Volume (kg)','Bulan aktif','Terakhir beli','Status']];
+  [...group(rows,custKey)].map(([k,a])=>{const pp=[...new Set(a.map(r=>r.p))].sort();const lp=pp[pp.length-1];const g=monthsBetween(lp,lastOf[a[0].d]);
+    return [titleCase(a[0].d),a[0].kc,a[0].nc,a[0].a,a[0].sg,Math.round(sum(a,r=>r.o)),Math.round(sum(a,r=>r.kg)*10)/10,pp.length,lp,g===0?'Aktif':'Absen '+g+' bulan'];})
+    .sort((x,y)=>y[5]-x[5]).forEach(r=>r4.push(r));
+  XLSX.utils.book_append_sheet(wb,sheet(r4,[18,16,34,12,20,16,12,10,12,14]),'Customer');
+  // Area & Sales
+  const r5=[['Distributor','Area/Depo','Omset (Rp)','% Omset','Volume (kg)','Customer','Jumlah sales']];
+  [...group(rows,r=>r.d+'|'+r.a)].map(([k,a])=>[titleCase(a[0].d),a[0].a,Math.round(sum(a,r=>r.o)),om?Math.round(sum(a,r=>r.o)/om*10000)/10000:0,Math.round(sum(a,r=>r.kg)*10)/10,uniqCount(a,r=>r.kc),uniqCount(a,r=>r.s)]).sort((x,y)=>y[2]-x[2]).forEach(r=>r5.push(r));
+  XLSX.utils.book_append_sheet(wb,sheet(r5,[20,14,16,10,12,10,12]),'Area');
+  const r6=[['Distributor','Salesman','Omset (Rp)','Volume (kg)','Customer','Bulan aktif','Transaksi']];
+  [...group(rows,r=>r.d+'|'+r.s)].map(([k,a])=>[titleCase(a[0].d),a[0].s||'(tanpa nama)',Math.round(sum(a,r=>r.o)),Math.round(sum(a,r=>r.kg)*10)/10,uniqCount(a,r=>r.kc),uniqCount(a,r=>r.p),a.length]).sort((x,y)=>y[2]-x[2]).forEach(r=>r6.push(r));
+  XLSX.utils.book_append_sheet(wb,sheet(r6,[20,22,16,12,10,10,10]),'Sales');
+  // Data
+  const r7=[['Distributor','Tahun','Bulan','Periode','Area/Depo','Sales','Kode customer','Nama customer','Segmen','Produk','Kategori','Qty (pcs/zak)','Volume (kg)','Omset (Rp)']];
+  rows.forEach(r=>{const [y,m]=r.p.split('-');r7.push([titleCase(r.d),+y,BLN_FULL[+m-1],r.p,r.a,r.s,r.kc,r.nc,r.sg,r.pr,r.kt,r.q,r.kg,r.o]);});
+  XLSX.utils.book_append_sheet(wb,sheet(r7,[18,7,11,9,12,18,16,32,20,36,20,10,10,14]),'Data');
+  const r8=[['Distributor','Nama di data','TSR / PIC SPK','No. HP TSR','PIC distributor','No. HP PIC dist.','Status','Catatan']];
+  for(const d of masterList()){const x=S.pic[d]||{};r8.push([titleCase(d),S.dists.includes(d)?d:'',x.nama||'',x.hp||'',x.picDist||'',x.picDistHp||'',S.dists.includes(d)?'Ada data sell out':'Ditambah manual',x.catatan||'']);}
+  XLSX.utils.book_append_sheet(wb,sheet(r8,[28,22,20,14,20,14,18,34]),'Master PIC');
+  // Actual vs Target per bulan
+  // ---- Actual vs Target per bulan (target dari Target Bulanan, fallback Master PIC)
+  const K=TK;const pc=(a,t)=>t?Math.round(a/t*10000)/10000:'';
+  const stat=c=>c===''?'-':c>=1?'Tercapai':c>=0.7?'Perlu dorong':'Di bawah target';
+  const rnd=(k,v)=>k==='Kg'?Math.round(v*10)/10:Math.round(v);
+  const fmtWs=(ws,rowsN,pctCols,numCols)=>{for(let R=1;R<rowsN;R++){for(const C of pctCols){const a=XLSX.utils.encode_cell({r:R,c:C});if(ws[a]&&typeof ws[a].v==='number')ws[a].z='0.0%';}
+    for(const C of numCols){const a=XLSX.utils.encode_cell({r:R,c:C});if(ws[a]&&typeof ws[a].v==='number')ws[a].z='#,##0';}}};
+  const DL=masterList().filter(d=>S.dist==='ALL'||d===S.dist);
+  const hdr=['Distributor','TSR / PIC SPK','Tahun','Bulan','Periode'];K.forEach(k=>hdr.push('Target '+k[1],'Actual '+k[1],'% '+k[0],'Target akumulasi '+k[0],'Actual akumulasi '+k[0],'% akumulasi '+k[0]));hdr.push('Status bulan (Value)','Status akumulasi (Value)');
+  const r9=[hdr];
+  for(const d of DL){
+    const x=S.pic[d]||{};const f=firstPeriod(d);let n=0;
+    for(const p of ps){if(f&&p<f)continue;const r=realisasi(d,p);const [y,m]=p.split('-');n++;
+      const row=[titleCase(d),x.nama||'',+y,BLN_FULL[+m-1],p];let cv=null;
+      K.forEach(k=>{const t=tgtFor(d,p,k[0]);const ct=tgtCum(d,y,k[0],m,true);const ca=actCum(d,y,k[0],m);
+        row.push(t||'',rnd(k[0],r[k[0]]),pc(r[k[0]],t),ct?rnd(k[0],ct):'',rnd(k[0],ca),pc(ca,ct));if(k[0]==='Rp')cv=pc(ca,ct);});
+      row.push(stat(pc(r.Rp,tgtFor(d,p,'Rp'))),stat(cv));r9.push(row);}
+    if(n)r9.push([]);
+  }
+  r9.push(['Catatan: target per bulan dari tab Target Bulanan; bulan yang kosong dianggap belum ada target. Akumulasi dihitung sejak Januari tahun berjalan: Value/Volume/Pcs dijumlah, OA dirata-rata, CL posisi bulan tsb. Bulan sebelum distributor punya data tidak dihitung.']);
+  const pctC=[],numC=[];K.forEach((k,i)=>{const b=5+i*6;numC.push(b,b+1,b+3,b+4);pctC.push(b+2,b+5);});
+  const ws9=sheet(r9,[30,18,7,11,9,...Array(30).fill(12),18,20]);fmtWs(ws9,r9.length,pctC,numC);
+  XLSX.utils.book_append_sheet(wb,ws9,'Actual vs Target');
+
+  // ---- Pencapaian Bulanan (bulan terpilih di tab Pencapaian, default bulan akhir filter)
+  const pm=(S.pc&&S.pc.month)||S.to;
+  const h12=['Distributor','TSR / PIC SPK','Bulan'];K.forEach(k=>h12.push('Actual '+k[1],'Target '+k[1],'% '+k[0]));h12.push('Status (Value)');
+  const r12=[h12];
+  for(const d of DL){const r=realisasi(d,pm);const row=[titleCase(d),(S.pic[d]||{}).nama||'',plabelFull(pm)];
+    K.forEach(k=>{const t=tgtFor(d,pm,k[0]);row.push(rnd(k[0],r[k[0]]),t||'',pc(r[k[0]],t));});row.push(stat(pc(r.Rp,tgtFor(d,pm,'Rp'))));r12.push(row);}
+  const p12=[],n12=[];K.forEach((k,i)=>{const b=3+i*3;n12.push(b,b+1);p12.push(b+2);});
+  const ws12=sheet(r12,[28,18,16,...Array(15).fill(13),16]);fmtWs(ws12,r12.length,p12,n12);
+  XLSX.utils.book_append_sheet(wb,ws12,'Pencapaian '+plabel(pm));
+
+  // ---- Rekap Pencapaian per distributor per tahun
+  const yrs=[...new Set(ps.map(p=>p.slice(0,4)))];
+  const h10=['Tahun','Distributor','TSR / PIC SPK','YTD s/d'];K.forEach(k=>h10.push('Target 1 tahun '+k[0],'Target YTD '+k[0],'Actual YTD '+k[0],'% YTD '+k[0],'% tahunan '+k[0]));h10.push('Status YTD (Value)');
+  const r10=[h10];
+  for(const y of yrs)for(const d of DL){const lp=lastPeriod(d,y);if(!lp&&!tgtCum(d,y,'Rp','12'))continue;const lm=lp?lp.slice(5):(ps.filter(p=>p.slice(0,4)===y).pop()||'').slice(5);if(!lm)continue;
+    const row=[+y,titleCase(d),(S.pic[d]||{}).nama||'',BLN_FULL[+lm-1]];let sv='';
+    K.forEach(k=>{const tY=tgtCum(d,y,k[0],'12'),tYTD=tgtCum(d,y,k[0],lm,true),aYTD=actCum(d,y,k[0],lm);row.push(tY?rnd(k[0],tY):'',tYTD?rnd(k[0],tYTD):'',rnd(k[0],aYTD),pc(aYTD,tYTD),pc(aYTD,tY));if(k[0]==='Rp')sv=pc(aYTD,tYTD);});
+    row.push(stat(sv));r10.push(row);}
+  r10.push([]);r10.push(['YTD = bulan pertama distributor punya data (maks. Januari) s/d bulan data terakhir; target YTD dihitung di rentang yang sama. % tahunan = actual YTD dibanding target 1 tahun penuh.']);
+  const p10=[],n10=[];K.forEach((k,i)=>{const b=4+i*5;n10.push(b,b+1,b+2);p10.push(b+3,b+4);});
+  const ws10=sheet(r10,[7,30,18,11,...Array(25).fill(13),18]);fmtWs(ws10,r10.length,p10,n10);
+  XLSX.utils.book_append_sheet(wb,ws10,'Rekap Pencapaian');
+
+  // ---- Target Bulanan (isian)
+  const h11=['Distributor','Tahun','Bulan'];K.forEach(k=>h11.push('Target '+k[1]));h11.push('Sumber');
+  const r11=[h11];
+  const tys=[...new Set(yrs.concat(Object.values(S.targets).map(t=>String(t.year))))].sort();
+  for(const d of DL)for(const y of tys){const T=tgtDoc(d,y);if(!T&&!Object.values(S.pic[d]||{}).length)continue;
+    let any=false;const block=[];
+    MM.forEach((m,i)=>{const row=[titleCase(d),+y,BLN_FULL[i]];let src='Master PIC';K.forEach(k=>{const own=T&&T.m&&T.m[m]&&T.m[m][k[0]]!==''&&T.m[m][k[0]]!=null;if(own)src='Target Bulanan';const t=tgtFor(d,y+'-'+m,k[0]);if(t)any=true;row.push(t||'');});row.push(src);block.push(row);});
+    if(!any)continue;block.forEach(r=>r11.push(r));
+    const tr=[titleCase(d)+' — AKUMULASI 1 TAHUN',+y,''];K.forEach(k=>tr.push(rnd(k[0],tgtCum(d,y,k[0],'12'))||''));tr.push('');r11.push(tr);r11.push([]);}
+  r11.push(['Akumulasi 1 tahun: Value, Volume, Pcs = jumlah 12 bulan; OA = rata-rata; CL = target bulan terakhir yang diisi.']);
+  const ws11=sheet(r11,[34,7,11,16,14,12,12,12,16]);fmtWs(ws11,r11.length,[],[3,4,5,6,7]);
+  XLSX.utils.book_append_sheet(wb,ws11,'Target Bulanan');
+
+  // ---- YTD dengan rumus Excel (1 tahun saja) + tabel bantu
+  {const st=ytdState();const Y=st.y,Mn=+st.m;const YL=masterList().filter(d=>S.dist==='ALL'||d===S.dist);
+   // YTD_Data: transaksi tahun Y (semua bulan)
+   const dD=[['Distributor','Tahun','Bulan ke','Kode customer','Qty (pcs/zak)','Volume (kg)','Omset (Rp)']];
+   S.rows.filter(r=>YL.includes(r.d)&&r.p.slice(0,4)===Y&&(S.kat==='ALL'||r.kt===S.kat)).forEach(r=>dD.push([titleCase(r.d),+Y,+r.p.slice(5),r.kc,r.q,r.kg,r.o]));
+   XLSX.utils.book_append_sheet(wb,sheet(dD,[28,7,9,16,12,12,14]),'YTD_Data');
+   // YTD_Bulan: OA per bulan & CL berjalan (customer unik Jan s/d bulan)
+   const dB=[['Distributor','Tahun','Bulan ke','OA (outlet aktif)','CL YTD (customer unik Jan s/d bulan)']];
+   for(const d of YL)for(const mm of MM){const rs=ytdRows(d,Y,mm);dB.push([titleCase(d),+Y,+mm,uniqCount(rs.filter(r=>r.p.slice(5)===mm),r=>r.kc),uniqCount(rs,r=>r.kc)]);}
+   XLSX.utils.book_append_sheet(wb,sheet(dB,[28,7,9,16,30]),'YTD_Bulan');
+   // YTD_Target: target per bulan (dari tab Target Bulanan)
+   const dT=[['Distributor','Tahun','Bulan ke','Target Value (Rp)','Target Volume (kg)','Target Pcs','Target OA','Target CL']];
+   for(const d of YL)for(const mm of MM){const p=Y+'-'+mm;dT.push([titleCase(d),+Y,+mm,...TK.map(k=>tgtFor(d,p,k[0]))]);}
+   XLSX.utils.book_append_sheet(wb,sheet(dT,[28,7,9,16,16,12,10,10]),'YTD_Target');
+   // YTD sheet
+   const ws={};const put=(a,v,f,z)=>{const c=typeof v==='number'?{t:'n',v}:{t:'s',v:String(v==null?'':v)};if(f)c.f=f;if(z)c.z=z;ws[a]=c;};
+   put('A1','PENCAPAIAN YTD — 1 JANUARI S/D BULAN TERPILIH (1 TAHUN)');
+   put('A2','Tahun');put('B2',+Y);put('D2','Ubah Tahun (B2) atau Bulan ke (B3) lalu semua rumus di bawah ikut dihitung ulang. Data di sheet YTD_Data, YTD_Bulan, YTD_Target.');
+   put('A3','s/d Bulan ke (1-12)');put('B3',Mn);put('C3',BLN_FULL[Mn-1],'INDEX({"Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"},B3)');
+   const H=['Distributor','TSR / PIC SPK','Target YTD Value (Rp)','Actual YTD Value (Rp)','% Value','Target 1 tahun Value (Rp)','% tahunan','Target YTD Volume (kg)','Actual YTD Volume (kg)','% Volume','Target YTD Pcs','Actual YTD Pcs','% Pcs','Target YTD OA','Actual YTD OA','% OA','Target YTD CL','Actual YTD CL','% CL','Status YTD'];
+   H.forEach((h,i)=>put(XLSX.utils.encode_cell({r:4,c:i}),h));
+   const R0=6;const TD='YTD_Data',TB='YTD_Bulan',TT='YTD_Target';
+   YL.forEach((d,i)=>{const r=R0+i;const c=ytdCalc(d,Y,st.m);const A='$A'+r;
+     const crit=(sh)=>sh+'!$A:$A,'+A+','+sh+'!$B:$B,$B$2,'+sh+'!$C:$C,"<="&$B$3';
+     put('A'+r,titleCase(d));put('B'+r,(S.pic[d]||{}).nama||'');
+     put('C'+r,c.tgt.Rp,'SUMIFS('+TT+'!$D:$D,'+crit(TT)+')','#,##0');
+     put('D'+r,Math.round(c.act.Rp),'SUMIFS('+TD+'!$G:$G,'+crit(TD)+')','#,##0');
+     put('E'+r,c.tgt.Rp?c.act.Rp/c.tgt.Rp:'','IFERROR(D'+r+'/C'+r+',"")','0.0%');
+     put('F'+r,c.year.Rp,'SUMIFS('+TT+'!$D:$D,'+TT+'!$A:$A,'+A+','+TT+'!$B:$B,$B$2)','#,##0');
+     put('G'+r,c.year.Rp?c.act.Rp/c.year.Rp:'','IFERROR(D'+r+'/F'+r+',"")','0.0%');
+     put('H'+r,c.tgt.Kg,'SUMIFS('+TT+'!$E:$E,'+crit(TT)+')','#,##0');
+     put('I'+r,Math.round(c.act.Kg*10)/10,'SUMIFS('+TD+'!$F:$F,'+crit(TD)+')','#,##0.0');
+     put('J'+r,c.tgt.Kg?c.act.Kg/c.tgt.Kg:'','IFERROR(I'+r+'/H'+r+',"")','0.0%');
+     put('K'+r,c.tgt.Pcs,'SUMIFS('+TT+'!$F:$F,'+crit(TT)+')','#,##0');
+     put('L'+r,c.act.Pcs,'SUMIFS('+TD+'!$E:$E,'+crit(TD)+')','#,##0');
+     put('M'+r,c.tgt.Pcs?c.act.Pcs/c.tgt.Pcs:'','IFERROR(L'+r+'/K'+r+',"")','0.0%');
+     put('N'+r,c.tgt.OA,'IFERROR(AVERAGEIFS('+TT+'!$G:$G,'+crit(TT)+','+TT+'!$G:$G,">0"),0)','#,##0.0');
+     put('O'+r,c.act.OA,'SUMIFS('+TB+'!$D:$D,'+crit(TB)+')/$B$3','#,##0.0');
+     put('P'+r,c.tgt.OA?c.act.OA/c.tgt.OA:'','IFERROR(O'+r+'/N'+r+',"")','0.0%');
+     put('Q'+r,c.tgt.CL,'_xlfn.MAXIFS('+TT+'!$H:$H,'+crit(TT)+')','#,##0');
+     put('R'+r,c.act.CL,'SUMIFS('+TB+'!$E:$E,'+TB+'!$A:$A,'+A+','+TB+'!$B:$B,$B$2,'+TB+'!$C:$C,$B$3)','#,##0');
+     put('S'+r,c.tgt.CL?c.act.CL/c.tgt.CL:'','IFERROR(R'+r+'/Q'+r+',"")','0.0%');
+     const e=c.tgt.Rp?c.act.Rp/c.tgt.Rp:null;
+     put('T'+r,e==null?'-':e>=1?'Tercapai':e>=0.7?'Perlu dorong':'Di bawah target','IF(E'+r+'="","-",IF(E'+r+'>=1,"Tercapai",IF(E'+r+'>=0.7,"Perlu dorong","Di bawah target")))');
+   });
+   const rl=R0+YL.length-1,rt=rl+1;put('A'+rt,'TOTAL');
+   const sumCols={C:'#,##0',D:'#,##0',F:'#,##0',H:'#,##0',I:'#,##0.0',K:'#,##0',L:'#,##0',N:'#,##0.0',O:'#,##0.0',Q:'#,##0',R:'#,##0'};
+   Object.entries(sumCols).forEach(([col,z])=>{let v=0;for(let r=R0;r<=rl;r++){const c=ws[col+r];if(c&&typeof c.v==='number')v+=c.v;}put(col+rt,v,'SUM('+col+R0+':'+col+rl+')',z);});
+   [['E','D','C'],['G','D','F'],['J','I','H'],['M','L','K'],['P','O','N'],['S','R','Q']].forEach(([c,a,b])=>{let va=0;for(let r=R0;r<=rl;r++){const tb=ws[b+r],ta=ws[a+r];if(tb&&tb.v>0&&ta&&typeof ta.v==='number')va+=ta.v;}const vb=ws[b+rt].v;
+     put(c+rt,vb?va/vb:'','IFERROR(SUMIFS('+a+R0+':'+a+rl+','+b+R0+':'+b+rl+',">0")/'+b+rt+',"")','0.0%');});
+   const et=ws['E'+rt].v;put('T'+rt,et===''?'-':et>=1?'Tercapai':et>=0.7?'Perlu dorong':'Di bawah target','IF(E'+rt+'="","-",IF(E'+rt+'>=1,"Tercapai",IF(E'+rt+'>=0.7,"Perlu dorong","Di bawah target")))');
+   const notes=['Formula YTD (1 Januari s/d bulan ke-B3, tahun B2 saja):',
+     'Value / Volume / Pcs: Target YTD = SUMIFS target bulan 1..B3 · Actual YTD = SUMIFS transaksi bulan 1..B3.',
+     'OA: Actual = total outlet aktif per bulan (bulan 1..B3) ÷ B3 · Target = AVERAGEIFS target OA yang > 0.',
+     'CL: Actual = jumlah customer unik yang membeli sejak 1 Januari s/d bulan B3 · Target = MAXIFS target CL bulan 1..B3.',
+     '% = Actual ÷ Target. Baris TOTAL: % hanya dari distributor yang punya target. Status (Value): ≥100% Tercapai, 70–99% Perlu dorong, <70% Di bawah target.'];
+   notes.forEach((t,i)=>put('A'+(rt+2+i),t));
+   ws['!ref']='A1:T'+(rt+2+notes.length);
+   ws['!cols']=[28,18,16,16,9,16,9,14,14,9,12,12,9,12,12,9,12,12,9,16].map(w=>({wch:w}));
+   XLSX.utils.book_append_sheet(wb,ws,'YTD');
+   // pindahkan YTD tepat setelah Rekap Pencapaian
+   const nm=wb.SheetNames;const iy=nm.indexOf('YTD');nm.splice(iy,1);nm.splice(nm.indexOf('Rekap Pencapaian')+1,0,'YTD');
+  }
+  return wb;
+}
+async function exportExcel(){
+  if(typeof XLSX==='undefined'){toast('Modul Excel belum termuat. Coba lagi sebentar.');return;}
+  if(!base().length){toast('Tidak ada data pada filter ini.');return;}
+  const f=filterLabel();
+  const name=('Sell Out '+f.distributor+' '+S.from+' sd '+S.to).replace(/[^A-Za-z0-9 _.-]/g,'')+'.xlsx';
+  const wb=buildExport();
+  const hosted=!!(window.claude&&window.claude.use);
+  if(hosted){
+    let dl=null;try{dl=await window.claude.use('downloads');}catch(e){}
+    if(!dl){toast('Export tidak tersedia di tampilan ini.',5000);return;}
+    try{const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});await dl.save({filename:name,data:buf});toast('File Excel disimpan.');}
+    catch(e){const c=e&&e.code;toast(c==='declined'?'Export dibatalkan.':c==='rate_limited'?'Tunggu sebentar lalu coba lagi.':'Export gagal: '+((e&&e.message)||'coba lagi'),5000);}
+  }else{
+    try{XLSX.writeFile(wb,name);toast('File Excel diunduh: '+name);}catch(e){toast('Export gagal: '+e.message,5000);}
+  }
+}
+$('#exportBtn').onclick=exportExcel;
+
 /* ============ tabs & boot ============ */
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{S.tab=t.dataset.tab;try{localStorage.setItem('so_tab',S.tab);}catch(e){}render();});
 try{const t=localStorage.getItem('so_tab');if(t)S.tab=t;}catch(e){}
@@ -722,8 +1229,10 @@ function localDb(){
 }
 function attachDb(db){
       S.db=db;render();
-      db.collection('pic').onSnapshot(snap=>{const p={};snap.docs.forEach(d=>{const x=d.data();if(x&&x.distributor)p[x.distributor]=x;});S.pic=p;
-        const act=document.activeElement;if(act&&act.closest&&act.closest('.pic-card'))return;render();},()=>{});
+      db.collection('targets').onSnapshot(snap=>{const t={};snap.docs.forEach(d=>{const x=d.data();if(x&&x.distributor&&x.year)t[x.distributor+'|'+x.year]=x;});S.targets=t;
+        const act=document.activeElement;if(act&&act.closest&&act.closest('.master-edit'))return;if(S.masterDirty)return;if(['target','rekap','master','pencapaian','ytd'].includes(S.tab))render();},()=>{});
+      db.collection('pic').onSnapshot(snap=>{const p={};snap.docs.forEach(d=>{const x=d.data();if(x&&x.distributor)p[x.distributor]=x;});S.pic=p;try{buildFilters();}catch(e){}
+        const act=document.activeElement;if(act&&act.closest&&(act.closest('.pic-card')||act.closest('.master-edit')))return;if(S.masterDirty)return;render();},()=>{});
       db.doc('dataset/current').onSnapshot(snap=>{const m=snap.data();if(m)loadDataset(m).catch(e=>console.error(e));},()=>{});
 }
 function boot(){
