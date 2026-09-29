@@ -383,6 +383,7 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
     <button type="button" class="tab" role="tab" id="tab7" data-p="7" aria-controls="page7" aria-selected="false" tabindex="-1">Report</button>
     <button type="button" class="tab" role="tab" id="tab15" data-p="15" aria-controls="page15" aria-selected="false" tabindex="-1">Monitoring</button>
     <button type="button" class="tab" role="tab" id="tab16" data-p="16" aria-controls="page16" aria-selected="false" tabindex="-1">Rekap Produk</button>
+    <button type="button" class="tab" role="tab" id="tab17" data-p="17" aria-controls="page17" aria-selected="false" tabindex="-1">Rekap Per Hari</button>
     <button type="button" class="tab" role="tab" id="tab12" data-p="12" aria-controls="page12" aria-selected="false" tabindex="-1">Ach MTD</button>
     <button type="button" class="tab" role="tab" id="tab13" data-p="13" aria-controls="page13" aria-selected="false" tabindex="-1">Ach YTD</button>
     <button type="button" class="tab" role="tab" id="tab14" data-p="14" aria-controls="page14" aria-selected="false" tabindex="-1">Target</button>
@@ -1042,6 +1043,17 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
     </div>
     <div class="phead" id="rk_ph"></div>
     <div id="rk_wrap"></div>
+  </div>
+
+  <div id="page17" role="tabpanel" aria-labelledby="tab17" hidden>
+    <div class="fpanel" role="group" aria-label="Filter rekap per hari">
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="rh_areaChips" role="group" aria-label="Filter area"></div></div>
+        <div class="fgrp"><span class="fshow">Data s.d <b id="rh_show"></b></span></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px">Rata-rata jual per hari = jumlah terjual dalam bulan ÷ jumlah hari ada transaksi di outlet itu.</p>
+    <div id="rh_wrap"></div>
   </div>
 
   <div id="page12" role="tabpanel" aria-labelledby="tab12" hidden>
@@ -2239,16 +2251,16 @@ function renderPage1(){
   }finally{PFX='';Object.assign(S,saved)}
 }
 function showPage(n){
-  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;
+  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===2)render();
+  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===2)render();
   if(n===6)exFilterText();
   window.scrollTo(0,0);
 }
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>{b.onclick=()=>showPage(+b.dataset.p);
-    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,7,15,16,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
+    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,7,15,16,17,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
 }
 /* ===== Halaman 9: Weekly ===== */
 const WS={area:'all',outlet:'all',ch:'all',from:'',to:''};
@@ -2849,6 +2861,35 @@ function renderRk(){
           `</tbody><tfoot><tr><td>Total</td>${cols.map(o=>`<td>${nf.format(ct[o]||0)}</td>`).join('')}<td class="tt">${nf.format(gq)}</td><td>${nf.format(gn)}</td></tr></tfoot></table></div></section>`}
       else if(RKS.prod==='bd')bdet='<p class="note">Tidak ada penjualan bundling pada periode ini.</p>'}}
   $('rk_wrap').innerHTML=RKP.filter(p=>RKS.prod==='all'||RKS.prod===p[0]).map(build).join('')+bdet;
+}
+
+/* ===== Halaman 17: Rekap rata-rata jual per hari per bulan ===== */
+const RHS={area:'all'};
+function renderRh(){
+  const {ly,ldd,cm}=ayCur(),ld=D.lastDate,Y=TGT.year;
+  const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
+  mk('rh_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],RHS.area,v=>{RHS.area=v;renderRh()});
+  $('rh_show').textContent=dLong(ld);
+  const outs=RHS.area==='all'?OUT.slice():OUT.filter(o=>AREAS[RHS.area].o.includes(o));
+  const P=[['Better Cup','Cup',1,'var(--net)'],['Pastry','Pcs',3,'var(--disc)']];
+  const isTx=r=>!!r&&((r[0]||0)>0||(r[1]||0)>0||(r[8]||0)>0);
+  // agregasi per outlet per bulan: qty per produk + hari trx
+  const A={},dayAny=new Array(12).fill(0).map(()=>new Set());
+  outs.forEach(o=>{A[o]={tx:new Array(12).fill(0),q:P.map(()=>new Array(12).fill(0))};const rows=D.daily.o[o];if(!rows)return;
+    TD.forEach((d,i)=>{if(+d.slice(0,4)!==Y)return;const m=+d.slice(5,7)-1,r=rows[i];if(!isTx(r))return;A[o].tx[m]++;dayAny[m].add(i);P.forEach((p,k)=>A[o].q[k][m]+=r[p[2]]||0)})});
+  const f1=v=>v.toLocaleString('id-ID',{maximumFractionDigits:v<10?1:0});
+  const fut=m=>ly<Y||(ly===Y&&m>cm);
+  let html='';
+  P.forEach(([pn,pu,ix,pc],k)=>{
+    let mx=0;outs.forEach(o=>A[o].tx.forEach((t,m)=>{if(t)mx=Math.max(mx,A[o].q[k][m]/t)}));
+    const cell=(v,t,m)=>{if(fut(m))return '<td></td>';if(!t)return '<td class="z">-</td>';const a=v/t,al=mx?Math.min(1,a/mx):0;return `<td style="background:color-mix(in srgb,${pc} ${Math.round(al*38)}%,transparent)">${f1(a)}</td>`};
+    let body='';const TQ=new Array(12).fill(0);
+    outs.forEach(o=>{const q=A[o].q[k],t=A[o].tx;q.forEach((v,m)=>TQ[m]+=v);const sq=q.reduce((a,v)=>a+v,0),st=t.reduce((a,v)=>a+v,0);
+      body+=`<tr><td>${o}</td>`+MS.map((_,m)=>cell(q[m],t[m],m)).join('')+`<td class="tt">${st?f1(sq/st):'-'}</td><td>${nf.format(sq)}</td><td>${st}</td></tr>`});
+    const tq=TQ.reduce((a,v)=>a+v,0),tdays=dayAny.reduce((a,s2)=>a+s2.size,0);
+    const foot=`<tfoot><tr><td>Total semua outlet</td>`+MS.map((_,m)=>fut(m)?'<td></td>':`<td>${dayAny[m].size?f1(TQ[m]/dayAny[m].size):'-'}</td>`).join('')+`<td class="tt">${tdays?f1(tq/tdays):'-'}</td><td>${nf.format(tq)}</td><td>${tdays}</td></tr></tfoot>`;
+    html+=`<section><h2>Rata-rata ${pn} per hari (${pu}), ${Y}</h2><div class="tw"><table class="rkt"><thead><tr><th>Outlet</th>${MS.map(x=>`<th>${x}</th>`).join('')}<th class="tt">Rata2 ${Y}</th><th>Total ${Y}</th><th>Hari trx</th></tr></thead><tbody>${body}</tbody>${foot}</table></div></section>`});
+  $('rh_wrap').innerHTML=html;
 }
 
 /* ===== Halaman 10: Bank (metode bayar) ===== */
@@ -4162,7 +4203,7 @@ function initExport(){
   const g=document.getElementById('ex_goto');if(g)g.onclick=()=>showPage(2);
 }
 period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initProduct();initWeekly();initBank();initOnline();initTarget();initAch();initTplan();initMon();initReport();initExport();initUpload();initSheet();showPage(1);
-let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else if(PAGE===16)renderRk();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else if(PAGE===16)renderRk();else if(PAGE===17)renderRh();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
 </html>
