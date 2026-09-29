@@ -341,6 +341,7 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
 .wb{transition:opacity .12s}
 </style>
 <style>#o_kpi{grid-template-columns:repeat(3,1fr)}#o_kpi>div:nth-child(n+4){border-top:1px solid var(--rule)}#o_kpi>div:nth-child(3n){border-right:0}#o_kpi>div:nth-child(3n+1){padding-left:0}@media (max-width:860px){#o_kpi{grid-template-columns:repeat(2,1fr)}#o_kpi>div:nth-child(n){border-top:0;border-right:0;padding-left:0}}</style>
+<style>.gp{font-weight:700}.gp.ok{color:var(--good)}.gp.mid{color:var(--disc)}.gp.lo{color:var(--bad)}#tg_tbl tr.sub td,#ay_tbl tr.sub td{font-weight:700;background:var(--hi)}.gyear td small{display:block;color:var(--mute);font-size:11px;line-height:1.3}.gyear td{vertical-align:top}.gbar{height:6px;border-radius:3px;background:var(--rule);overflow:hidden;min-width:60px;margin-top:4px}.gbar span{display:block;height:100%}#ay_kpi{grid-template-columns:repeat(3,1fr)}#ay_kpi>div:nth-child(n+4){border-top:1px solid var(--rule)}#ay_kpi>div:nth-child(3n){border-right:0}#ay_kpi>div:nth-child(3n+1){padding-left:0}@media (max-width:860px){#ay_kpi{grid-template-columns:repeat(2,1fr)}#ay_kpi>div:nth-child(n){border-top:0;border-right:0;padding-left:0}}.tqt input[type=number]{font:600 14px var(--bd);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:4px 6px;width:72px;text-align:right}.tqt tr.tqm th{border-bottom:2px solid var(--rule);padding-top:6px;padding-bottom:8px;color:var(--ink)}.tqt #tq_master{border:2px solid var(--net)}.tqt input.ovr{border-color:var(--c3);box-shadow:0 0 0 1px var(--c3)}.tqt td small{display:block;color:var(--mute);font-size:11px}.tqt tr.sub td{font-weight:700;background:var(--hi)}.tqt td.t27{font-weight:700}.tqt{font-size:13px}.tqt th{white-space:normal;line-height:1.2;vertical-align:bottom;font-size:11.5px;padding:6px 6px}.tqt td{padding:6px 6px;white-space:nowrap}.tqt input[type=number]{width:54px;padding:2px 4px;font-size:13px}.tqt td small{font-size:10px}.tqt input.tqp{width:78px}.tqt input.tqd{width:58px}.tqt td:nth-child(2),.tqt th:nth-child(2){text-align:left}.tqt td:first-child,.tqt th:first-child{text-align:left;width:36px}#mn_tbl{font-size:14px}#mn_tbl th{font-size:12.5px}#mn_tbl input[type=number]{width:54px}#mn_tbl input[data-pd]{width:64px}#mn_tbl td:first-child,#mn_tbl th:first-child{text-align:left;width:auto}#mn_tbl td:nth-child(2),#mn_tbl th:nth-child(2){text-align:right}</style>
 </head>
 <body>
 <div class="wrap">
@@ -365,6 +366,10 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
     <button type="button" class="tab" role="tab" id="tab11" data-p="11" aria-controls="page11" aria-selected="false" tabindex="-1">Online</button>
     <button type="button" class="tab" role="tab" id="tab10" data-p="10" aria-controls="page10" aria-selected="false" tabindex="-1">Bank</button>
     <button type="button" class="tab" role="tab" id="tab7" data-p="7" aria-controls="page7" aria-selected="false" tabindex="-1">Report</button>
+    <button type="button" class="tab" role="tab" id="tab15" data-p="15" aria-controls="page15" aria-selected="false" tabindex="-1">Monitoring</button>
+    <button type="button" class="tab" role="tab" id="tab12" data-p="12" aria-controls="page12" aria-selected="false" tabindex="-1">Ach MTD</button>
+    <button type="button" class="tab" role="tab" id="tab13" data-p="13" aria-controls="page13" aria-selected="false" tabindex="-1">Ach YTD</button>
+    <button type="button" class="tab" role="tab" id="tab14" data-p="14" aria-controls="page14" aria-selected="false" tabindex="-1">Target</button>
     <button type="button" class="tab" role="tab" id="tab6" data-p="6" aria-controls="page6" aria-selected="false" tabindex="-1">Import-Export</button>
   </nav>
 
@@ -977,6 +982,116 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
       <p class="note">Online = GrabFood, GoFood, ShopeeFood. Angka kecil = porsi per baris.</p>
       <p class="note" id="b_stMis"></p>
       <div class="tw"><table id="b_stTbl" class="mtx"></table></div>
+    </section>
+  </div>
+
+  <div id="page15" role="tabpanel" aria-labelledby="tab15" hidden>
+    <div class="fpanel" role="group" aria-label="Filter monitoring">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="mn_areaChips" role="group" aria-label="Filter area monitoring"></div></div>
+        <div class="fgrp"><span class="fl">Outlet</span><div class="chips" id="mn_outletChips" role="group" aria-label="Filter outlet monitoring"></div></div>
+      </div>
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Bulan</span><select id="mn_month" aria-label="Pilih bulan monitoring"></select>
+          <button type="button" class="chip" id="mn_now">Bulan berjalan</button>
+          <button type="button" class="chip" id="mn_reset">Reset HK &amp; Target / hari</button></div>
+        <div class="fgrp"><span class="fshow">Ditampilkan: <b id="mn_show"></b></span></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px">Target bulan = Target / hari × HK. HK otomatis: hari yang sudah lewat = jumlah hari ada transaksi, hari yang belum lewat = hari kalender (mulai tanggal buka outlet). Target / hari dan HK bisa diedit per outlet per bulan; kosongkan untuk kembali ke angka awal.</p>
+    <section aria-labelledby="mnh_k">
+      <h2 id="mnh_k"></h2>
+      <p class="note" id="mns_k"></p>
+      <dl class="kpi" id="mn_kpi"></dl>
+    </section>
+    <section aria-labelledby="mnh_t">
+      <h2 id="mnh_t"></h2>
+      <div class="tw"><table id="mn_tbl" class="tqt"></table></div>
+    </section>
+  </div>
+
+  <div id="page12" role="tabpanel" aria-labelledby="tab12" hidden>
+    <div class="fpanel" role="group" aria-label="Filter Ach MTD">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="tg_areaChips" role="group" aria-label="Filter area target"></div></div>
+        <div class="fgrp"><span class="fl">Outlet</span><div class="chips" id="tg_outletChips" role="group" aria-label="Filter outlet target"></div></div>
+      </div>
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Bulan</span><select id="tg_month" aria-label="Pilih bulan target"></select>
+          <button type="button" class="chip" id="tg_now">Bulan berjalan</button></div>
+        <div class="fgrp"><span class="fshow">Ditampilkan: <b id="tg_show"></b></span></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px">Ach MTD (month to date) = aktual Better Cup sejak tanggal 1 ÷ target bulan yang dihitung proporsional sampai tanggal data terakhir (Target MTD). Target Better Cup 2026 dalam Cup, total penjualan Online dan Offline. Proyeksi (run-rate) = rata-rata Cup per hari bulan berjalan × jumlah hari dalam bulan. Target per hari dihitung dari target bulan ÷ jumlah hari bulan itu.</p>
+    <section aria-labelledby="tgh_k">
+      <h2 id="tgh_k"></h2>
+      <p class="note" id="tgs_k"></p>
+      <dl class="kpi" id="tg_kpi"></dl>
+    </section>
+    <section aria-labelledby="tgh_t">
+      <h2 id="tgh_t"></h2>
+      <div class="tw"><table id="tg_tbl"></table></div>
+    </section>
+    <section aria-labelledby="tgh_c">
+      <h2 id="tgh_c"></h2>
+      <div class="legend"><span><i style="background:var(--good)"></i>Aktual ≥ 100% target</span><span><i style="background:var(--disc)"></i>80–99%</span><span><i style="background:var(--bad)"></i>&lt; 80%</span><span><i style="background:var(--mute);opacity:.35"></i>Proyeksi bulan berjalan</span><span><i style="background:var(--ink);height:3px;vertical-align:3px"></i>Target</span></div>
+      <div class="tchart" id="tg_chart"></div>
+    </section>
+    <section aria-labelledby="tgh_y">
+      <h2 id="tgh_y"></h2>
+      <p class="note">Setiap sel: aktual, target, dan % pencapaian. YTD = Januari sampai tanggal data terakhir; target bulan berjalan dihitung proporsional sesuai jumlah hari yang sudah lewat.</p>
+      <div class="tw"><table id="tg_year" class="gyear"></table></div>
+    </section>
+  </div>
+
+  <div id="page13" role="tabpanel" aria-labelledby="tab13" hidden>
+    <div class="fpanel" role="group" aria-label="Filter Ach YTD">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="ay_areaChips" role="group" aria-label="Filter area"></div></div>
+        <div class="fgrp"><span class="fl">Outlet</span><div class="chips" id="ay_outletChips" role="group" aria-label="Filter outlet"></div></div>
+      </div>
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Periode</span>
+          <label>Dari <select id="ay_from" aria-label="Bulan awal"></select></label>
+          <label>s.d <select id="ay_to" aria-label="Bulan akhir"></select></label></div>
+        <div class="fgrp"><span class="fl">Periode cepat</span><div class="chips" id="ay_presetChips" role="group" aria-label="Periode cepat"></div></div>
+      </div>
+      <div class="frow fend">
+        <div class="fgrp"><span class="fshow">Ditampilkan: <b id="ay_show"></b></span></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:16px">Ach (achievement) = akumulasi aktual Better Cup ÷ akumulasi target pada periode terpilih. Bila periode mencakup bulan berjalan, target bulan itu dihitung proporsional sampai tanggal data terakhir (Target s.d tgl data); bulan yang belum berjalan tidak ikut dihitung. Proyeksi = aktual + rata-rata Cup per hari bulan berjalan × sisa hari periode.</p>
+    <section aria-labelledby="ayh_k">
+      <h2 id="ayh_k"></h2>
+      <p class="note" id="ays_k"></p>
+      <dl class="kpi" id="ay_kpi"></dl>
+    </section>
+    <section aria-labelledby="ayh_t">
+      <h2 id="ayh_t"></h2>
+      <div class="tw"><table id="ay_tbl"></table></div>
+    </section>
+    <section aria-labelledby="ayh_m">
+      <h2 id="ayh_m"></h2>
+      <p class="note">Akumulasi berjalan dari bulan awal periode. Bulan berjalan memakai target proporsional.</p>
+      <div class="tw"><table id="ay_mon"></table></div>
+    </section>
+  </div>
+
+  <div id="page14" role="tabpanel" aria-labelledby="tab14" hidden>
+    <div class="fpanel" role="group" aria-label="Pengaturan target 2027">
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Adjust growth 2027</span>
+          <b>+</b> <input type="number" id="tq_all" min="-100" max="1000" step="1" value="0" aria-label="Persentase growth untuk semua outlet"> <b>%</b> dari Ttl 2026
+          <button type="button" class="chip" id="tq_apply">Terapkan ke semua outlet</button>
+          <button type="button" class="chip" id="tq_reset">Reset 0%</button>
+          <button type="button" class="chip" id="tq_resetP">Reset proyeksi ke otomatis</button></div>
+        <div class="fgrp"><span class="fshow">Data s.d: <b id="tq_show"></b></span></div>
+      </div>
+    </div>
+    
+    <section aria-labelledby="tqh">
+      <h2 id="tqh">Rekap target Better Cup 2026 dan rencana 2027</h2>
+      <div class="tw"><table id="tq_tbl" class="tqt"></table></div>
     </section>
   </div>
 
@@ -2090,16 +2205,16 @@ function renderPage1(){
   }finally{PFX='';Object.assign(S,saved)}
 }
 function showPage(n){
-  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;
+  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===2)render();
+  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===2)render();
   if(n===6)exFilterText();
   window.scrollTo(0,0);
 }
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>{b.onclick=()=>showPage(+b.dataset.p);
-    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,7,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
+    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,7,15,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
 }
 /* ===== Halaman 9: Weekly ===== */
 const WS={area:'all',outlet:'all',ch:'all',from:'',to:''};
@@ -2332,6 +2447,298 @@ function renderOnline(){
     dates.map((d,i)=>{const row=outs.map(o=>byO[o][i]),tr=new Array(NZ).fill(0);row.forEach(r=>{for(let c=0;c<NZ;c++)tr[c]+=r[c]});
       return '<tr><td>'+LB(d)+'</td>'+row.map(r=>'<td>'+fv(mf(r))+'</td>').join('')+(outs.length>1?'<td><b>'+fv(mf(tr))+'</b></td>':'')+'</tr>'}).join('')+
     '</tbody><tfoot><tr><td>Total</td>'+outs.map(o=>'<td>'+fv(mf(tO[o]))+'</td>').join('')+(outs.length>1?'<td>'+fv(mf(T))+'</td>':'')+'</tr></tfoot>';
+}
+
+/* ===== Halaman 12: Target Better Cup ===== */
+const TGT={year:2026,note:'PENENTUAN TARGET 2026 a better cup (In Cup)',rows:[
+  {o:'Tebet',start:'2025-10-10',pd:150,grp:'Outlet 2025',t:[4650,4200,4650,4500,4650,4500,4650,4650,4500,4650,4500,4650]},
+  {o:'UNTAR',start:'2025-11-11',pd:75,grp:'Outlet 2025',t:[1425,750,1050,1200,1350,900,750,900,1500,1650,1500,750]},
+  {o:'Kelapa Dua',start:'2026-01-29',pd:100,grp:'Penambahan 2026',t:[0,2800,3100,3000,3100,3000,3100,3100,3000,3100,3000,3100]},
+  {o:'Petra University',start:'2026-06-30',pd:75,grp:'Penambahan 2026',t:[0,0,0,0,0,0,2325,2325,2250,2325,2250,2325]},
+  {o:'Tunjungan',start:'2026-07-31',pd:150,grp:'Penambahan 2026',t:[0,0,0,0,0,0,0,4650,4500,4650,4500,4650]},
+  {o:'Mulyosari',start:'2026-09-30',pd:100,grp:'Penambahan 2026',t:[0,0,0,0,0,0,0,0,0,3100,3000,3100]},
+  {o:'Outlet 7',start:'2026-11-30',pd:150,grp:'Penambahan 2026',t:[0,0,0,0,0,0,0,0,0,0,0,4650]}]};
+const TGS={area:'all',outlet:'all',m:''};
+const gCls=p=>p==null?'':p>=100?'ok':p>=80?'mid':'lo';
+const gCol=p=>p>=100?'var(--good)':p>=80?'var(--disc)':'var(--bad)';
+const gPct=(a,t)=>t>0?a/t*100:null;
+const gPf=p=>p==null?'-':p.toLocaleString('id-ID',{maximumFractionDigits:1})+'%';
+function gOutlets(){
+  const all=TGT.rows.map(r=>r.o).concat(OUT.filter(o=>!TGT.rows.some(r=>r.o===o)));
+  if(TGS.outlet!=='all')return [TGS.outlet];
+  if(TGS.area==='all')return all;
+  return all.filter(o=>AREAS[TGS.area].o.includes(o));
+}
+function gActual(o){ // Cup per bulan (12) + hari data per bulan
+  const a=new Array(12).fill(0),rows=D.daily.o[o];if(!rows)return a;
+  TD.forEach((d,i)=>{if(+d.slice(0,4)!==TGT.year)return;const r=rows[i];if(r)a[+d.slice(5,7)-1]+=r[1]||0});return a;
+}
+function initTarget(){
+  const mo=$('tg_month');
+  mo.innerHTML=MN.map((n,i)=>`<option value="${i}">${n} ${TGT.year}</option>`).join('');
+  mo.onchange=e=>{TGS.m=+e.target.value;renderTarget()};
+  $('tg_now').onclick=()=>{TGS.m='';renderTarget()};
+}
+function renderTarget(){
+  const ld=D.lastDate,ly=+ld.slice(0,4),lm=+ld.slice(5,7)-1,ldd=+ld.slice(8);
+  const curM=ly===TGT.year?lm:(ly>TGT.year?11:-1);
+  if(TGS.m==='')TGS.m=Math.max(0,curM);
+  const m=TGS.m,dm=dim(TGT.year,m+1);
+  const el=m===curM&&ly===TGT.year?ldd:(m<curM||ly>TGT.year?dm:0); // hari yang sudah lewat
+  const isCur=m===curM&&ly===TGT.year&&ldd<dm;
+  // chips
+  const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
+  mk('tg_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],TGS.area,v=>{TGS.area=v;if(TGS.outlet!=='all'&&v!=='all'&&!AREAS[v].o.includes(TGS.outlet))TGS.outlet='all';renderTarget()});
+  const allO=TGT.rows.map(r=>r.o).concat(OUT.filter(o=>!TGT.rows.some(r=>r.o===o)));
+  const list=TGS.area==='all'?allO:allO.filter(x=>AREAS[TGS.area].o.includes(x));
+  mk('tg_outletChips',[['all','Semua outlet']].concat(list.map(x=>[x,x])),TGS.outlet,v=>{TGS.outlet=v;renderTarget()});
+  $('tg_month').value=m;$('tg_now').setAttribute('aria-pressed',m===curM);
+  const outs=gOutlets();
+  const olabel=TGS.outlet!=='all'?TGS.outlet:(TGS.area==='all'?'Semua outlet':AREAS[TGS.area].name);
+  const T=o=>{const r=TGT.rows.find(x=>x.o===o);return r?r.t:new Array(12).fill(0)};
+  const A={};outs.forEach(o=>A[o]=gActual(o));
+  $('tg_show').textContent=MN[m]+' '+TGT.year+', '+olabel+(isCur?' (data s.d '+dLong(ld)+')':'');
+  // ringkasan bulan
+  let tg=0,ac=0;outs.forEach(o=>{tg+=T(o)[m];ac+=A[o][m]});
+  const proj=isCur&&el>0?ac/el*dm:ac,left=dm-el,need=isCur&&left>0?Math.max(0,tg-ac)/left:0;
+  $('tgh_k').textContent='Ach MTD Better Cup '+MN[m]+' '+TGT.year+', '+olabel;
+  $('tgs_k').textContent=el===0?'Bulan ini belum berjalan, hanya target yang ditampilkan.':isCur?'Bulan berjalan: '+el+' dari '+dm+' hari. Data tanggal terakhir mungkin belum satu hari penuh.':'Bulan sudah selesai.';
+  const kd=(lab,col,v,d)=>`<div><dt><i style="background:${col}"></i>${lab}</dt><dd><div class="v">${v}</div>${d?`<div class="d">${d}</div>`:''}</dd></div>`;
+  const tmtd=tg*(el/dm),pa=gPct(ac,tmtd),pf=gPct(ac,tg),pp=gPct(proj,tg);
+  $('tg_kpi').innerHTML=kd('Target bulan','var(--ink)',nf.format(tg)+'<span class="u">Cup</span>','≈ '+nf.format(tg/dm)+' Cup per hari; Target MTD '+nf.format(tmtd)+' ('+el+' hari)')+
+    kd('Aktual'+(isCur?' s.d '+dShort(ld):''),'var(--net)',nf.format(ac)+'<span class="u">Cup</span>','Ach MTD <span class="gp '+gCls(pa)+'">'+gPf(pa)+'</span>'+(isCur?'; '+gPf(pf)+' dari target bulan penuh':'')+(el?', rata2 '+nf.format(ac/Math.max(1,el))+' per hari':''))+
+    kd(isCur?'Proyeksi akhir bulan':'Hasil akhir bulan','var(--disc)',nf.format(proj)+'<span class="u">Cup</span>','<span class="gp '+gCls(pp)+'">'+gPf(pp)+'</span> Ach BE (vs target bulan)')+
+    kd(isCur?'Kebutuhan per hari (sisa '+left+' hari)':'Selisih vs target','var(--c3)',isCur?nf.format(need)+'<span class="u">Cup</span>':(ac-tg>=0?'+':'−')+nf.format(Math.abs(ac-tg))+'<span class="u">Cup</span>',isCur?'Sisa target '+nf.format(Math.max(0,tg-ac))+' Cup':'');
+  // tabel per outlet
+  $('tgh_t').textContent='Ach MTD per outlet, '+MN[m]+' '+TGT.year+(isCur?' (s.d '+dShort(ld)+')':'');
+  const row=(name,t,a,cls)=>{const tm=t*(el/dm),p=gPct(a,tm),pj=isCur&&el>0?a/el*dm:a,ppj=gPct(pj,t),nd=isCur&&left>0?Math.max(0,t-a)/left:0;
+    return `<tr${cls?` class="${cls}"`:''}><td>${name}</td><td>${nf.format(t/dm)}</td><td>${nf.format(t)}</td><td>${t?nf.format(tm):'-'}</td><td>${nf.format(a)}</td><td><span class="gp ${gCls(p)}">${gPf(p)}</span><div class="gbar"><span style="width:${Math.min(100,p||0)}%;background:${p==null?'var(--mute)':gCol(p)}"></span></div></td><td>${el?nf.format(a/el):'-'}</td><td>${nf.format(pj)}</td><td><span class="gp ${gCls(ppj)}">${gPf(ppj)}</span></td><td>${t?(a-tm>=0?'+':'−')+nf.format(Math.abs(a-tm)):'-'}</td>${isCur?`<td>${t?nf.format(nd):'-'}</td>`:''}</tr>`};
+  let body='';const grp={};
+  outs.forEach(o=>{const r=TGT.rows.find(x=>x.o===o),g=r?r.grp:'Tanpa target';(grp[g]||(grp[g]=[])).push(o)});
+  const gs=Object.keys(grp);
+  gs.forEach(g=>{let st=0,sa=0;grp[g].forEach(o=>{const t=T(o)[m],a=A[o][m];st+=t;sa+=a;body+=row(o+(A[o][m]===0&&t===0?' <small style="color:var(--mute)">(belum buka)</small>':''),t,a)});
+    if(gs.length>1||grp[g].length>1)body+=row('Subtotal '+g,st,sa,'sub')});
+  $('tg_tbl').innerHTML='<thead><tr><th>Outlet</th><th>Target / hari</th><th>Target bulan</th><th>Target MTD</th><th>Aktual MTD</th><th>% Ach MTD</th><th>Aktual / hari</th><th>'+(isCur?'Proyeksi':'Akhir bulan')+'</th><th>% Ach BE</th><th>Selisih vs MTD</th>'+(isCur?'<th>Butuh / hari</th>':'')+'</tr></thead><tbody>'+body+'</tbody>'+
+    (gs.length>1?'<tfoot>'+row('Total',tg,ac).replace('<tr>','<tr>')+'</tfoot>':'');
+  // grafik tahunan
+  $('tgh_c').textContent='Target vs aktual Better Cup per bulan '+TGT.year+', '+olabel;
+  const tm=new Array(12).fill(0),am=new Array(12).fill(0);outs.forEach(o=>{T(o).forEach((v,i)=>tm[i]+=v);A[o].forEach((v,i)=>am[i]+=v)});
+  const pjm=am.map((v,i)=>i===curM&&ly===TGT.year&&ldd<dim(TGT.year,i+1)&&ldd>0?v/ldd*dim(TGT.year,i+1):v);
+  gChart('tg_chart',tm,am,pjm,curM);
+  // tabel tahun
+  $('tgh_y').textContent='Rekap tahunan per outlet, '+olabel;
+  const ytdT=o=>T(o).reduce((s2,v,i)=>s2+(i<curM?v:i===curM?v*Math.min(1,ldd/dim(TGT.year,i+1)):0),0),ytdA=o=>A[o].reduce((s2,v,i)=>s2+(i<=curM?v:0),0);
+  const cell=(a,t,fut)=>{const p=gPct(a,t);return fut?`<td><small>target</small>${t?nf.format(t):'-'}</td>`:`<td>${nf.format(a)}<small>${t?'dari '+nf.format(t):'tanpa target'}</small>${p!=null?`<small class="gp ${gCls(p)}">${gPf(p)}</small>`:''}</td>`};
+  let yb='';const TT=new Array(12).fill(0),AA=new Array(12).fill(0);let yt=0,ya=0,tt=0;
+  outs.forEach(o=>{const t=T(o);t.forEach((v,i)=>{TT[i]+=v;AA[i]+=A[o][i]});const a1=ytdA(o),t1=ytdT(o);yt+=t1;ya+=a1;tt+=t.reduce((x,v)=>x+v,0);
+    yb+='<tr><td>'+o+'</td>'+t.map((v,i)=>cell(A[o][i],v,i>curM)).join('')+'<td><b>'+nf.format(a1)+'</b><small>dari '+nf.format(t1)+'</small><small class="gp '+gCls(gPct(a1,t1))+'">'+gPf(gPct(a1,t1))+'</small></td><td>'+nf.format(t.reduce((x,v)=>x+v,0))+'</td></tr>'});
+  $('tg_year').innerHTML='<thead><tr><th>Outlet</th>'+MS.map(x=>'<th>'+x+'</th>').join('')+'<th>YTD</th><th>Target '+TGT.year+'</th></tr></thead><tbody>'+yb+'</tbody>'+
+    (outs.length>1?'<tfoot><tr><td>Total</td>'+TT.map((v,i)=>cell(AA[i],v,i>curM)).join('')+'<td>'+nf.format(ya)+'<small>dari '+nf.format(yt)+'</small><small class="gp '+gCls(gPct(ya,yt))+'">'+gPf(gPct(ya,yt))+'</small></td><td>'+nf.format(tt)+'</td></tr></tfoot>':'');
+}
+function gChart(elId,tm,am,pjm,curM){
+  const el=$(elId),W=Math.max(300,el.clientWidth||900),H=300,ml=54,mr=10,mt=16,mb=28,n=12;
+  const raw=Math.max(1,...tm,...pjm)/3,e10=Math.pow(10,Math.floor(Math.log10(raw))),stp=[1,2,2.5,5,10].map(k=>k*e10).find(k=>k>=raw),max=stp*3;
+  const iw=W-ml-mr,bw=iw/n,x=i=>ml+i*bw,y=v=>mt+(H-mt-mb)*(1-Math.max(0,v)/max);
+  const fx=v=>v>=1e3?(v/1e3).toLocaleString('id-ID',{maximumFractionDigits:1})+' rb':String(Math.round(v));
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Target dan aktual Better Cup per bulan">`;
+  for(let i=0;i<=3;i++){const v=stp*i,yy=y(v);s+=`<line x1="${ml}" x2="${W-mr}" y1="${yy}" y2="${yy}" stroke="var(--rule)"/><text x="${ml-6}" y="${yy+4}" text-anchor="end" font-size="10.5" fill="var(--mute)">${fx(v)}</text>`}
+  for(let i=0;i<n;i++){const cx=x(i)+bw/2,w=Math.min(46,bw*.62),p=gPct(am[i],tm[i]);
+    if(i<=curM){
+      if(pjm[i]>am[i])s+=`<rect x="${cx-w/2}" y="${y(pjm[i])}" width="${w}" height="${y(0)-y(pjm[i])}" fill="var(--mute)" opacity=".28" rx="2"/>`;
+      s+=`<rect x="${cx-w/2}" y="${y(am[i])}" width="${w}" height="${y(0)-y(am[i])}" fill="${tm[i]?gCol(p):'var(--tax)'}" rx="2"/>`;
+      if(am[i])s+=`<text x="${cx}" y="${y(Math.max(am[i],pjm[i]))-5}" text-anchor="middle" font-size="10" fill="var(--ink)">${p!=null?gPf(p):fx(am[i])}</text>`}
+    if(tm[i])s+=`<line x1="${cx-w/2-5}" x2="${cx+w/2+5}" y1="${y(tm[i])}" y2="${y(tm[i])}" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>`;
+    s+=`<text x="${cx}" y="${H-8}" text-anchor="middle" font-size="10.5" fill="var(--mute)">${MS[i]}</text>`;
+    s+=`<rect class="gh" data-i="${i}" x="${x(i)}" y="${mt}" width="${bw}" height="${H-mt-mb}" fill="transparent"/>`}
+  s+=`</svg><div class="ttip" id="${elId}_t" hidden></div>`;el.innerHTML=s;
+  const svg=el.querySelector('svg'),tp=$(elId+'_t');
+  svg.querySelectorAll('.gh').forEach(r=>{const show=()=>{const i=+r.dataset.i,rc=svg.getBoundingClientRect(),p=gPct(am[i],tm[i]);
+    tp.hidden=false;tp.innerHTML=`<b>${MN[i]} ${TGT.year}</b><br>Target: ${nf.format(tm[i])} Cup`+(i<=curM?`<br>Aktual: ${nf.format(am[i])} Cup (${gPf(p)})`+(pjm[i]>am[i]?`<br>Proyeksi: ${nf.format(pjm[i])} Cup (${gPf(gPct(pjm[i],tm[i]))})`:''):'');
+    const tw=tp.offsetWidth,cx=(x(i)+bw/2)*(rc.width/W);tp.style.left=Math.min(Math.max(0,cx-tw/2),rc.width-tw)+'px';tp.style.top='0px'};
+    r.addEventListener('pointermove',show);r.addEventListener('pointerdown',show);r.addEventListener('pointerleave',()=>tp.hidden=true)});
+}
+
+/* ===== Halaman 13: Ach YTD (akumulasi target vs aktual) ===== */
+const AYS={area:'all',outlet:'all',a:0,b:-1};
+function ayCur(){const ld=D.lastDate,ly=+ld.slice(0,4);return {ly,lm:+ld.slice(5,7)-1,ldd:+ld.slice(8),cm:ly===TGT.year?+ld.slice(5,7)-1:(ly>TGT.year?11:-1)}}
+function initAch(){
+  const opt=MN.map((n,i)=>`<option value="${i}">${n} ${TGT.year}</option>`).join('');
+  $('ay_from').innerHTML=opt;$('ay_to').innerHTML=opt;
+  $('ay_from').onchange=e=>{AYS.a=+e.target.value;if(AYS.a>AYS.b)AYS.b=AYS.a;renderAch()};
+  $('ay_to').onchange=e=>{AYS.b=+e.target.value;if(AYS.b<AYS.a)AYS.a=AYS.b;renderAch()};
+  AYS.b=-1;
+}
+function renderAch(){
+  const {ly,ldd,cm}=ayCur();
+  if(AYS.b<0){AYS.a=0;AYS.b=Math.max(0,cm)}
+  const a=AYS.a,b=AYS.b;
+  const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx,dis])=>{const bt=document.createElement('button');bt.type='button';bt.className='chip';bt.textContent=tx;bt.setAttribute('aria-pressed',cur===v);if(dis){bt.disabled=true}bt.onclick=()=>fn(v);e.appendChild(bt)})};
+  mk('ay_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],AYS.area,v=>{AYS.area=v;if(AYS.outlet!=='all'&&v!=='all'&&!AREAS[v].o.includes(AYS.outlet))AYS.outlet='all';renderAch()});
+  const allO=TGT.rows.map(r=>r.o).concat(OUT.filter(o=>!TGT.rows.some(r=>r.o===o)));
+  const list=AYS.area==='all'?allO:allO.filter(x=>AREAS[AYS.area].o.includes(x));
+  mk('ay_outletChips',[['all','Semua outlet']].concat(list.map(x=>[x,x])),AYS.outlet,v=>{AYS.outlet=v;renderAch()});
+  const cmx=Math.max(0,cm);
+  const pres=[['ytd','YTD (Jan s.d '+MS[cmx]+')',0,cmx],['cur','Bulan berjalan',cmx,cmx],['q1','Q1',0,2],['q2','Q2',3,5],['q3','Q3',6,8],['q4','Q4',9,11],['s1','Semester 1',0,5],['s2','Semester 2',6,11],['fy','Setahun',0,11]];
+  const pc=$('ay_presetChips');pc.innerHTML='';
+  pres.forEach(([k,tx,x,y])=>{const bt=document.createElement('button');bt.type='button';bt.className='chip';bt.textContent=tx;bt.setAttribute('aria-pressed',a===x&&b===y);bt.onclick=()=>{AYS.a=x;AYS.b=y;renderAch()};pc.appendChild(bt)});
+  $('ay_from').value=a;$('ay_to').value=b;
+  // cakupan hari
+  const dmm=i=>dim(TGT.year,i+1);
+  const elM=i=>i<cm||ly>TGT.year?dmm(i):i===cm?ldd:0; // hari terlewati di bulan i
+  const fr=i=>dmm(i)?elM(i)/dmm(i):0;
+  let Dtot=0,E=0;for(let i=a;i<=b;i++){Dtot+=dmm(i);E+=elM(i)}
+  const left=Dtot-E,isOpen=left>0&&E>0;
+  const outs=AYS.outlet!=='all'?[AYS.outlet]:(AYS.area==='all'?allO:allO.filter(o=>AREAS[AYS.area].o.includes(o)));
+  const olabel=AYS.outlet!=='all'?AYS.outlet:(AYS.area==='all'?'Semua outlet':AREAS[AYS.area].name);
+  const pl=a===b?MN[a]+' '+TGT.year:MS[a]+' s.d '+MS[b]+' '+TGT.year;
+  $('ay_show').textContent=pl+' ('+Dtot+' hari, '+E+' hari berdata'+(isOpen?' s.d '+dLong(D.lastDate):'')+'), '+olabel;
+  const T=o=>{const r=TGT.rows.find(x=>x.o===o);return r?r.t:new Array(12).fill(0)};
+  const calc=o=>{const t=T(o),ac=gActual(o);let tf=0,td=0,A=0;for(let i=a;i<=b;i++){tf+=t[i];td+=t[i]*fr(i);if(elM(i))A+=ac[i]}
+    const rate=cm>=a&&cm<=b&&ldd>0?ac[cm]/ldd:0,pj=A+rate*left;return {tf,td,A,pj,rate}};
+  const R={};outs.forEach(o=>R[o]=calc(o));
+  const sum=list2=>list2.reduce((z,o)=>{const r=R[o];z.tf+=r.tf;z.td+=r.td;z.A+=r.A;z.pj+=r.pj;z.rate+=r.rate;return z},{tf:0,td:0,A:0,pj:0,rate:0});
+  const G=sum(outs);
+  // KPI
+  const kd=(lab,col,v,d)=>`<div><dt><i style="background:${col}"></i>${lab}</dt><dd><div class="v">${v}</div>${d?`<div class="d">${d}</div>`:''}</dd></div>`;
+  const U='<span class="u">Cup</span>',pa=gPct(G.A,G.td),pf=gPct(G.A,G.tf),pp=gPct(G.pj,G.tf),need=left>0?Math.max(0,G.tf-G.A)/left:0;
+  $('ayh_k').textContent='Ach Better Cup '+pl+', '+olabel;
+  $('ays_k').textContent=E===0?'Periode ini belum berjalan, hanya target yang ditampilkan.':isOpen?'Periode masih berjalan: '+E+' dari '+Dtot+' hari. Data tanggal terakhir mungkin belum satu hari penuh.':'Periode sudah selesai.';
+  $('ay_kpi').innerHTML=kd('Target periode','var(--ink)',nf.format(G.tf)+U,MS[a]+(a===b?'':' s.d '+MS[b])+', '+Dtot+' hari')+
+    kd('Target s.d tgl data','var(--tax)',nf.format(G.td)+U,isOpen?'proporsional '+E+' hari':'= target periode')+
+    kd('Aktual (realisasi)','var(--net)',nf.format(G.A)+U,E?'rata2 '+nf.format(G.A/E)+' Cup per hari':'')+
+    kd('Ach','var(--good)','<span class="gp '+gCls(pa)+'">'+gPf(pa)+'</span>','vs target s.d tgl data'+(isOpen?'; '+gPf(pf)+' dari target periode penuh':''))+
+    kd(isOpen?'Proyeksi akhir periode':'Hasil akhir periode','var(--disc)',nf.format(G.pj)+U,'<span class="gp '+gCls(pp)+'">'+gPf(pp)+'</span> Ach BE (vs target periode)')+
+    kd(isOpen?'Butuh per hari (sisa '+left+' hari)':'Selisih vs target','var(--c3)',isOpen?nf.format(need)+U:(G.A-G.tf>=0?'+':'−')+nf.format(Math.abs(G.A-G.tf))+U,isOpen?'Sisa target '+nf.format(Math.max(0,G.tf-G.A))+' Cup':'');
+  // tabel per outlet
+  $('ayh_t').textContent='Pencapaian per outlet, akumulasi '+pl;
+  const row=(name,r,cls)=>{const p=gPct(r.A,r.td),pp2=gPct(r.pj,r.tf),nd=left>0&&r.tf?Math.max(0,r.tf-r.A)/left:0;
+    return `<tr${cls?` class="${cls}"`:''}><td>${name}</td><td>${r.tf?nf.format(r.tf):'-'}</td><td>${r.td?nf.format(r.td):'-'}</td><td>${nf.format(r.A)}</td><td><span class="gp ${gCls(p)}">${gPf(p)}</span><div class="gbar"><span style="width:${Math.min(100,p||0)}%;background:${p==null?'var(--mute)':gCol(p)}"></span></div></td><td>${E?nf.format(r.A/E):'-'}</td><td>${nf.format(r.pj)}</td><td><span class="gp ${gCls(pp2)}">${gPf(pp2)}</span></td><td>${r.td?(r.A-r.td>=0?'+':'−')+nf.format(Math.abs(r.A-r.td)):'-'}</td>${isOpen?`<td>${r.tf?nf.format(nd):'-'}</td>`:''}</tr>`};
+  const grp={};outs.forEach(o=>{const r=TGT.rows.find(x=>x.o===o),g=r?r.grp:'Tanpa target';(grp[g]||(grp[g]=[])).push(o)});
+  const gs=Object.keys(grp);let body='';
+  gs.forEach(g=>{grp[g].forEach(o=>{const r=R[o];body+=row(o+(r.A===0&&r.tf===0?' <small style="color:var(--mute)">(belum buka)</small>':''),r)});
+    if(gs.length>1||grp[g].length>1)body+=row('Subtotal '+g,sum(grp[g]),'sub')});
+  $('ay_tbl').innerHTML='<thead><tr><th>Outlet</th><th>Target periode</th><th>Target s.d tgl data</th><th>Aktual</th><th>% Ach</th><th>Aktual / hari</th><th>'+(isOpen?'Proyeksi':'Akhir periode')+'</th><th>% Ach BE</th><th>Selisih</th>'+(isOpen?'<th>Butuh / hari</th>':'')+'</tr></thead><tbody>'+body+'</tbody>'+(gs.length>1||outs.length>1?'<tfoot>'+row('Total',G)+'</tfoot>':'');
+  // akumulasi per bulan
+  $('ayh_m').textContent='Akumulasi per bulan, '+olabel;
+  let ct=0,ca=0,mb='';
+  for(let i=a;i<=b;i++){let t=0,tt=0,ac=0;outs.forEach(o=>{t+=T(o)[i]*fr(i);tt+=T(o)[i];ac+=elM(i)?gActual(o)[i]:0});
+    const fut=!elM(i);ct+=t;ca+=ac;const pm=gPct(ac,t),pk=gPct(ca,ct);
+    mb+=`<tr><td>${MN[i]}${i===cm&&ldd<dmm(i)?' <small style="color:var(--mute)">(s.d '+ldd+')</small>':''}</td><td>${nf.format(tt)}</td><td>${fut?'-':nf.format(t)}</td><td>${fut?'-':nf.format(ac)}</td><td>${fut?'-':'<span class="gp '+gCls(pm)+'">'+gPf(pm)+'</span>'}</td><td>${fut?'-':nf.format(ct)}</td><td>${fut?'-':nf.format(ca)}</td><td>${fut?'-':'<span class="gp '+gCls(pk)+'">'+gPf(pk)+'</span>'}</td></tr>`}
+  $('ay_mon').innerHTML='<thead><tr><th>Bulan</th><th>Target bulan</th><th>Target s.d tgl data</th><th>Aktual</th><th>% Ach bulan</th><th>Kumulatif target</th><th>Kumulatif aktual</th><th>% Ach kumulatif</th></tr></thead><tbody>'+mb+'</tbody>';
+}
+
+/* ===== Halaman 14: Target (rekap 2026 dan rencana 2027) ===== */
+const TQK='abc_target2027_growth_v2';
+let TQ27=(()=>{try{return JSON.parse(localStorage.getItem(TQK))||{}}catch(e){return {}}})(); // {all:growth%,o:{outlet:growth%}}
+if(TQ27.all==null)TQ27.all=0;if(!TQ27.o)TQ27.o={};if(!TQ27.p)TQ27.p={};if(!TQ27.d)TQ27.d={};
+const tqSave=()=>{try{localStorage.setItem(TQK,JSON.stringify(TQ27))}catch(e){}};
+function renderTplan(){
+  const {ly,ldd,cm}=ayCur(),ld=D.lastDate;
+  $('tq_show').textContent=dLong(ld);
+  const allO=TGT.rows.map(r=>r.o).concat(OUT.filter(o=>!TGT.rows.some(r=>r.o===o)));
+  const endY=new Date(Date.UTC(TGT.year,11,31)),ldD=new Date(ld+'T00:00:00Z');
+  const rem=ly===TGT.year?Math.round((endY-ldD)/864e5):(ly>TGT.year?0:365);
+  const R=allO.map(o=>{const tr=TGT.rows.find(x=>x.o===o),t=tr?tr.t.reduce((a,v)=>a+v,0):0,ac=gActual(o);
+    const act=ac.reduce((a,v,i)=>a+(i<=cm?v:0),0);
+    let od=ldd,fdY=null;{const rows=D.daily.o[o];if(rows){const fi=rows.findIndex(r=>r&&r[1]>0);if(fi>=0){const fd=TD[fi];fdY=fd;if(+fd.slice(0,4)===TGT.year&&+fd.slice(5,7)-1===cm)od=ldd-(+fd.slice(8))+1}}}
+    const rate=cm>=0&&od>0?ac[cm]/od:0,ttlA=act+rate*rem,man=TQ27.p[o]!=null,ttl=man?TQ27.p[o]:ttlA;
+    const y0=Date.UTC(TGT.year,0,1),ydays=Math.round((endY-y0)/864e5)+1,st=tr&&tr.start<TGT.year+'-01-01'?y0:(fdY?Math.max(y0,Date.parse(fdY+'T00:00:00Z')):(tr?Math.max(y0,Date.parse(tr.start+'T00:00:00Z')):null));
+    const opD=st!=null&&st<=endY?Math.round((endY-st)/864e5)+1:0,opM=opD/ydays*12,avg=opD>0?ttl/opD:0,base=avg*ydays;
+    const dm=TQ27.d[o]!=null,D27x=Math.round((Date.UTC(TGT.year+1,11,31)-Date.UTC(TGT.year+1,0,1))/864e5)+1,t27m=dm?TQ27.d[o]*D27x:null;
+    const pct=dm?(base?(t27m/base-1)*100:null):(TQ27.o[o]!=null?TQ27.o[o]:TQ27.all);
+    return {o,grp:tr?tr.grp:'Tanpa target',t,act,ttl,rate,pct,ovr:TQ27.o[o]!=null||dm,opM,opD,avg,base,ttlA,man,dm,t27m}});
+  const pf=v=>v==null?'-':v.toLocaleString('id-ID',{maximumFractionDigits:1})+'%';
+  const sg=v=>(v>=0?'+':'−')+nf.format(Math.abs(v));
+  const gpf=v=>v==null?'':(v>0?'+':v<0?'−':'')+Math.abs(v).toLocaleString('id-ID',{maximumFractionDigits:1})+'%';
+  const D27=Math.round((Date.UTC(TGT.year+1,11,31)-Date.UTC(TGT.year+1,0,1))/864e5)+1;
+  const row=(no,r,cls,inp)=>{const p=gPct(r.act,r.t),be=gPct(r.ttl,r.t),t27=r.t27!=null?r.t27:(r.dm?r.t27m:r.base*(1+r.pct/100));
+    return `<tr${cls?` class="${cls}"`:''}><td>${no}</td><td>${r.o}${r.t===0&&r.act===0?' <small>belum buka</small>':''}</td><td>${r.t?nf.format(r.t):'-'}</td><td>${nf.format(r.act)}</td><td><b>${pf(p)}</b></td><td>${r.t?sg(r.act-r.t):'-'}</td><td>${inp?`<input type="number" class="tqp${r.man?' ovr':''}" min="0" step="1" data-p="${r.o}" value="${Math.round(r.ttl)}" aria-label="Proyeksi 2026 ${r.o}">${r.man?`<small>auto ${nf.format(r.ttlA)}</small>`:''}`:`<b>${nf.format(r.ttl)}</b>`}</td><td><span class="gp ${gCls(be)}">${pf(be)}</span></td><td>${r.t?sg(r.ttl-r.t):'-'}</td><td>${inp?`<input type="number" min="-100" max="1000" step="1" class="${r.ovr?'ovr':''}" data-o="${r.o}" value="${r.pct==null?'':Math.round(r.pct*10)/10}" aria-label="Growth % ${r.o}"> %`:(r.pct!=null?gpf(r.pct):'')}</td><td>${r.ttl||t27?sg(t27-r.ttl):'-'}</td><td class="t27">${nf.format(t27)}</td><td>${inp?`<input type="number" class="tqd${r.dm?' ovr':''}" min="0" step="1" data-d="${r.o}" value="${t27?Math.round(t27/D27):''}" aria-label="Target per hari 2027 ${r.o}">`:(t27?nf.format(t27/D27):'-')}</td><td>${r.avg?nf.format(r.avg):'-'}${r.opM&&r.opM<11.99&&inp?`<small>${r.opD} hari buka</small>`:''}</td></tr>`};
+  const sum=(name,list)=>{const z={o:name,t:0,act:0,ttl:0,t27:0,avg:0,base:0};list.forEach(r=>{z.t+=r.t;z.act+=r.act;z.ttl+=r.ttl;z.avg+=r.avg;z.base+=r.base;z.t27+=r.dm?r.t27m:r.base*(1+(r.pct||0)/100)});z.pct=z.base?(z.t27/z.base-1)*100:null;return z};
+  const grp={};R.forEach(r=>(grp[r.grp]||(grp[r.grp]=[])).push(r));
+  let body='',no=0;
+  Object.keys(grp).forEach(g=>{grp[g].forEach(r=>{body+=row(++no,r,'',true)});body+=row('',sum('Subtotal '+g,grp[g]),'sub',false)});
+  $('tq_tbl').innerHTML='<thead><tr><th>No</th><th>Outlet</th><th>Target 2026</th><th>Act 2026</th><th>% Ach</th><th>+/-</th><th>Ttl 2026 (Proyeksi, bisa diedit)</th><th>% Ach BE</th><th>+/- BE vs Target 1 Thn</th><th>Growth %</th><th>Kenaikan Cup</th><th>Target 2027</th><th>Target / hari 2027 (bisa diedit)</th><th>Rata2 / hari 2026</th></tr><tr class="tqm"><th colspan="9" style="text-align:right;font-weight:600">Growth untuk semua outlet</th><th><input type="number" id="tq_master" min="-100" max="1000" step="1" aria-label="Growth % untuk semua outlet"> %</th><th colspan="4"></th></tr></thead><tbody>'+body+'</tbody><tfoot>'+row('',sum('Total',R),'',false)+'</tfoot>';
+  $('tqh').textContent='Target Better Cup 2026 & 2027 (Act s.d '+dShort(ld)+')';
+  $('tq_all').value=TQ27.all;$('tq_master').value=TQ27.all;
+  $('tq_master').onchange=e=>{const v=parseFloat(e.target.value);if(isNaN(v))return;TQ27.all=v;TQ27.o={};TQ27.d={};tqSave();renderTplan()};
+  $('tq_tbl').querySelectorAll('input[data-p]').forEach(inp=>{inp.onchange=e=>{const o=e.target.dataset.p,raw=e.target.value.trim(),v=parseFloat(raw),a=R.find(x=>x.o===o);
+    if(raw===''||isNaN(v)||(a&&Math.round(a.ttlA)===Math.round(v)))delete TQ27.p[o];else TQ27.p[o]=v;tqSave();renderTplan()}});
+  $('tq_tbl').querySelectorAll('input[data-o]').forEach(inp=>{inp.onchange=e=>{const v=parseFloat(e.target.value);const o=e.target.dataset.o;
+    delete TQ27.d[o];if(isNaN(v)||v===TQ27.all)delete TQ27.o[o];else TQ27.o[o]=v;tqSave();renderTplan()}});
+  $('tq_tbl').querySelectorAll('input[data-d]').forEach(inp=>{inp.onchange=e=>{const o=e.target.dataset.d,raw=e.target.value.trim(),v=parseFloat(raw);
+    if(raw===''||isNaN(v))delete TQ27.d[o];else{TQ27.d[o]=v;delete TQ27.o[o]}tqSave();renderTplan()}});
+}
+function initTplan(){
+  $('tq_all').onchange=e=>{const v=parseFloat(e.target.value);if(isNaN(v))return;TQ27.all=v;TQ27.o={};TQ27.d={};tqSave();renderTplan()};
+  $('tq_apply').onclick=()=>{const v=parseFloat($('tq_all').value);if(!isNaN(v))TQ27.all=v;TQ27.o={};TQ27.d={};tqSave();renderTplan()};
+  $('tq_resetP').onclick=()=>{TQ27.p={};tqSave();renderTplan()};
+  $('tq_reset').onclick=()=>{TQ27.all=0;TQ27.o={};TQ27.d={};tqSave();renderTplan()};
+}
+
+/* ===== Halaman 15: Monitoring (target per hari × HK) ===== */
+const MNK='abc_hk_v1';
+let MNHK=(()=>{try{return JSON.parse(localStorage.getItem(MNK))||{}}catch(e){return {}}})();
+const mnSave=()=>{try{localStorage.setItem(MNK,JSON.stringify(MNHK))}catch(e){}};
+const MNS={area:'all',outlet:'all',m:''};
+function initMon(){
+  $('mn_month').innerHTML=MN.map((n,i)=>`<option value="${i}">${n} ${TGT.year}</option>`).join('');
+  $('mn_month').onchange=e=>{MNS.m=+e.target.value;renderMon()};
+  $('mn_now').onclick=()=>{MNS.m='';renderMon()};
+  $('mn_reset').onclick=()=>{const m=MNS.m;Object.keys(MNHK).forEach(k=>{if(k.startsWith(m+'|')||k.startsWith('pd:'+m+'|'))delete MNHK[k]});mnSave();renderMon()};
+}
+function mnInfo(o,m){ // aktual, hari transaksi, hari lewat, HK otomatis
+  const {ly,ldd,cm}=ayCur(),dm=dim(TGT.year,m+1),tr=TGT.rows.find(x=>x.o===o),rows=D.daily.o[o];
+  const past=ly>TGT.year||m<cm?dm:(m===cm?ldd:0); // hari kalender yang sudah lewat
+  let ac=0,tx=0;
+  if(rows)TD.forEach((d,i)=>{if(+d.slice(0,4)!==TGT.year||+d.slice(5,7)-1!==m)return;const r=rows[i];if(!r)return;ac+=r[1]||0;if((r[0]||0)>0||(r[8]||0)>0||(r[1]||0)>0)tx++});
+  let startDay=1;let st0=tr?tr.start:null;if(rows){const fi=rows.findIndex(r=>r&&((r[0]||0)>0||(r[1]||0)>0));if(fi>=0&&(!st0||TD[fi]<st0))st0=TD[fi]}
+  if(st0){const sy=+st0.slice(0,4),sm=+st0.slice(5,7)-1,sd=+st0.slice(8);
+    if(sy>TGT.year||(sy===TGT.year&&sm>m))startDay=dm+1;else if(sy===TGT.year&&sm===m)startDay=sd}
+  const fut=Math.max(0,dm-Math.max(past,startDay-1)); // hari kalender belum lewat, setelah tanggal buka
+  const auto=tx+fut,key=m+'|'+o,man=MNHK[key]!=null,hk=man?MNHK[key]:auto;
+  const pdA=tr?tr.pd:0,pk='pd:'+key,pdM=MNHK[pk]!=null,pd=pdM?MNHK[pk]:pdA;
+  return {ac,tx,past,fut,auto,hk,man,pd,pdA,pdM,dm};
+}
+function renderMon(){
+  const {ly,ldd,cm}=ayCur(),ld=D.lastDate;
+  if(MNS.m==='')MNS.m=Math.max(0,cm);
+  const m=MNS.m,isCur=m===cm&&ly===TGT.year&&ldd<dim(TGT.year,m+1);
+  const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
+  mk('mn_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],MNS.area,v=>{MNS.area=v;if(MNS.outlet!=='all'&&v!=='all'&&!AREAS[v].o.includes(MNS.outlet))MNS.outlet='all';renderMon()});
+  const allO=TGT.rows.map(r=>r.o).concat(OUT.filter(o=>!TGT.rows.some(r=>r.o===o)));
+  const list=MNS.area==='all'?allO:allO.filter(x=>AREAS[MNS.area].o.includes(x));
+  mk('mn_outletChips',[['all','Semua outlet']].concat(list.map(x=>[x,x])),MNS.outlet,v=>{MNS.outlet=v;renderMon()});
+  $('mn_month').value=m;$('mn_now').setAttribute('aria-pressed',m===cm);
+  const outs=MNS.outlet!=='all'?[MNS.outlet]:(MNS.area==='all'?allO:allO.filter(o=>AREAS[MNS.area].o.includes(o)));
+  const olabel=MNS.outlet!=='all'?MNS.outlet:(MNS.area==='all'?'Semua outlet':AREAS[MNS.area].name);
+  $('mn_show').textContent=MN[m]+' '+TGT.year+', '+olabel+(isCur?' (data s.d '+dLong(ld)+')':'');
+  const futM=ly<TGT.year||(ly===TGT.year&&m>cm),remCal=isCur?dim(TGT.year,m+1)-ldd:0;
+  const R=outs.map(o=>{const x=mnInfo(o,m),tb=x.pd*x.hk,rem=Math.max(0,x.hk-x.tx),rate=x.tx?x.ac/x.tx:0,pj=x.ac+rate*rem;return {o,...x,tb,rem,rate,pj}});
+  const sum=l=>l.reduce((z,r)=>{z.pd+=r.pd;z.hk+=r.hk;z.tb+=r.tb;z.ac+=r.ac;z.tx+=r.tx;z.pj+=r.pj;z.rem+=r.rem;return z},{pd:0,hk:0,tb:0,ac:0,tx:0,pj:0,rem:0});
+  const G=sum(R),U='<span class="u">Cup</span>';
+  const pa=gPct(G.ac,G.tb),pp=gPct(G.pj,G.tb);
+  const remDays=isCur?dim(TGT.year,m+1)-ldd:0,need=remDays>0?Math.max(0,G.tb-G.ac)/remDays:0;
+  $('mnh_k').textContent='Monitoring Better Cup '+MN[m]+' '+TGT.year+', '+olabel;
+  $('mns_k').textContent=isCur?'Bulan berjalan: data s.d '+dLong(ld)+', sisa '+remDays+' hari kalender.':(m>cm?'Bulan ini belum berjalan, hanya target yang ditampilkan.':'Bulan sudah selesai.');
+  const kd=(lab,col,v,d)=>`<div><dt><i style="background:${col}"></i>${lab}</dt><dd><div class="v">${v}</div>${d?`<div class="d">${d}</div>`:''}</dd></div>`;
+  $('mn_kpi').innerHTML=kd('Target bulan','var(--ink)',nf.format(G.tb)+U,'Target / hari × HK')+
+    kd('Aktual','var(--net)',nf.format(G.ac)+U,'Ach <span class="gp '+gCls(pa)+'">'+gPf(pa)+'</span>')+
+    kd(isCur?'Proyeksi akhir bulan':'Hasil akhir bulan','var(--disc)',nf.format(G.pj)+U,'Ach BE <span class="gp '+gCls(pp)+'">'+gPf(pp)+'</span>')+
+    kd(isCur?'Butuh per hari (sisa '+remDays+' hari)':'Selisih vs target','var(--c3)',isCur?nf.format(need)+U:(G.ac-G.tb>=0?'+':'−')+nf.format(Math.abs(G.ac-G.tb))+U,isCur?'Sisa target '+nf.format(Math.max(0,G.tb-G.ac))+' Cup':'');
+  $('mnh_t').textContent='Monitoring per outlet, '+MN[m]+' '+TGT.year+(isCur?' (s.d '+dShort(ld)+')':'');
+  const sg=v=>(v>=0?'+':'−')+nf.format(Math.abs(v));
+  const row=(name,r,cls,inp)=>{const p=futM?null:gPct(r.ac,r.tb),pj=futM?null:gPct(r.pj,r.tb),rr=inp?r.rem:remCal,nd=rr>0?Math.max(0,r.tb-r.ac)/rr:0;
+    const hk=inp?`<input type="number" min="0" max="31" step="1" class="${r.man?'ovr':''}" data-hk="${r.o}" value="${r.hk}" aria-label="HK ${r.o}">${r.man?`<small>auto ${r.auto}</small>`:`<small>${r.tx} trx${r.fut?' + '+r.fut+' sisa':''}</small>`}`:nf.format(r.hk);
+    const pdc=inp?`<input type="number" min="0" step="1" class="${r.pdM?'ovr':''}" data-pd="${r.o}" value="${r.pd}" aria-label="Target per hari ${r.o}">${r.pdM?`<small>awal ${nf.format(r.pdA)}</small>`:''}`:(r.pd?nf.format(r.pd):'-');
+    return `<tr${cls?` class="${cls}"`:''}><td>${name}</td><td>${pdc}</td><td>${hk}</td><td><b>${r.tb?nf.format(r.tb):'-'}</b></td><td>${nf.format(r.ac)}</td><td><span class="gp ${gCls(p)}">${gPf(p)}</span><div class="gbar"><span style="width:${Math.min(100,p||0)}%;background:${p==null?'var(--mute)':gCol(p)}"></span></div></td><td>${r.tx?nf.format(r.ac/r.tx):'-'}</td><td>${futM?'-':nf.format(r.pj)}</td><td><span class="gp ${gCls(pj)}">${gPf(pj)}</span></td><td>${r.tb&&!futM?sg(r.ac-r.tb):'-'}</td>${isCur?`<td>${r.tb&&rr?nf.format(nd):'-'}</td>`:''}</tr>`};
+  const grp={};R.forEach(r=>{const t=TGT.rows.find(x=>x.o===r.o),g=t?t.grp:'Tanpa target';(grp[g]||(grp[g]=[])).push(r)});
+  const gs=Object.keys(grp);let body='';
+  gs.forEach(g=>{grp[g].forEach(r=>body+=row(r.o,r,'',true));if(gs.length>1||grp[g].length>1)body+=row('Subtotal '+g,sum(grp[g]),'sub',false)});
+  $('mn_tbl').innerHTML='<thead><tr><th>Outlet</th><th>Target / hari (bisa diedit)</th><th>HK (bisa diedit)</th><th>Target bulan</th><th>Aktual</th><th>% Ach</th><th>Aktual / hari trx</th><th>'+(isCur||futM?'Proyeksi':'Akhir bulan')+'</th><th>% Ach BE</th><th>Selisih</th>'+(isCur?'<th>Butuh / hari</th>':'')+'</tr></thead><tbody>'+body+'</tbody>'+(R.length>1?'<tfoot>'+row('Total',G,'',false)+'</tfoot>':'');
+  $('mn_tbl').querySelectorAll('input[data-pd]').forEach(inp=>{inp.onchange=e=>{const o=e.target.dataset.pd,raw=e.target.value.trim(),v=parseFloat(raw),key='pd:'+m+'|'+o,a=R.find(x=>x.o===o);
+    if(raw===''||isNaN(v)||(a&&a.pdA===v))delete MNHK[key];else MNHK[key]=Math.max(0,v);mnSave();renderMon()}});
+  $('mn_tbl').querySelectorAll('input[data-hk]').forEach(inp=>{inp.onchange=e=>{const o=e.target.dataset.hk,raw=e.target.value.trim(),v=parseFloat(raw),key=m+'|'+o,a=R.find(x=>x.o===o);
+    if(raw===''||isNaN(v)||(a&&a.auto===v))delete MNHK[key];else MNHK[key]=Math.max(0,v);mnSave();renderMon()}});
 }
 
 /* ===== Halaman 10: Bank (metode bayar) ===== */
@@ -3159,7 +3566,7 @@ function applyDataset(newX){
   [T,H].forEach(st=>{st.from=TMIN;st.to=TMAX;if(st.outlet!=='all'&&!D.outlets.includes(st.outlet))st.outlet='all'});
   builtRange=null;DSD=null;DSbusy=false;DSapprox=false;DSerr='';
   DS.from=TMIN;DS.to=TMAX;
-  period();initFilters();initTrend();initTraffic();initDaily();initProduct();initWeekly();initBank();initOnline();PX=null;PXsrc=null;Perr='';
+  period();initFilters();initTrend();initTraffic();initDaily();initProduct();initWeekly();initBank();initOnline();initTarget();initAch();initTplan();initMon();PX=null;PXsrc=null;Perr='';
   showPage(PAGE);
 }
 
@@ -3640,8 +4047,8 @@ function exFilterText(){
 function initExport(){
   const g=document.getElementById('ex_goto');if(g)g.onclick=()=>showPage(2);
 }
-period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initProduct();initWeekly();initBank();initOnline();initReport();initExport();initUpload();initSheet();showPage(1);
-let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
+period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initProduct();initWeekly();initBank();initOnline();initTarget();initAch();initTplan();initMon();initReport();initExport();initUpload();initSheet();showPage(1);
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
 </html>
