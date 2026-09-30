@@ -313,6 +313,15 @@ tr.psp{display:none}
   body.pr-rekap .rkt th:first-child,body.pr-rekap .rkt td:first-child{position:static;background:transparent}
   body.pr-rekap .rkt.wk{font-size:10px}
   body.pr-rekap *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.pr-push{padding:10mm 12mm;background:#fff;color:#000}
+  body.pr-push .top,body.pr-push .tabs,body.pr-push #page21 .fpanel{display:none!important}
+  body.pr-push .wrap{max-width:none;padding:0}
+  body.pr-push .phead{display:block;font-size:12px;margin:0 0 6px;line-height:1.4}
+  body.pr-push .punote{font-size:22px;margin:4px 0 10px}
+  body.pr-push #page21 section{padding:0;border:0}
+  body.pr-push .tw{overflow:visible!important}
+  body.pr-push .put input[type=number]{border:0;background:transparent;box-shadow:none;font-weight:700;padding:0;text-align:right}
+  body.pr-push *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 .ptools{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin-top:12px}
 .ptools label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mute)}
@@ -356,7 +365,7 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
 .wb{transition:opacity .12s}
 </style>
 <style>#o_kpi{grid-template-columns:repeat(3,1fr)}#o_kpi>div:nth-child(n+4){border-top:1px solid var(--rule)}#o_kpi>div:nth-child(3n){border-right:0}#o_kpi>div:nth-child(3n+1){padding-left:0}@media (max-width:860px){#o_kpi{grid-template-columns:repeat(2,1fr)}#o_kpi>div:nth-child(n){border-top:0;border-right:0;padding-left:0}}</style>
-<style>.gp{font-weight:700}.gp.ok{color:var(--good)}.gp.mid{color:var(--disc)}.gp.lo{color:var(--bad)}#tg_tbl tr.sub td,#ay_tbl tr.sub td{font-weight:700;background:var(--hi)}.gyear td small{display:block;color:var(--mute);font-size:11px;line-height:1.3}.gyear td{vertical-align:top}.gbar{height:6px;border-radius:3px;background:var(--rule);overflow:hidden;min-width:60px;margin-top:4px}.gbar span{display:block;height:100%}#ay_kpi{grid-template-columns:repeat(3,1fr)}#ay_kpi>div:nth-child(n+4){border-top:1px solid var(--rule)}#ay_kpi>div:nth-child(3n){border-right:0}#ay_kpi>div:nth-child(3n+1){padding-left:0}@media (max-width:860px){#ay_kpi{grid-template-columns:repeat(2,1fr)}#ay_kpi>div:nth-child(n){border-top:0;border-right:0;padding-left:0}}.tqt input[type=number]{font:600 14px var(--bd);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:4px 6px;width:72px;text-align:right}.tqt tr.tqm th{border-bottom:2px solid var(--rule);padding-top:6px;padding-bottom:8px;color:var(--ink)}.tqt #tq_master{border:2px solid var(--net)}.tqt input.ovr{border-color:var(--c3);box-shadow:0 0 0 1px var(--c3)}.tqt td small{display:block;color:var(--mute);font-size:11px}.tqt tr.sub td{font-weight:700;background:var(--hi)}.tqt td.t27{font-weight:700}.tqt{font-size:13px}.tqt th{white-space:normal;line-height:1.2;vertical-align:bottom;font-size:11.5px;padding:6px 6px}.tqt td{padding:6px 6px;white-space:nowrap}.tqt input[type=number]{width:54px;padding:2px 4px;font-size:13px}.tqt td small{font-size:10px}.tqt input.tqp{width:78px}.tqt input.tqd{width:58px}.tqt td:nth-child(2),.tqt th:nth-child(2){text-align:left}.tqt td:first-child,.tqt th:first-child{text-align:left;width:36px}#mn_tbl{font-size:14px}#mn_tbl th{font-size:12.5px}#mn_tbl input[type=number]{width:54px}#mn_tbl input[data-pd]{width:64px}#mn_tbl td:first-child,#mn_tbl th:first-child{text-align:left;width:auto}#mn_tbl td:nth-child(2),#mn_tbl th:nth-child(2){text-align:right}.rkt{font-size:12.5px}.rkt th,.rkt td{padding:5px 5px;text-align:right;white-space:nowrap}.rkt th:first-child,.rkt td:first-child{text-align:left;position:sticky;left:0;background:var(--bg);z-index:1}.rkt thead th small{display:block;font-weight:400;color:var(--mute);font-size:10px}.rkt th.we{color:var(--bad)}.rkt td.z{color:var(--mute)}.rkt tr.sub td{font-weight:700;background:var(--hi)}.rkt tr.sub td:first-child{background:var(--hi)}.rkb td:first-child{white-space:normal;min-width:220px}.rkt td.tt,.rkt th.tt{font-weight:700;border-left:1px solid var(--rule)}.dskt td:first-child a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--rule);cursor:pointer}.dskt tr.sel td{background:var(--hi)}.dskt td:nth-child(3){white-space:normal;min-width:110px;max-width:170px;text-align:left}.dskt th{white-space:normal;vertical-align:bottom}.dskt td small{display:block;color:var(--mute);font-size:10.5px}.gd.up{color:var(--good);font-weight:700}.gd.dn{color:var(--bad);font-weight:700}#dsk_imp{grid-template-columns:repeat(4,1fr)}.rkt th.pz{background:color-mix(in srgb,var(--disc) 28%,transparent);color:var(--ink)}.rkt td.pz{box-shadow:inset 0 2px 0 var(--disc),inset 0 -2px 0 var(--disc)}</style>
+<style>.gp{font-weight:700}.gp.ok{color:var(--good)}.gp.mid{color:var(--disc)}.gp.lo{color:var(--bad)}#tg_tbl tr.sub td,#ay_tbl tr.sub td{font-weight:700;background:var(--hi)}.gyear td small{display:block;color:var(--mute);font-size:11px;line-height:1.3}.gyear td{vertical-align:top}.gbar{height:6px;border-radius:3px;background:var(--rule);overflow:hidden;min-width:60px;margin-top:4px}.gbar span{display:block;height:100%}#ay_kpi{grid-template-columns:repeat(3,1fr)}#ay_kpi>div:nth-child(n+4){border-top:1px solid var(--rule)}#ay_kpi>div:nth-child(3n){border-right:0}#ay_kpi>div:nth-child(3n+1){padding-left:0}@media (max-width:860px){#ay_kpi{grid-template-columns:repeat(2,1fr)}#ay_kpi>div:nth-child(n){border-top:0;border-right:0;padding-left:0}}.tqt input[type=number]{font:600 14px var(--bd);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:4px 6px;width:72px;text-align:right}.tqt tr.tqm th{border-bottom:2px solid var(--rule);padding-top:6px;padding-bottom:8px;color:var(--ink)}.tqt #tq_master{border:2px solid var(--net)}.tqt input.ovr{border-color:var(--c3);box-shadow:0 0 0 1px var(--c3)}.tqt td small{display:block;color:var(--mute);font-size:11px}.tqt tr.sub td{font-weight:700;background:var(--hi)}.tqt td.t27{font-weight:700}.tqt{font-size:13px}.tqt th{white-space:normal;line-height:1.2;vertical-align:bottom;font-size:11.5px;padding:6px 6px}.tqt td{padding:6px 6px;white-space:nowrap}.tqt input[type=number]{width:54px;padding:2px 4px;font-size:13px}.tqt td small{font-size:10px}.tqt input.tqp{width:78px}.tqt input.tqd{width:58px}.tqt td:nth-child(2),.tqt th:nth-child(2){text-align:left}.tqt td:first-child,.tqt th:first-child{text-align:left;width:36px}#mn_tbl{font-size:14px}#mn_tbl th{font-size:12.5px}#mn_tbl input[type=number]{width:54px}#mn_tbl input[data-pd]{width:64px}#mn_tbl td:first-child,#mn_tbl th:first-child{text-align:left;width:auto}#mn_tbl td:nth-child(2),#mn_tbl th:nth-child(2){text-align:right}.rkt{font-size:12.5px}.rkt th,.rkt td{padding:5px 5px;text-align:right;white-space:nowrap}.rkt th:first-child,.rkt td:first-child{text-align:left;position:sticky;left:0;background:var(--bg);z-index:1}.rkt thead th small{display:block;font-weight:400;color:var(--mute);font-size:10px}.rkt th.we{color:var(--bad)}.rkt td.z{color:var(--mute)}.rkt tr.sub td{font-weight:700;background:var(--hi)}.rkt tr.sub td:first-child{background:var(--hi)}.rkb td:first-child{white-space:normal;min-width:220px}.rkt td.tt,.rkt th.tt{font-weight:700;border-left:1px solid var(--rule)}.dskt td:first-child a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--rule);cursor:pointer}.dskt tr.sel td{background:var(--hi)}.dskt td:nth-child(3){white-space:normal;min-width:110px;max-width:170px;text-align:left}.dskt th{white-space:normal;vertical-align:bottom}.dskt td small{display:block;color:var(--mute);font-size:10.5px}.gd.up{color:var(--good);font-weight:700}.gd.dn{color:var(--bad);font-weight:700}#dsk_imp{grid-template-columns:repeat(4,1fr)}.rkt th.pz{background:color-mix(in srgb,var(--disc) 28%,transparent);color:var(--ink)}.rkt td.pz{box-shadow:inset 0 2px 0 var(--disc),inset 0 -2px 0 var(--disc)}.put{font-size:15px}.put th{font-size:13px}.put td,.put th{padding:8px 10px}.put input[type=number]{width:80px;font-size:15px}.put td:nth-child(2),.put th:nth-child(2){text-align:left}.put tfoot td{font-weight:700}.punote{font:600 clamp(20px,2.4vw,28px)/1.4 var(--hd);color:var(--ink);margin:22px 0 6px;max-width:none}@media (max-width:600px){.punote{font-size:18px}}</style>
 </head>
 <body>
 <div class="wrap">
@@ -382,6 +391,7 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
     <button type="button" class="tab" role="tab" id="tab10" data-p="10" aria-controls="page10" aria-selected="false" tabindex="-1">Bank</button>
     <button type="button" class="tab" role="tab" id="tab7" data-p="7" aria-controls="page7" aria-selected="false" tabindex="-1">Report</button>
     <button type="button" class="tab" role="tab" id="tab15" data-p="15" aria-controls="page15" aria-selected="false" tabindex="-1">Monitoring</button>
+    <button type="button" class="tab" role="tab" id="tab21" data-p="21" aria-controls="page21" aria-selected="false" tabindex="-1">PUSH</button>
     <button type="button" class="tab" role="tab" id="tab16" data-p="16" aria-controls="page16" aria-selected="false" tabindex="-1">Daily Prod Summary</button>
     <button type="button" class="tab" role="tab" id="tab18" data-p="18" aria-controls="page18" aria-selected="false" tabindex="-1">Monthly Prod Summary</button>
     <button type="button" class="tab" role="tab" id="tab17" data-p="17" aria-controls="page17" aria-selected="false" tabindex="-1">Avg Prod/Month</button>
@@ -1137,6 +1147,22 @@ body[data-pg="9"]{--pg:var(--c9)}#tab9{--pg:var(--c9)}
       <section aria-labelledby="dskh_i"><h2 id="dskh_i"></h2><p class="note" id="dsks_i"></p><dl class="kpi" id="dsk_imp"></dl></section>
       <section aria-labelledby="dskh_p"><h2 id="dskh_p"></h2><div class="tw"><table id="dsk_items" class="rkt rkb"></table></div></section>
     </div>
+  </div>
+
+  <div id="page21" role="tabpanel" aria-labelledby="tab21" hidden>
+    <div class="fpanel" role="group" aria-label="Filter PUSH">
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Tanggal</span><input type="date" id="pu_date" aria-label="Tanggal actual">
+          <button type="button" class="chip" id="pu_last">Hari terakhir</button></div>
+        <div class="fgrp"><span class="fl">Basis rata-rata</span><div class="chips" id="pu_basis" role="group" aria-label="Basis rata-rata"></div></div>
+        <div class="fgrp"><button type="button" class="chip" id="pu_reset">Reset target ke rata-rata</button>
+          <button type="button" class="chip exp" id="pu_pdf">Export PDF</button></div>
+      </div>
+    </div>
+    <p id="pu_note" class="punote"></p>
+    <div class="phead" id="pu_ph"></div>
+    <section aria-labelledby="puh"><h2 id="puh"></h2>
+      <div class="tw"><table id="pu_tbl" class="tqt put"></table></div></section>
   </div>
 
   <div id="page12" role="tabpanel" aria-labelledby="tab12" hidden>
@@ -2339,16 +2365,16 @@ function renderPage1(){
   }finally{PFX='';Object.assign(S,saved)}
 }
 function showPage(n){
-  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;$('page18').hidden=n!==18;$('page19').hidden=n!==19;$('page20').hidden=n!==20;
+  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;$('page18').hidden=n!==18;$('page19').hidden=n!==19;$('page20').hidden=n!==20;$('page21').hidden=n!==21;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===18)renderRb();else if(n===19)renderAp();else if(n===20)renderDsk();else if(n===2)render();
+  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===18)renderRb();else if(n===19)renderAp();else if(n===20)renderDsk();else if(n===21)renderPush();else if(n===2)render();
   if(n===6)exFilterText();
   window.scrollTo(0,0);
 }
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>{b.onclick=()=>showPage(+b.dataset.p);
-    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,7,15,16,18,17,19,20,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
+    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,7,15,21,16,18,17,19,20,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
 }
 /* ===== Halaman 9: Weekly ===== */
 const WS={area:'all',outlet:'all',ch:'all',from:'',to:''};
@@ -3246,6 +3272,43 @@ function chRow(o,i,ch){const r=D.daily.o[o]&&D.daily.o[o][i];if(!r||ch==='all')r
 const rowOK=(r,ch)=>ch==='all'?true:ch==='on'?r[5]>0:ch==='off'?!r[5]:r[5]===({gf:1,go:2,sf:3})[ch];
 function chHourly(o,ch){const a=D.hourly.o[o]||[];if(ch==='all')return a;if(PFN[ch])return (D.hourly.pf&&D.hourly.pf[ch]&&D.hourly.pf[ch][o])||[];const on=(D.hourly.on&&D.hourly.on[o])||[];if(ch==='on')return on;const m=new Map();on.forEach(e=>m.set(e[0]*100+e[1],e));return a.map(e=>{const x=m.get(e[0]*100+e[1]);return x?[e[0],e[1],e[2]-x[2],e[3]-x[3],e[4]-x[4]]:e})}
 const xOn=X=>X.pl.map(p=>ONL.has(p));
+
+/* ===== Halaman 21: PUSH (target harian Better Cup) ===== */
+const PUK='abc_push_v1';let PUT=(()=>{try{return JSON.parse(localStorage.getItem(PUK))||{}}catch(e){return {}}})();
+const puSave=()=>{try{localStorage.setItem(PUK,JSON.stringify(PUT))}catch(e){}};
+const PU={date:'',basis:'mtd'};
+function renderPush(){
+  const ld=D.lastDate;if(!PU.date||PU.date>ld||PU.date<TMIN)PU.date=ld;
+  const di=TD.indexOf(PU.date),inp=$('pu_date');inp.min=TMIN;inp.max=ld;inp.value=PU.date;
+  inp.onchange=e=>{if(e.target.value){PU.date=e.target.value;renderPush()}};
+  $('pu_last').onclick=()=>{PU.date=ld;renderPush()};$('pu_last').setAttribute('aria-pressed',PU.date===ld);
+  const bx=$('pu_basis');bx.innerHTML='';[['mtd','Bulan berjalan (s.d H-1)'],['prev','Bulan lalu penuh']].forEach(([v,t])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t;b.setAttribute('aria-pressed',PU.basis===v);b.onclick=()=>{PU.basis=v;renderPush()};bx.appendChild(b)});
+  // rentang basis
+  const mk=PU.date.slice(0,7),y=+mk.slice(0,4),m=+mk.slice(5,7),pm=m===1?(y-1)+'-12':y+'-'+String(m-1).padStart(2,'0');
+  let bKey=PU.basis==='mtd'?mk:pm,bFrom=bKey+'-01',bTo=PU.basis==='mtd'?TD[di-1]||'':monthRange(pm).to,fallback=false;
+  const isTx=r=>!!r&&((r[0]||0)>0||(r[1]||0)>0||(r[8]||0)>0);
+  const calc=(o,from,to)=>{let q=0,n=0;const rows=D.daily.o[o]||[];for(let i=TD.indexOf(from<TMIN?TMIN:from);i>=0&&i<TD.length&&TD[i]<=to;i++){if(TD[i]<from)continue;const r=rows[i];if(isTx(r)){q+=r[1]||0;n++}}return {q,n,avg:n?q/n:0}};
+  if(PU.basis==='mtd'&&(!bTo||bTo<bFrom)){fallback=true;bKey=pm;bFrom=pm+'-01';bTo=monthRange(pm).to}
+  const outs=OUT.filter(o=>D.daily.o[o]&&(D.daily.o[o].some(isTx)));
+  $('puh').textContent='PUSH Better Cup, '+dFull(PU.date);
+  $('pu_note').innerHTML='<span style="color:var(--bad);font-weight:600">Kekuatan pikiran</span> adalah hal yang luar biasa. Ketika kita percaya bahwa bisa, kita <em>benar-benar</em> bisa.';
+  const sg=v=>(v>=0?'+':'−')+nf.format(Math.abs(Math.round(v)));
+  let T={t:0,a:0,r:0},no=0;
+  const rows=outs.map(o=>{const b=calc(o,bFrom,bTo),r=D.daily.o[o][di],act=di>=0&&r?(r[1]||0):0,open=isTx(r),key=PU.date+'|'+o,man=PUT[key]!=null,tg=man?PUT[key]:Math.round(b.avg);
+    if(open){T.t+=tg;T.a+=act}T.r+=b.avg;const p=open?gPct(act,tg):null;
+    return `<tr><td>${++no}</td><td>${o}${open?'':' <small style="color:var(--mute)">tidak ada transaksi</small>'}</td><td><input type="number" min="0" step="1" data-pu="${o}" class="${man?'ovr':''}" value="${tg}" aria-label="Target ${o}">${man?`<small>rata2 ${nf.format(Math.round(b.avg))}</small>`:''}</td><td><b>${nf.format(act)}</b></td><td><span class="gp ${gCls(p)}">${gPf(p)}</span><div class="gbar"><span style="width:${Math.min(100,p||0)}%;background:${p==null?'var(--mute)':gCol(p)}"></span></div></td><td>${tg&&open?sg(act-tg):'-'}</td><td>${b.n?nf.format(Math.round(b.avg)):'-'}<small>${b.n} hari</small></td></tr>`}).join('');
+  const pt=gPct(T.a,T.t);
+  $('pu_tbl').innerHTML='<thead><tr><th>No</th><th>Nama Outlet</th><th>Target (Cup)</th><th>Actual (Cup)</th><th>% Ach</th><th>+/-</th><th>Rata2 / hari</th></tr></thead><tbody>'+rows+'</tbody>'+
+    `<tfoot><tr><td></td><td>Total</td><td>${nf.format(T.t)}</td><td>${nf.format(T.a)}</td><td><span class="gp ${gCls(pt)}">${gPf(pt)}</span></td><td>${sg(T.a-T.t)}</td><td>${nf.format(Math.round(T.r))}</td></tr></tfoot>`;
+  $('pu_tbl').querySelectorAll('input[data-pu]').forEach(el=>el.onchange=e=>{const o=e.target.dataset.pu,raw=e.target.value.trim(),v=parseFloat(raw),key=PU.date+'|'+o;
+    const b=calc(o,bFrom,bTo);if(raw===''||isNaN(v)||v===Math.round(b.avg))delete PUT[key];else PUT[key]=Math.max(0,v);puSave();renderPush()});
+  $('pu_pdf').onclick=()=>{
+    $('pu_ph').innerHTML='<b>PUSH Better Cup a better cup</b> · '+dFull(PU.date)+'<br><small>Target awal = rata-rata Better Cup per hari transaksi '+(bFrom&&bTo?dLong(bFrom)+' s.d '+dLong(bTo):'-')+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
+    const t=document.title;document.title='PUSH Better Cup - '+PU.date;
+    document.body.classList.add('pr-push');const done=()=>{document.body.classList.remove('pr-push');document.title=t;window.removeEventListener('afterprint',done)};
+    window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
+  $('pu_reset').onclick=()=>{Object.keys(PUT).forEach(k=>{if(k.startsWith(PU.date+'|'))delete PUT[k]});puSave();renderPush()};
+}
 
 /* ===== Halaman 10: Bank (metode bayar) ===== */
 const BK={ch:'all',area:'all',outlet:'all',from:'',to:'',pm:'',tm:'nt',tg:'w',sm:'nt',rs:{k:'nt',d:-1}};
@@ -4570,7 +4633,7 @@ function initExport(){
   const g=document.getElementById('ex_goto');if(g)g.onclick=()=>showPage(2);
 }
 period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initProduct();initWeekly();initBank();initOnline();initTarget();initAch();initTplan();initMon();initReport();initExport();initUpload();initSheet();showPage(1);
-let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else if(PAGE===16)renderRk();else if(PAGE===17)renderRh();else if(PAGE===18)renderRb();else if(PAGE===19)renderAp();else if(PAGE===20)renderDsk();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else if(PAGE===16)renderRk();else if(PAGE===17)renderRh();else if(PAGE===18)renderRb();else if(PAGE===19)renderAp();else if(PAGE===20)renderDsk();else if(PAGE===21)renderPush();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
 </html>
