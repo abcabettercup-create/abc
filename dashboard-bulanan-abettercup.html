@@ -3277,7 +3277,7 @@ function chHourly(o,ch){const a=D.hourly.o[o]||[];if(ch==='all')return a;if(PFN[
 const xOn=X=>X.pl.map(p=>ONL.has(p));
 
 /* ===== Halaman 21: PUSH (target harian Better Cup) ===== */
-const PUK='abc_push_v1';let PUT=(()=>{try{return JSON.parse(localStorage.getItem(PUK))||{}}catch(e){return {}}})();
+const PUK='abc_push_v2';let PUT=(()=>{try{return JSON.parse(localStorage.getItem(PUK))||{}}catch(e){return {}}})();
 const puSave=()=>{try{localStorage.setItem(PUK,JSON.stringify(PUT))}catch(e){}};
 const PU={date:'',basis:'mtd'};
 function renderPush(){
@@ -3298,20 +3298,20 @@ function renderPush(){
   $('pu_note').innerHTML='<span style="color:var(--bad);font-weight:600">Kekuatan pikiran</span> adalah hal yang luar biasa. Ketika kita percaya bahwa bisa, kita <em>benar-benar</em> bisa.';
   const sg=v=>(v>=0?'+':'−')+nf.format(Math.abs(Math.round(v)));
   let T={t:0,a:0,r:0},no=0;
-  const rows=outs.map(o=>{const b=calc(o,bFrom,bTo),r=D.daily.o[o][di],act=di>=0&&r?(r[1]||0):0,open=isTx(r),key=PU.date+'|'+o,man=PUT[key]!=null,tg=man?PUT[key]:Math.round(b.avg);
+  const rows=outs.map(o=>{const b=calc(o,bFrom,bTo),r=D.daily.o[o][di],act=di>=0&&r?(r[1]||0):0,open=isTx(r),key=o,man=PUT[key]!=null,tg=man?PUT[key]:Math.round(b.avg);
     if(open){T.t+=tg;T.a+=act}T.r+=b.avg;const p=open?gPct(act,tg):null;
     return `<tr><td>${++no}</td><td>${o}${open?'':' <small style="color:var(--mute)">tidak ada transaksi</small>'}</td><td><input type="number" min="0" step="1" data-pu="${o}" class="${man?'ovr':''}" value="${tg}" aria-label="Target ${o}">${man?`<small>rata2 ${nf.format(Math.round(b.avg))}</small>`:''}</td><td><b>${nf.format(act)}</b></td><td><span class="gp ${gCls(p)}">${gPf(p)}</span><div class="gbar"><span style="width:${Math.min(100,p||0)}%;background:${p==null?'var(--mute)':gCol(p)}"></span></div></td><td>${tg&&open?sg(act-tg):'-'}</td><td>${b.n?nf.format(Math.round(b.avg)):'-'}<small>${b.n} hari</small></td></tr>`}).join('');
   const pt=gPct(T.a,T.t);
   $('pu_tbl').innerHTML='<thead><tr><th>No</th><th>Nama Outlet</th><th>Target (Cup)</th><th>Actual (Cup)</th><th>% Ach</th><th>+/-</th><th>Rata2 / hari</th></tr></thead><tbody>'+rows+'</tbody>'+
     `<tfoot><tr><td></td><td>Total</td><td>${nf.format(T.t)}</td><td>${nf.format(T.a)}</td><td><span class="gp ${gCls(pt)}">${gPf(pt)}</span></td><td>${sg(T.a-T.t)}</td><td>${nf.format(Math.round(T.r))}</td></tr></tfoot>`;
-  $('pu_tbl').querySelectorAll('input[data-pu]').forEach(el=>el.onchange=e=>{const o=e.target.dataset.pu,raw=e.target.value.trim(),v=parseFloat(raw),key=PU.date+'|'+o;
-    const b=calc(o,bFrom,bTo);if(raw===''||isNaN(v)||v===Math.round(b.avg))delete PUT[key];else PUT[key]=Math.max(0,v);puSave();renderPush()});
+  $('pu_tbl').querySelectorAll('input[data-pu]').forEach(el=>el.onchange=e=>{const o=e.target.dataset.pu,raw=e.target.value.trim(),v=parseFloat(raw),key=o;
+    if(raw===''||isNaN(v))delete PUT[key];else PUT[key]=Math.max(0,v);puSave();renderPush()});
   $('pu_pdf').onclick=()=>{
     $('pu_ph').innerHTML='<b>PUSH Better Cup a better cup</b> · '+dFull(PU.date)+(puUpd?' · '+puUpd:'')+'<br><small>Target awal = rata-rata Better Cup per hari transaksi '+(bFrom&&bTo?dLong(bFrom)+' s.d '+dLong(bTo):'-')+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
     const t=document.title;document.title='PUSH Better Cup - '+PU.date;
     document.body.classList.add('pr-push');const done=()=>{document.body.classList.remove('pr-push');document.title=t;window.removeEventListener('afterprint',done)};
     window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
-  $('pu_reset').onclick=()=>{Object.keys(PUT).forEach(k=>{if(k.startsWith(PU.date+'|'))delete PUT[k]});puSave();renderPush()};
+  $('pu_reset').onclick=()=>{PUT={};puSave();renderPush()};
 }
 
 /* ===== Halaman 10: Bank (metode bayar) ===== */
