@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Dashboard Absensi — A Better Cup</title>
+<title>Absensi Karyawan — A Better Cup</title>
 <style>
   body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F7F4EA;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#16332A}
   .box{text-align:center;padding:24px;max-width:420px;line-height:1.5}
@@ -14,14 +14,14 @@
 </style>
 </head>
 <body>
-<div class="box" id="box"><div class="spin"></div>Memuat dashboard…</div>
+<div class="box" id="box"><div class="spin"></div>Memuat aplikasi…</div>
 
 <script>
 // ================== PENGATURAN ==================
 // 1) Tempel link Web App Apps Script (yang berakhiran /exec)
 var API_URL = 'https://script.google.com/macros/s/AKfycbz6yg3TaZ946QO98-lgVU76iF4oubu_-e4erQ03SzkNFWlCJ1qoFPKb6tPZ79GGZ0Ejrw/exec';
 // 2) Halaman yang dibuka:  ''  = absen karyawan,  'izin' = langsung tab izin,  'dashboard' = dashboard
-var HALAMAN = 'dashboard';
+var HALAMAN = '';
 // ================================================
 
 // Pengganti google.script.run: semua panggilan diteruskan ke doPost() di Apps Script
