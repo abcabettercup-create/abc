@@ -1,0 +1,165 @@
+<!-- =====================================================================
+  MODUL DINAS LUAR KOTA (PDLK) — ditempel otomatis ke halaman absen oleh Kode.gs,
+  sesudah Izin.html. Menambah tab "Dinas Luar Kota" di bagian atas halaman.
+  Tampilan memakai gaya yang sama dengan tab Izin (kelas .mcs-app / .iz-*).
+===================================================================== -->
+<style>
+  .mcs-app .dl-total{display:inline-block;margin-top:8px;background:#EAF2EC;color:var(--iz-roast);border-radius:999px;padding:3px 12px;font-size:12.5px;font-weight:700}
+  .mcs-app .dl-hist li .kota{font-weight:700;color:var(--iz-dark)}
+</style>
+
+<div id="dinasApp" class="mcs-app">
+  <div class="iz-head">
+    <h1>Pengajuan Dinas Luar Kota (PDLK)</h1>
+    <p>Perjalanan dinas ke luar kota · diperiksa atasan / HRD</p>
+  </div>
+  <div class="iz-main">
+    <div id="dlFormWrap">
+      <div class="iz-msg" id="dlMsg"></div>
+
+      <div class="iz-card">
+        <h2>1. Karyawan</h2>
+        <div class="iz-selected">
+          <div><b id="dlNama">—</b><div class="iz-chips" id="dlInfo"></div></div>
+        </div>
+      </div>
+
+      <div class="iz-card">
+        <h2>2. Detail Dinas</h2>
+        <div class="iz-field">
+          <label class="iz-lbl" for="dlKota">Kota Tujuan</label>
+          <input id="dlKota" placeholder="mis. Jakarta" autocomplete="off" autocapitalize="words">
+        </div>
+        <div class="iz-field" style="margin-bottom:0">
+          <label class="iz-lbl" for="dlKeperluan">Keperluan Dinas</label>
+          <textarea id="dlKeperluan" placeholder="mis. Training barista outlet Tebet, meeting dengan vendor"></textarea>
+        </div>
+      </div>
+
+      <div class="iz-card">
+        <h2>3. Periode PDLK</h2>
+        <div class="iz-row">
+          <div class="iz-field"><label class="iz-lbl" for="dlMulai">Tanggal Berangkat</label><input type="date" id="dlMulai"></div>
+          <div class="iz-field"><label class="iz-lbl" for="dlSelesai">Tanggal Pulang</label><input type="date" id="dlSelesai"></div>
+        </div>
+        <div id="dlHari"></div>
+        <div class="iz-hint">Selama dinas, absen tetap bisa lewat tab Absen dengan pilihan lokasi <strong>Tugas Luar / Lokasi Lain</strong>.</div>
+      </div>
+
+      <button type="button" class="iz-primary" id="dlKirim">Kirim Pengajuan Dinas</button>
+    </div>
+
+    <div id="dlDoneWrap" class="iz-card iz-done iz-hidden">
+      <div class="big">&#10003;</div>
+      <h3>Pengajuan dinas terkirim</h3>
+      <div><span class="iz-badge b-wait">Menunggu persetujuan atasan</span></div>
+      <table id="dlDoneTbl"></table>
+      <button type="button" class="iz-link" id="dlLagi">Ajukan lagi</button>
+      <button type="button" class="iz-link" id="dlKeAbsen">Kembali ke Absen</button>
+    </div>
+
+    <div class="iz-card iz-hidden" id="dlHistCard">
+      <h2>Riwayat Dinas Saya</h2>
+      <ul class="iz-hist dl-hist" id="dlHist"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const START = <?= startTab ?>;
+  const el = id => document.getElementById(id);
+  const app = el('dinasApp');
+  const BLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const todayWIB = off => new Date(Date.now() + 7*3600e3 + (off||0)*864e5).toISOString().slice(0,10);
+  const fmtTgl = iso => { if(!iso) return '-'; const p = iso.split('-'); return parseInt(p[2],10) + ' ' + BLN[parseInt(p[1],10)-1] + ' ' + p[0]; };
+  const selisih = (a,b) => Math.round((Date.parse(b) - Date.parse(a))/864e5) + 1;
+  const store = k => { try{ return localStorage.getItem(k); }catch(e){ return null; } };
+  const GAS = typeof google !== 'undefined' && google.script && google.script.run;
+
+  // ---------- tombol tab ----------
+  const seg = document.querySelector('#izTabs .iz-seg');
+  if(seg){
+    seg.insertAdjacentHTML('beforeend', '<button type="button" data-tab="dinas">Dinas Luar Kota<small>pengajuan PDLK</small></button>');
+  }
+  document.body.appendChild(app);   // pastikan berada langsung di <body>
+
+  // ---------- data karyawan ----------
+  function isiKaryawan(){
+    const s = window.MCS_SESI;
+    el('dlNama').textContent = s ? s.nama : '—';
+    const jab = store('mcs_jabatan') || (s && s.divisi) || '';
+    el('dlInfo').innerHTML = (jab ? `<span class="iz-chip">${esc(jab)}</span>` : '') + (s && s.outlet ? `<span class="iz-chip">Outlet: ${esc(s.outlet)}</span>` : '');
+    if(s) loadHist();
+  }
+  document.addEventListener('mcs-login', isiKaryawan);
+  document.addEventListener('mcs-logout', () => { el('dlNama').textContent = '—'; el('dlInfo').innerHTML = ''; el('dlHistCard').classList.add('iz-hidden'); });
+  document.addEventListener('mcs-tab', e => { if(e.detail === 'dinas') isiKaryawan(); });
+
+  // ---------- tanggal ----------
+  const minT = todayWIB(-7), maxT = todayWIB(180);
+  ['dlMulai','dlSelesai'].forEach(id => { el(id).min = minT; el(id).max = maxT; el(id).value = todayWIB(); });
+  function updHari(){
+    if(el('dlSelesai').value < el('dlMulai').value) el('dlSelesai').value = el('dlMulai').value;
+    const n = selisih(el('dlMulai').value, el('dlSelesai').value);
+    el('dlHari').innerHTML = n > 0 ? `<span class="dl-total">Total ${n} hari · ${fmtTgl(el('dlMulai').value)}${n > 1 ? ' s/d ' + fmtTgl(el('dlSelesai').value) : ''}</span>` : '';
+  }
+  ['dlMulai','dlSelesai'].forEach(id => el(id).addEventListener('change', updHari));
+  updHari();
+
+  function err(t){ const m = el('dlMsg'); m.textContent = t; m.className = 'iz-msg err'; window.scrollTo({top:0, behavior:'smooth'}); }
+
+  // ---------- kirim ----------
+  el('dlKirim').addEventListener('click', () => {
+    el('dlMsg').className = 'iz-msg';
+    const s = window.MCS_SESI;
+    if(!s) return err('Silakan login dulu di tab Absen.');
+    const kota = el('dlKota').value.trim(), keperluan = el('dlKeperluan').value.trim();
+    if(kota.length < 3) return err('Kota tujuan wajib diisi.');
+    if(keperluan.length < 5) return err('Keperluan dinas wajib diisi (minimal 5 huruf).');
+    const mulai = el('dlMulai').value, selesai = el('dlSelesai').value;
+    if(!mulai || !selesai) return err('Tanggal berangkat dan pulang wajib diisi.');
+    const payload = { token: s.token, divisi: store('mcs_jabatan') || s.divisi || '', outlet: s.outlet || '',
+                      kota, keperluan, mulai, selesai };
+    const btn = el('dlKirim'); btn.disabled = true; btn.textContent = 'Mengirim…';
+    const selesaiKirim = r => {
+      btn.disabled = false; btn.textContent = 'Kirim Pengajuan Dinas';
+      if(!r || !r.ok) return err((r && r.message) || 'Gagal mengirim. Coba lagi.');
+      el('dlDoneTbl').innerHTML =
+        `<tr><td>Kota tujuan</td><td><b>${esc(r.kota)}</b></td></tr>` +
+        `<tr><td>Periode</td><td>${esc(r.mulai)}${r.hari > 1 ? ' s/d ' + esc(r.selesai) : ''} (${r.hari} hari)</td></tr>` +
+        `<tr><td>Keperluan</td><td>${esc(keperluan)}</td></tr>`;
+      el('dlFormWrap').classList.add('iz-hidden'); el('dlDoneWrap').classList.remove('iz-hidden');
+      window.scrollTo(0,0); loadHist();
+    };
+    if(!GAS){   // mode pratinjau
+      const n = selisih(mulai, selesai);
+      return setTimeout(() => selesaiKirim({ ok:true, kota, mulai:fmtTgl(mulai), selesai:fmtTgl(selesai), hari:n }), 600);
+    }
+    window.mcsRun('submitDinas', payload).then(selesaiKirim).catch(e => selesaiKirim({ ok:false, message:e.message }));
+  });
+  el('dlLagi').addEventListener('click', () => {
+    el('dlKota').value = ''; el('dlKeperluan').value = '';
+    el('dlDoneWrap').classList.add('iz-hidden'); el('dlFormWrap').classList.remove('iz-hidden');
+  });
+  el('dlKeAbsen').addEventListener('click', () => window.mcsShowTab && window.mcsShowTab('absen'));
+
+  // ---------- riwayat ----------
+  function badge(st){ const c = st === 'Disetujui' ? 'b-ok' : st === 'Ditolak' ? 'b-no' : 'b-wait'; return `<span class="iz-badge ${c}">${esc(st)}</span>`; }
+  function loadHist(){
+    const s = window.MCS_SESI;
+    if(!s || !GAS || !window.mcsRun) return;
+    window.mcsRun('getDinasSaya', s.token).then(list => {
+      if(!list || !list.length){ el('dlHistCard').classList.add('iz-hidden'); return; }
+      el('dlHist').innerHTML = list.map(r => `<li><div><span class="kota">${esc(r.kota)}</span>
+        <div class="sub">${fmtTgl(r.mulai)}${r.selesai !== r.mulai ? ' – ' + fmtTgl(r.selesai) : ''} · ${esc(r.hari)} hari</div>
+        ${r.catatan ? `<div class="sub"><i>${esc(r.catatan)}</i></div>` : ''}</div>${badge(r.status)}</li>`).join('');
+      el('dlHistCard').classList.remove('iz-hidden');
+    }).catch(() => {});
+  }
+
+  if(window.MCS_SESI) isiKaryawan();
+  if(START === 'dinas' && window.mcsShowTab) window.mcsShowTab('dinas');
+})();
+</script>
