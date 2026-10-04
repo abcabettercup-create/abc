@@ -36,12 +36,12 @@
   body{
     margin:0; background:var(--bg); color:var(--text);
     font-family:'Public Sans', system-ui, -apple-system, "Segoe UI", sans-serif;
-    padding-inline:16px;
+    padding-inline:clamp(12px, 2.2vw, 36px);
   }
   h1,h2,h3{ font-family:'Fraunces', Georgia, serif; font-weight:600; text-wrap:balance; margin:0; }
   .num{ font-variant-numeric: tabular-nums; }
 
-  .wrap{ max-width:1180px; margin:0 auto; padding-block:28px 64px; }
+  .wrap{ max-width:1680px; margin:0 auto; padding-block:24px 64px; }
 
   header.top{ display:flex; flex-direction:column; gap:6px; margin-bottom:24px; }
   .eyebrow{ font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; }
@@ -95,7 +95,7 @@
   .period-note{ font-size:12px; color:var(--blue); margin-top:8px; }
 
   .kpi-grid{
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(min(168px,100%),1fr)); gap:12px;
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr)); gap:12px;
     margin-bottom:28px;
   }
   .kpi{
@@ -136,7 +136,7 @@
   .kpi.tone-yellow .label{ color:color-mix(in srgb, var(--yellow) 78%, var(--text-2) 22%); }
 
   .grid2{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr)); gap:16px; margin-bottom:16px; }
-  .grid3{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr)); gap:16px; margin-bottom:8px; }
+  .grid3{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(480px,100%),1fr)); gap:16px; margin-bottom:8px; }
   .section-title{ font-size:17px; font-weight:600; margin:34px 0 12px; color:var(--text); padding-top:20px; border-top:1px solid var(--border); }
   .section-title:first-of-type{ border-top:none; padding-top:0; }
   .section-sub{ font-family:'Public Sans',sans-serif; font-weight:400; font-size:12.5px; color:var(--muted); }
@@ -253,6 +253,33 @@
   .section-title{ color:var(--brand-dark); }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .section-title{ color:var(--text); } }
   :root[data-theme="dark"] .section-title{ color:var(--text); }
+
+  /* ---------- Responsif laptop & HP ---------- */
+  .chart-hint{ display:none; font-size:11px; color:var(--muted); margin:-2px 0 6px; }
+  @media (min-width:1200px){ .kpi-grid{ grid-template-columns:repeat(6,1fr); } }
+  @media (max-width:640px){
+    .kpi-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .kpi{ padding:14px 12px 12px; }
+    .kpi .value{ font-size:21px; }
+    .kpi .sub{ font-size:11.5px; }
+    .toolbar{ flex-direction:column; align-items:stretch; }
+    .period-group{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; align-items:center; }
+    .period-group label{ grid-column:1 / -1; margin-bottom:-4px; }
+    .period-group select{ width:100%; grid-column:1 / -1; }
+    .period-group .btn-chip{ width:100%; padding-inline:6px; }
+    .card{ overflow-x:auto; scrollbar-width:thin; }
+    .card > svg[id]{ min-width:520px; }
+    .card > svg#chartTrend{ min-width:760px; }
+    .card > svg#chartPoints{ min-width:480px; }
+    .chart-hint{ display:block !important; }
+    .toolbar-actions{ display:grid; grid-template-columns:1fr 1fr; }
+    .toolbar-actions .btn-upload, .toolbar-actions .btn-export{ justify-content:center; }
+    .card{ padding:14px 12px; border-radius:14px; }
+    .card h2{ font-size:17px; }
+    .section-title{ font-size:16px; }
+    .hero-row{ gap:14px; }
+    header.brand-hero .status-badge, .last-trx{ font-size:11.5px; }
+  }
   @media (max-width:560px){
     header.brand-hero{ padding:18px 16px 22px; }
     header.brand-hero h1{ font-size:26px; }
@@ -316,6 +343,7 @@
         <span><i style="background:var(--blue)"></i>Pelanggan baru</span>
         <span><i style="background:var(--accent)"></i>Member terdaftar poin</span>
       </div>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartTrend" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
   </div>
@@ -324,30 +352,37 @@
   <div class="grid3">
     <div class="card">
       <h3>Member Baru (Kumulatif)</h3>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartMemberGrowth" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
       <h3>Member Transaksi*</h3>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartActiveMembers" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
       <h3>Total Order</h3>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartOrders" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
       <h3>Revenue</h3>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartRevenue" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
       <h3>Rata-rata Order</h3>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartAov" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
       <h3>Rekap Poin</h3>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartPointsRecap" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
       <h3>Pelanggan Redeem Poin per Bulan</h3>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartRedeemersMonthly" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
@@ -357,6 +392,7 @@
         <span><i style="background:var(--blue)"></i>% jumlah pelanggan</span>
         <span><i style="background:var(--accent)"></i>% revenue lifetime</span>
       </div>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartSegment" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
   </div>
@@ -365,12 +401,14 @@
     <div class="card">
       <h2>Resensi Kunjungan (Recency)</h2>
       <p class="desc">Lama sejak kunjungan terakhir &mdash; makin merah, makin berisiko churn.</p>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartRecency" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
       <p class="foot">1.018 pelanggan (43%) belum kembali &gt;60 hari &mdash; kandidat kampanye win-back.</p>
     </div>
     <div class="card">
       <h2>Frekuensi Order</h2>
       <p class="desc">Jumlah pelanggan menurut total order lifetime.</p>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartFreq" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet"></svg>
       <p class="foot">57,6% pelanggan baru order 1x &mdash; peluang terbesar ada di konversi ke order kedua.</p>
     </div>
@@ -380,6 +418,7 @@
     <div class="card">
       <h2>Sebaran Saldo Poin</h2>
       <p class="desc">Saldo poin member aktif saat ini (424 non-member tidak termasuk).</p>
+      <span class="chart-hint">Geser grafik ke samping &rarr;</span>
       <svg id="chartPoints" viewBox="0 0 560 260" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
     <div class="card">
