@@ -1178,7 +1178,7 @@ table.dskr td,table.dskr th{padding-left:14px}
     <div class="fpanel" role="group" aria-label="Filter analisa diskon">
       <div class="frow">
         <div class="fgrp"><span class="fl">Area</span><div class="chips" id="dsk_areaChips" role="group" aria-label="Filter area"></div></div>
-        <div class="fgrp"><span class="fl">Outlet</span><div class="chips" id="dsk_outletChips" role="group" aria-label="Filter outlet"></div></div>
+        <div class="fgrp"><span class="fl">Outlet <small style="font-weight:400;color:var(--mute)">(bisa pilih lebih dari 1)</small></span><div class="chips" id="dsk_outletChips" role="group" aria-label="Filter outlet"></div></div>
         <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="dsk_chChips" role="group" aria-label="Filter online offline diskon"></div></div>
       </div>
       <div class="frow fend">
@@ -3228,7 +3228,7 @@ function renderAp(){
 /* Rekap diskon per outlet per bulan (All Disc & Disc BRI) */
 function dskRekap(X,ol){
   const Y=TGT.year,ld=D.lastDate,pBRI=X.pl.indexOf('BRI');
-  const outs=DSK.outlet!=='all'?[DSK.outlet]:ol,oi=new Map(outs.map((o,k)=>[o,k]));
+  const outs=dskSel(ol),oi=new Map(outs.map((o,k)=>[o,k]));
   const oIdx=X.outlets.map(o=>oi.has(o)?oi.get(o):-1);
   const ma=DSK.a,mb=DSK.b,MSel=MS.map((m,k)=>k).filter(k=>k>=ma&&k<=mb);
   const mIdx=X.dates.map(d=>{if(+d.slice(0,4)!==Y||d>ld)return -1;const m=+d.slice(5,7)-1;return m>=ma&&m<=mb?m:-1});
@@ -3237,7 +3237,7 @@ function dskRekap(X,ol){
   for(let i=0;i<X.d.length;i++){const r=oIdx[X.o[i]];if(r<0)continue;const m=mIdx[X.d[i]];if(m<0)continue;
     if(cp&&!chOKp(DSK.ch,cp[X.p[i]]))continue;const v=X.dc[i];if(!v)continue;all[r][m]+=v;if(X.p[i]===pBRI)bri[r][m]+=v}
   const lm=+ld.slice(0,4)===Y?+ld.slice(5,7)-1:11;
-  const olabel=DSK.outlet!=='all'?DSK.outlet:(DSK.area==='all'?'Semua outlet':AREAS[DSK.area].name);
+  const olabel=dskOL(ol);
   const tbl=A=>{const col=new Float64Array(12);let gt=0;
     const head='<thead><tr><th>No</th><th class="ol">Outlet</th>'+MSel.map(k=>'<th>'+MS[k]+'</th>').join('')+'<th class="tt">Total Diskon</th></tr></thead>';
     const cell=(v,m)=>m>lm?'<td class="z">-</td>':v?'<td>'+nf.format(v)+'</td>':'<td class="z">0</td>';
@@ -3254,7 +3254,9 @@ function dskRekap(X,ol){
   $('dsk_r2').innerHTML=tbl(bri);
 }
 /* ===== Halaman 20: Analisa Diskon (Discount Applied vs sales) ===== */
-const DSK={ch:'all',area:'all',outlet:'all',a:0,b:-1,d:'all'};let DSKbusy=false,DSKerr='',DSKc=null,DSKsrc=null;
+const DSK={ch:'all',area:'all',outs:[],a:0,b:-1,d:'all'};const dskSel=ol=>{const f=ol.filter(o=>DSK.outs.includes(o));return f.length?f:ol};
+const dskOL=ol=>{const f=ol.filter(o=>DSK.outs.includes(o));return f.length?(f.length<=3?f.join(', '):f.length+' outlet'):(DSK.area==='all'?'Semua outlet':AREAS[DSK.area].name)};
+let DSKbusy=false,DSKerr='',DSKc=null,DSKsrc=null;
 function dskDaily(X,ch){ // net, cup, bill per outlet per hari (index TD)
   ch=ch||'all';if(DSKsrc!==X||!DSKc){DSKsrc=X;DSKc={}}if(DSKc[ch])return DSKc[ch];const pO=xOn(X);
   const n=TD.length,ti=new Map();TD.forEach((d,i)=>ti.set(d,i));const dI=X.dates.map(d=>ti.has(d)?ti.get(d):-1);
@@ -3266,10 +3268,13 @@ function renderDsk(){
   const {ly,cm}=ayCur(),Y=TGT.year,ld=D.lastDate;
   if(DSK.b<0){DSK.a=0;DSK.b=Math.max(0,cm)}
   const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
-  mk('dsk_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],DSK.area,v=>{DSK.area=v;if(DSK.outlet!=='all'&&v!=='all'&&!AREAS[v].o.includes(DSK.outlet))DSK.outlet='all';renderDsk()});
+  mk('dsk_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],DSK.area,v=>{DSK.area=v;if(v!=='all')DSK.outs=DSK.outs.filter(o=>AREAS[v].o.includes(o));renderDsk()});
   const ol=DSK.area==='all'?OUT:OUT.filter(x=>AREAS[DSK.area].o.includes(x));
   chChips('dsk_chChips',DSK.ch,v=>{DSK.ch=v;renderDsk()});
-  mk('dsk_outletChips',[['all','Semua outlet']].concat(ol.map(x=>[x,x])),DSK.outlet,v=>{DSK.outlet=v;renderDsk()});
+  {const e=$('dsk_outletChips');e.innerHTML='';const sel=ol.filter(o=>DSK.outs.includes(o));
+    [['all','Semua outlet']].concat(ol.map(x=>[x,x])).forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;
+      b.setAttribute('aria-pressed',v==='all'?!sel.length:sel.includes(v));
+      b.onclick=()=>{if(v==='all')DSK.outs=[];else{const i=DSK.outs.indexOf(v);if(i>=0)DSK.outs.splice(i,1);else DSK.outs.push(v);if(ol.every(o=>DSK.outs.includes(o)))DSK.outs=[]}renderDsk()};e.appendChild(b)})}
   const opt=MN.map((n,i)=>`<option value="${i}">${n} ${Y}</option>`).join('');
   const fs=$('dsk_from'),ts=$('dsk_to');if(!fs.options.length){fs.innerHTML=opt;ts.innerHTML=opt}
   fs.value=DSK.a;ts.value=DSK.b;
@@ -3282,7 +3287,7 @@ function renderDsk(){
   const X=DBC,hasDA=Array.isArray(X.dal)&&Array.isArray(X.da)&&X.da.length===X.d.length&&X.dal.some(v=>v);
   if(!hasDA){$('dsk_status').innerHTML='Data di dashboard ini belum memuat kolom <b>Discount Applied</b>. Buka tab Imp-Exp lalu klik <b>Sinkron sekarang</b> (atau unggah file ekspor POS yang berisi kolom Discount Applied), kemudian klik <b>Unduh HTML terbaru</b> agar tersimpan.';$('dsk_body').hidden=true;$('dsk_sel').innerHTML='';$('dsk_show').textContent='';return}
   $('dsk_status').textContent='';$('dsk_body').hidden=false;
-  const outs=new Set(DSK.outlet!=='all'?[DSK.outlet]:ol),oOK=X.outlets.map(o=>outs.has(o));
+  const outs=new Set(dskSel(ol)),oOK=X.outlets.map(o=>outs.has(o));
   const C=dskDaily(X,DSK.ch),dOn=xOn(X),inR=d=>+d.slice(0,4)===Y&&(+d.slice(5,7)-1)>=DSK.a&&(+d.slice(5,7)-1)<=DSK.b&&d<=ld;
   const dOK=X.dates.map(inR);
   // agregasi per diskon
@@ -3296,7 +3301,7 @@ function renderDsk(){
   // dropdown
   const sel=$('dsk_sel');sel.innerHTML='<option value="all">Semua diskon ('+list.length+')</option>'+list.map(a=>`<option value="${a.k}">${X.dal[a.k]}</option>`).join('');
   if(DSK.d!=='all'&&!list.some(a=>String(a.k)===String(DSK.d)))DSK.d='all';sel.value=DSK.d;sel.onchange=e=>{DSK.d=e.target.value;renderDsk()};
-  const olabel=DSK.outlet!=='all'?DSK.outlet:(DSK.area==='all'?'Semua outlet':AREAS[DSK.area].name);
+  const olabel=dskOL(ol);
   const pl=(DSK.a===DSK.b?MN[DSK.a]:MS[DSK.a]+' s.d '+MS[DSK.b])+' '+Y;
   $('dsk_show').textContent=pl+', '+olabel+chLbl(DSK.ch);
   // dampak: selama vs sebelum
