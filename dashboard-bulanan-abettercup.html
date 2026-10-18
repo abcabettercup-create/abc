@@ -3272,23 +3272,24 @@ function renderEst(){
   // bulan sebelumnya (satu bulan penuh)
   const pY=M===0?Y-1:Y,pM=M===0?11:M-1,pk=pY+'-'+String(pM+1).padStart(2,'0'),pl0=MN[pM]+' '+pY;
   const pidx=[];TD.forEach((d,i)=>{if(d.slice(0,7)===pk)pidx.push(i)});
-  const rows=outs.map(o=>{const z={o,g:0,n:0,c:0,hk:0,pg:0,pn:0,pc:0};
+  const rows=outs.map(o=>{const z={o,g:0,n:0,c:0,hk:0,pg:0,pn:0,pc:0,phk:0};
     idx.forEach(i=>{const r=chRow(o,i,ES.ch);if(!r)return;const has=(r[0]||0)>0||(r[8]||0)>0||(r[1]||0)>0;z.g+=r[0]||0;z.n+=r[8]||0;z.c+=r[1]||0;if(has)z.hk++});
-    pidx.forEach(i=>{const r=chRow(o,i,ES.ch);if(!r)return;z.pg+=r[0]||0;z.pn+=r[8]||0;z.pc+=r[1]||0});
+    pidx.forEach(i=>{const r=chRow(o,i,ES.ch);if(!r)return;if((r[0]||0)>0||(r[8]||0)>0||(r[1]||0)>0)z.phk++;z.pg+=r[0]||0;z.pn+=r[8]||0;z.pc+=r[1]||0});
     z.sisa=z.hk?rest.filter(ds=>estIsHK(o,ds)).length:0;return z});
   const f=v=>nf.format(v),f1=v=>v.toLocaleString('id-ID',{maximumFractionDigits:v<10?1:0});
   const gp=(e,p)=>p>0?`<span class="gd ${e>=p?'up':'dn'}">${e>=p?'+':'−'}${Math.abs((e/p-1)*100).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})}%</span>`:(e>0?'<span class="gd up">Baru</span>':'-');
   const gap=(e,p,fm)=>{const d=e-p;return `<span class="gd ${d>=0?'up':'dn'}">${d>=0?'+':'−'}${fm(Math.abs(d))}</span>`};
   const L=[['Gross Sales','Rp','g','pg',f],['Net Sales','Rp','n','pn',f],['Better Cup','Cup','c','pc',f1]];
   $('es_wrap').innerHTML=L.map(([nm,u,k,pk2,fm])=>{
-    const T={v:0,a:0,e:0,p:0};
+    const T={v:0,a:0,e:0,p:0,pa:0};
     const body=rows.map((r,x)=>{const v=r[k],p=r[pk2];let cells;
-      if(!r.hk){cells='<td class="z">-</td><td class="z">-</td><td class="z">-</td><td class="z">-</td><td class="z gs">-</td>';T.p+=p;
+      const pa=r.phk?p/r.phk:0;T.pa+=pa;const paC=`<td>${r.phk?fm(pa):'-'}</td>`;
+      if(!r.hk){cells='<td class="z">-</td><td class="z">-</td><td class="z">-</td>'+paC+'<td>'+(r.phk?'<span class="gd dn">−100,0%</span>':'-')+'</td><td class="z">-</td><td class="z gs">-</td>';T.p+=p;
         return `<tr><td>${x+1}</td><td class="ol">${r.o}</td>${cells}<td>${p?fm(p):'-'}</td><td>${p?'<span class="gd dn">−100,0%</span>':'-'}</td><td>${p?gap(0,p,fm):'-'}</td></tr>`}
       const a=v/r.hk,e=a*(r.hk+r.sisa);T.v+=v;T.a+=a;T.e+=e;T.p+=p;
-      return `<tr><td>${x+1}</td><td class="ol">${r.o}${EST_WD_ONLY.includes(r.o)?'<small>Senin–Jumat</small>':''}</td><td>${fm(v)}</td><td>${r.hk}</td><td>${fm(a)}</td><td>${r.sisa}</td><td class="tt gs">${fm(e)}</td><td>${p?fm(p):'-'}</td><td>${gp(e,p)}</td><td>${gap(e,p,fm)}</td></tr>`}).join('');
-    const foot=`<tfoot><tr><td></td><td class="ol">Total</td><td>${fm(T.v)}</td><td></td><td>${fm(T.a)}</td><td></td><td class="tt gs">${fm(T.e)}</td><td>${fm(T.p)}</td><td>${gp(T.e,T.p)}</td><td>${gap(T.e,T.p,fm)}</td></tr></tfoot>`;
-    return `<section aria-label="Estimasi ${nm}" style="border-top:0"><h2>Estimasi Closing ${nm} ${pl}, ${ar}${chLbl(ES.ch)}</h2><div class="tw"><table class="rkt est"><thead><tr><th>No</th><th class="ol">Outlet</th><th>${nm} s.d ${dShort(ld)}</th><th>HK</th><th>Rata2 / hari</th><th>Sisa HK</th><th class="tt gs">Est Closing ${MS[M]}</th><th>${pl0}</th><th>% Growth</th><th>Gap</th></tr></thead><tbody>${body}</tbody>${foot}</table></div></section>`}).join('');
+      return `<tr><td>${x+1}</td><td class="ol">${r.o}${EST_WD_ONLY.includes(r.o)?'<small>Senin–Jumat</small>':''}</td><td>${fm(v)}</td><td>${r.hk}</td><td>${fm(a)}</td>${paC}<td>${gp(a,pa)}</td><td>${r.sisa}</td><td class="tt gs">${fm(e)}</td><td>${p?fm(p):'-'}</td><td>${gp(e,p)}</td><td>${gap(e,p,fm)}</td></tr>`}).join('');
+    const foot=`<tfoot><tr><td></td><td class="ol">Total</td><td>${fm(T.v)}</td><td></td><td>${fm(T.a)}</td><td>${fm(T.pa)}</td><td>${gp(T.a,T.pa)}</td><td></td><td class="tt gs">${fm(T.e)}</td><td>${fm(T.p)}</td><td>${gp(T.e,T.p)}</td><td>${gap(T.e,T.p,fm)}</td></tr></tfoot>`;
+    return `<section aria-label="Estimasi ${nm}" style="border-top:0"><h2>Estimasi Closing ${nm} ${pl}, ${ar}${chLbl(ES.ch)}</h2><div class="tw"><table class="rkt est"><thead><tr><th>No</th><th class="ol">Outlet</th><th>${nm} s.d ${dShort(ld)}</th><th>HK</th><th>Rata2 / hari</th><th>Rata2 / hari ${MS[pM]}</th><th>% Growth vs ${MS[pM]}</th><th>Sisa HK</th><th class="tt gs">Est Closing ${MS[M]}</th><th>${pl0}</th><th>% Growth</th><th>Gap</th></tr></thead><tbody>${body}</tbody>${foot}</table></div></section>`}).join('');
   const nmL=new Map([...LIBUR_NAS.map(d=>[d,'libur nasional']),...(ES.cb?CUTI_BERSAMA.map(d=>[d,'cuti bersama']):[])]);
   const offU=rest.filter(ds=>!estIsHK('UNTAR',ds)).map(ds=>dShort(ds)+(nmL.has(ds)?' ('+nmL.get(ds)+')':''));
   $('es_hk').innerHTML=rest.length?('Sisa hari kalender: <b>'+rest.length+' hari</b> ('+dShort(rest[0])+' s.d '+dShort(rest[rest.length-1])+'). Untuk UNTAR, '+(offU.length?'tidak dihitung: '+offU.join(', ')+'.':'semua sisa hari adalah hari kerja.')):'Data sudah sampai akhir bulan, tidak ada sisa hari kerja.';
