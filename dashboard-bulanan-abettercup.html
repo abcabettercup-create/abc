@@ -3425,18 +3425,20 @@ function renderSV(){
   const cbTxt=z=>{if(!hasCB)return '-';const L=[...z.cb.entries()].map(([n,st])=>[n,st.size]).sort((a,b)=>b[1]-a[1]);return L.length?L.map(([n,c])=>`${n} <small class="ci">${c} bill</small>`).join('<br>'):'<span class="z">tidak tercatat</span>'};
   for(let i=0;i<X.d.length;i++){const r=oIdx[X.o[i]];if(r<0||!dOK[X.d[i]])continue;OT[r].nt+=X.nt[i];OT[r].bill+=X.bf[i];
     if(pOn[X.p[i]]===sOn[X.s[i]])continue;const k=X.p[i]+'|'+SLn[X.s[i]];let z=MM[r].get(k);
-    if(!z){z={pm:X.pl[X.p[i]],st:SLn[X.s[i]],on:sOn[X.s[i]],nt:0,rc:new Set(),last:'0',days:new Set(),cb:new Map()};MM[r].set(k,z)}
-    if(hasCB){const nm=X.cbl[X.cb[i]];if(nm){let cs=z.cb.get(nm);if(!cs){cs=new Set();z.cb.set(nm,cs)}cs.add(X.r[i])}}
-    const ds=X.dates[X.d[i]];z.nt+=X.nt[i];z.rc.add(X.r[i]);z.days.add(ds);if(ds>z.last)z.last=ds}
-  MM.forEach(m=>m.forEach(z=>z.bill=z.rc.size));
-  let body='',GN=0,GB=0,GT=0,no=0;
-  outs.forEach((o,r)=>{const L=[...MM[r].values()].sort((a,b)=>b.nt-a.nt);GT+=OT[r].nt;if(!L.length)return;no++;
+    if(!z){z={pm:X.pl[X.p[i]],st:SLn[X.s[i]],on:sOn[X.s[i]],nt:0,rv:new Map(),rcb:new Map(),cb:new Map()};MM[r].set(k,z)}
+    if(hasCB){const nm=X.cbl[X.cb[i]];if(nm)z.rcb.set(X.r[i],nm)}
+    const ds=X.dates[X.d[i]];let rv=z.rv.get(X.r[i]);if(!rv){rv={nt:0,ds};z.rv.set(X.r[i],rv)}rv.nt+=X.nt[i]}
+  // per struk: struk dengan Net Sales 0 (void/koreksi) dibuang
+  MM.forEach(m=>m.forEach(z=>{z.rc=new Set();z.days=new Set();z.last='0';z.nt=0;
+    z.rv.forEach((rv,rid)=>{if(Math.abs(rv.nt)<0.5)return;z.rc.add(rid);z.nt+=rv.nt;z.days.add(rv.ds);if(rv.ds>z.last)z.last=rv.ds;
+      const nm=z.rcb.get(rid);if(nm){let cs=z.cb.get(nm);if(!cs){cs=new Set();z.cb.set(nm,cs)}cs.add(rid)}});z.bill=z.rc.size}));
+  let body='',GN=0,GB=0,GT=0,no=0;const clean=[];
+  outs.forEach((o,r)=>{const L=[...MM[r].values()].filter(z=>z.bill>0).sort((a,b)=>b.nt-a.nt);GT+=OT[r].nt;if(!L.length){clean.push(o);return}no++;
     const sn=L.reduce((a,z)=>a+z.nt,0),U=new Set();L.forEach(z=>z.rc.forEach(x=>U.add(x)));const sb=U.size;GN+=sn;GB+=sb;
     body+=`<tr class="sech"><td>${no}</td><td colspan="2">${o}</td><td>${L.length} kombinasi</td><td>${fv(sb)}</td><td>${fv(sn)}</td><td></td><td></td></tr>`+
       L.map(z=>`<tr><td></td><td>${z.st}</td><td>${z.pm}</td><td class="mmt">${z.on?'Online dibayar offline':'Offline dibayar online'}</td><td>${fv(z.bill)}</td><td>${fv(z.nt)}</td><td class="cbc">${cbTxt(z)}</td><td>${dShort(z.last)}<small>${z.days.size} hari</small></td></tr>`).join('')});
-  const clean=outs.filter((o,r)=>!MM[r].size);
   $('svh_x').textContent='Summary per outlet: input tidak sesuai, '+olabel;
-  $('sv_xNote').innerHTML=(GB?`Total input tidak sesuai <b>${fv(GB)} bill</b>, Net Sales <b>${fv(GN)}</b> (${pf(GT?GN/GT:0)} dari Net Sales). `:'Tidak ada input yang tidak sesuai pada periode ini. ')+(clean.length&&GB?'Outlet tanpa input tidak sesuai: '+clean.join(', ')+'. ':'')+(hasCB?'':'<br><b>Collected By</b> belum ada di data dashboard ini. Pastikan sumber data (Google Sheet / file ekspor POS) memuat kolom <b>Collected By</b>, lalu klik <b>Sinkron sekarang</b> di tab Imp-Exp dan <b>Unduh HTML terbaru</b>.');
+  $('sv_xNote').innerHTML=(GB?`Transaksi dengan Net Sales 0 (sudah void/koreksi) tidak ditampilkan. Total input tidak sesuai <b>${fv(GB)} bill</b>, Net Sales <b>${fv(GN)}</b> (${pf(GT?GN/GT:0)} dari Net Sales). `:'Tidak ada input yang tidak sesuai pada periode ini. ')+(clean.length&&GB?'Outlet tanpa input tidak sesuai: '+clean.join(', ')+'. ':'')+(hasCB?'':'<br><b>Collected By</b> belum ada di data dashboard ini. Pastikan sumber data (Google Sheet / file ekspor POS) memuat kolom <b>Collected By</b>, lalu klik <b>Sinkron sekarang</b> di tab Imp-Exp dan <b>Unduh HTML terbaru</b>.');
   $('sv_xTbl').innerHTML=GB?'<thead><tr><th>No</th><th>Sales Type</th><th>Metode bayar</th><th>Jenis</th><th>Bill</th><th>Net Sales</th><th class="cbc">Collected By</th><th>Terakhir terjadi</th></tr></thead><tbody>'+body+
     `</tbody><tfoot><tr><td></td><td colspan="3">Total</td><td>${fv(GB)}</td><td>${fv(GN)}</td><td></td><td></td></tr></tfoot>`:'';
 }
