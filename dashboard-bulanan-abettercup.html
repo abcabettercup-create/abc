@@ -1121,8 +1121,8 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
         <div class="tw"><table id="sv_kTbl" class="mtx svt"></table></div>
       </section>
       <section aria-labelledby="svh_d">
-        <h2 id="svh_d">Sales Type vs Metode bayar per kanal</h2>
-        <p class="note">Selisih = total menurut Sales Type − total menurut Metode bayar. Selisih 0 berarti input kanal sudah sesuai.</p>
+        <h2 id="svh_d">Sales Type vs Metode bayar per channel</h2>
+        <p class="note">Selisih = total menurut Sales Type − total menurut Metode bayar. Selisih 0 berarti input channel sudah sesuai.</p>
         <div class="tw"><table id="sv_dTbl" class="mtx svt svd"></table></div>
       </section>
       <section aria-labelledby="svh_s">
@@ -3417,7 +3417,7 @@ function renderSV(){
   $('svh_k').textContent='Kecocokan Sales Type vs Metode bayar per outlet ('+ml+')';
   $('sv_kTbl').innerHTML='<thead><tr class="grp"><th></th><th colspan="2" class="gof">Cocok</th><th colspan="3" class="gon">Tidak cocok</th><th></th></tr><tr><th>Outlet</th><th>Offline – bayar offline</th><th>Online – bayar online</th><th>Offline – bayar online</th><th>Online – bayar offline</th><th>Total tidak cocok</th><th>Total</th></tr></thead>'+
     outs.map((o,r)=>kRow(o,K[r],'tbody')).join('').replace(/<\/tbody><tbody>/g,'')+kRow('Total',KT,'tfoot');
-  // 1b. selisih per kanal
+  // 1b. selisih per channel
   const KN=['Offline','GrabFood','GoFood','ShopeeFood'];
   const stK=st=>SV_ONST.has(st)?st:'Offline',pmK=pm=>isOnP(pm)?pfName(pm):'Offline';
   const DV=outs.map((o,r)=>{const a=KN.map(()=>[0,0]);A[r].forEach((v,k)=>{const [pm,st]=k.split('\u0000');a[KN.indexOf(stK(st))][0]+=v;a[KN.indexOf(pmK(pm))][1]+=v});return a});
@@ -3428,8 +3428,8 @@ function renderSV(){
     return KN.map((kn,k)=>`<tr class="${cls}${k===0?' first':''}"><td>${k===0?num:''}</td><td>${k===0?lab:''}</td><td>${kn}</td><td>${fv(a[k][0])}</td><td>${fv(a[k][1])}</td>${sel(a[k][0]-a[k][1])}</tr>`).join('')+
       (hasOn?`<tr class="ton"><td></td><td></td><td>Total Online</td><td>${fv(os)}</td><td>${fv(op)}</td>${sel(os-op)}</tr>`:'')+
       `<tr class="subt"><td></td><td></td><td>Total</td><td>${fv(ts)}</td><td>${fv(tp)}</td>${sel(ts-tp)}</tr>`};
-  $('svh_d').textContent='Sales Type vs Metode bayar per kanal ('+ml+')';
-  $('sv_dTbl').innerHTML='<thead><tr><th>No</th><th>Outlet</th><th>Kanal</th><th>Sales Type</th><th>Metode bayar</th><th>Selisih</th></tr></thead><tbody>'+
+  $('svh_d').textContent='Sales Type vs Metode bayar per channel ('+ml+')';
+  $('sv_dTbl').innerHTML='<thead><tr><th>No</th><th>Outlet</th><th>Channel</th><th>Sales Type</th><th>Metode bayar</th><th>Selisih</th></tr></thead><tbody>'+
     outs.map((o,r)=>dBlock(o,DV[r],'',r+1)).join('')+'</tbody>'+(outs.length>1?'<tfoot>'+dBlock('Semua outlet',DT,'',''  ).replace(/<tr class="subt">/,'<tr class="subt gt">')+'</tfoot>':'');
   // 2. sales type per outlet
   const stRow=(lab,vals,t)=>`<tr><td>${lab}</td>`+vals.map((v,k)=>cell(v,t,k===stOff.length&&stOff.length&&stOnL.length?'bl':'')).join('')+`<td><b>${fv(t)}</b></td></tr>`;
@@ -4582,6 +4582,7 @@ function buildD(X){
 
 /* ---------- terapkan dataset baru ke halaman ---------- */
 function applyDataset(newX){
+  const prevLast=D.lastDate;
   DBC=newX;
   const nd=buildD(newX);
   Object.keys(D).forEach(k=>delete D[k]);Object.assign(D,nd);
@@ -4593,6 +4594,7 @@ function applyDataset(newX){
   TD=D.daily.dates;TMIN=TD[0];TMAX=TD[TD.length-1];
   WD=TD.map(s=>(new Date(s+'T00:00:00Z').getUTCDay()+6)%7);
   Object.assign(NEUTRAL,{from:first,to:last});
+  if(!prevLast||D.lastDate>prevLast)toLatest();
   if(!D.months.includes(S.from))S.from=last;
   if(!D.months.includes(S.to))S.to=last;
   if(S.from>S.to)S.from=S.to;
@@ -4605,6 +4607,19 @@ function applyDataset(newX){
   showPage(PAGE);
 }
 
+/* data bertambah: semua pilihan periode pindah ke data terbaru */
+function toLatest(){
+  S.from=last;S.to=last;
+  try{RKS.m='';RKS.w=''}catch(e){}
+  try{TGS.m=''}catch(e){}
+  try{MNS.m=''}catch(e){}
+  try{AYS.b=-1}catch(e){}
+  try{APS.b=-1}catch(e){}
+  try{DSK.b=-1}catch(e){}
+  try{PU.date=''}catch(e){}
+  try{RP.from='';RP.to=''}catch(e){}
+  try{SV.from='';SV.to=''}catch(e){}
+}
 /* ---------- UI ---------- */
 const uEl=id=>document.getElementById(id);
 function uStat(msg,cls){const b=uEl('u_status');b.className='pgnote'+(cls?' '+cls:'');b.innerHTML=msg}
@@ -4892,6 +4907,21 @@ async function gApplyRecs(mode,auto){
   uEl('u_save').disabled=false;
   return {rows:nx.d.length,read:UP.recs.length,added:recs.length,before,newItems:UP.newItems.length,from:nx.dates[0],to:nx.dates[nx.dates.length-1]};
 }
+/* simpan hasil sinkron terakhir di browser (IndexedDB) */
+const gIDB={
+  open(){return new Promise((ok,no)=>{try{const r=indexedDB.open('abc_dash',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}})},
+  async get(k){try{const db=await this.open();return await new Promise(ok=>{const q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>ok(null)})}catch(e){return null}},
+  async set(k,v){try{const db=await this.open();await new Promise(ok=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=ok;t.onerror=ok;t.onabort=ok})}catch(e){}}
+};
+const xLast=x=>x&&x.dates&&x.dates.length?x.dates[x.dates.length-1]:'';
+async function gLoadCache(){
+  const c=await gIDB.get('lastSync');
+  if(!c||!c.x||!xLast(c.x)||xLast(c.x)<=D.lastDate)return false;
+  try{applyDataset(c.x)}catch(e){return false}
+  GS.cacheMsg='hasil sinkron terakhir '+gFmtDT(new Date(c.at))+' (s.d '+xLast(c.x)+')';
+  gHead('Sumber data: hasil sinkron terakhir '+gFmtDT(new Date(c.at))+' (s.d '+xLast(c.x)+'). Mengecek data baru di Google Sheets…');
+  return true;
+}
 async function gSync(auto){
   if(GS.busy)return;
   GS.busy=true;const btn=gEl('g_sync');btn.disabled=true;
@@ -4921,6 +4951,7 @@ async function gSync(auto){
     const pm=UP.mode;UP.mode=GS.mode;uPrepare();UP.mode=pm;
     if(!UP.recs||!UP.recs.length)throw new Error('tidak ada baris yang bisa dibaca dari sheet. Periksa kolom Tanggal dan Items.');
     const r=await gApplyRecs(GS.mode,auto);
+    gIDB.set('lastSync',{at:Date.now(),x:DBC});
     uEl('u_detail').hidden=true;
     const now=gFmtDT(new Date());
     gHead('Sumber data: Google Sheets, disinkron '+now+' ('+nf.format(r.rows)+' baris, '+r.from+' s.d '+r.to+').',true);
@@ -4930,7 +4961,7 @@ async function gSync(auto){
       (()=>{const n=[...new Set(UP.recs.map(r=>r.o))].filter(o=>!AREAS.jkt.o.includes(o)&&!AREAS.sby.o.includes(o));return n.length?'<br><b style="color:var(--bad)">Perhatian:</b> outlet '+n.join(', ')+' belum ada di daftar area Jakarta atau Surabaya, jadi belum masuk filter area.':''})()+
       '<br>Format angka terdeteksi: '+(ns==='comma'?'koma sebagai desimal':'titik sebagai desimal')+', urutan tanggal: '+(ds==='month'?'bulan-hari':'hari-bulan')+'.');
   }catch(err){
-    gHead('Sumber data: data tersimpan di berkas ini. Sinkron Google Sheets gagal: '+err.message,false);
+    gHead('Sumber data: '+(GS.cacheMsg||'data tersimpan di berkas ini')+'. Sinkron Google Sheets gagal: '+err.message,false);
     gStat('<b style="color:var(--bad)">Sinkron gagal:</b> '+err.message+'<br>Dashboard tetap memakai data yang tersimpan.');
   }
   GS.busy=false;btn.disabled=false;
@@ -4947,8 +4978,8 @@ function initSheet(){
   gEl('g_sync').onclick=()=>{GS.url=u.value.trim();gLS.set('abc_sheet_url',GS.url);gSync(false)};
   gEl('g_state').textContent=GS.auto?'Sinkron otomatis aktif':'Sinkron otomatis mati';
   a.addEventListener('change',()=>{gEl('g_state').textContent=a.checked?'Sinkron otomatis aktif':'Sinkron otomatis mati'});
-  if(GS.auto)setTimeout(()=>gSync(true),150);
-  else gHead('Sumber data: data tersimpan di berkas ini. Sinkron Google Sheets belum dijalankan.');
+  if(GS.auto)setTimeout(async()=>{await gLoadCache();gSync(true)},150);
+  else gLoadCache().then(ok=>{if(!ok)gHead('Sumber data: data tersimpan di berkas ini. Sinkron Google Sheets belum dijalankan.')});
 }
 
 /* ===== Page 6: Report ringkasan per outlet (siap salin) ===== */
