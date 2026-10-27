@@ -1494,7 +1494,7 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
 
       <div class="blk" id="ex_block" style="margin-top:22px">
         <h3>Export data ke Excel</h3>
-        <p class="fn">Isi file mengikuti filter yang sedang aktif di tab Monthly (periode, area, outlet, dan penjualan Online atau Offline). Berisi ringkasan, tabel bulanan dan mingguan, Online vs Offline, Quantity, Variant, rincian, dan bila dicentang, database transaksi.</p>
+        <p class="fn">Isi file mengikuti filter yang sedang aktif di tab Monthly (periode, area, outlet, dan penjualan Online atau Offline). Berisi ringkasan, tabel bulanan dan mingguan, Online vs Offline, Quantity, Variant, rincian, lalu satu sheet untuk setiap tab dashboard (kecuali Report dan Imp-Exp) sesuai filter yang sedang dipakai di tab masing-masing, dan bila dicentang, database transaksi.</p>
         <div class="frow"><span class="fshow">Filter aktif: <b id="ex_filter"></b></span><button type="button" class="chip" id="ex_goto">Ubah filter di Monthly</button></div>
         <div class="frow">
           <label class="ck"><input type="checkbox" id="exportDb" checked> Sertakan database transaksi</label>
@@ -2169,12 +2169,79 @@ function buildSheets(){
   SH.push({name:'Produk',freeze:1,rows:[XH(['Produk','Jumlah Item (sudah dikurangi refund)','Net Sales (sudah dikurangi refund)']),...it.map(([k,v])=>[k,XN(v[0]),XN(v[1])]),[],['Catatan','Plastic tidak dimasukkan dalam ranking item.']]});
   return SH;
 }
+/* ===== Export: satu sheet per tab dashboard (kecuali Report dan Imp-Exp) ===== */
+const PX_SKIP=new Set([6,7]);
+function pxNum(t){
+  const s=t.replace(/\u2212/g,'-').replace(/\s+/g,' ').trim();
+  const m=/^([+-])?\s*(Rp\s?)?(\d{1,3}(?:\.\d{3})+|\d+)(,\d+)?\s*(%)?$/.exec(s);
+  if(!m)return null;
+  let v=parseFloat(m[3].replace(/\./g,'')+(m[4]?'.'+m[4].slice(1):''));if(m[1]==='-')v=-v;
+  return m[5]?{v:v/100,p:1}:{v,p:0,d:!!m[4]};
+}
+function pxText(td){
+  const f=td.querySelector('input,select');
+  if(f){if(f.tagName==='SELECT')return f.selectedOptions[0]?f.selectedOptions[0].textContent.trim():'';
+    if(f.type==='checkbox'||f.type==='radio')return td.textContent.replace(/\s+/g,' ').trim();
+    return String(f.value||f.placeholder||'').trim()}
+  return td.textContent.replace(/\s+/g,' ').trim();
+}
+function pxTable(t){
+  const out=[];
+  [...t.rows].forEach(tr=>{
+    const sec=tr.parentElement&&tr.parentElement.tagName,cells=[...tr.cells];if(!cells.length)return;
+    const head=sec==='THEAD'||cells.every(c=>c.tagName==='TH')&&sec!=='TFOOT'&&sec!=='TBODY',bold=sec==='TFOOT';
+    const row=[];
+    cells.forEach(c=>{const tx=pxText(c);let cell;
+      if(head)cell={v:tx,s:1};
+      else{const n=pxNum(tx);cell=n?{v:n.v,s:n.p?(bold?7:3):n.d&&!bold?10:(bold?5:2)}:(bold?{v:tx,s:4}:tx)}
+      row.push(cell);for(let k=1;k<(c.colSpan||1);k++)row.push(head?{v:'',s:1}:'')});
+    out.push(row);
+  });
+  return out;
+}
+function pxPage(p){
+  const pg=$('page'+p),rows=[];if(!pg)return rows;
+  pg.querySelectorAll('h2,h3,dl,table').forEach(el=>{
+    if(el.offsetParent===null)return;
+    if(el.tagName!=='TABLE'&&el.closest('table'))return;
+    if(el.tagName==='TABLE'&&el.parentElement.closest('table'))return;
+    if(el.tagName==='H2'||el.tagName==='H3'){const t=el.textContent.replace(/\s+/g,' ').trim();if(t){if(rows.length)rows.push([]);rows.push([{v:t,s:4}])}return}
+    if(el.tagName==='DL'){
+      [...el.children].forEach(d=>{const dt=d.querySelector('dt'),dd=d.querySelector('dd');if(!dt||!dd)return;
+        const vEl=dd.querySelector('.v')||dd,vt=vEl.textContent.replace(/\s+/g,' ').trim(),u=vEl.querySelector('.u');
+        const raw=u?vt.slice(0,vt.length-u.textContent.trim().length).trim():vt,n=pxNum(raw);
+        const ex=[...dd.querySelectorAll('.d')].map(x=>x.textContent.replace(/\s+/g,' ').trim()).filter(Boolean).join(' | ');
+        rows.push([dt.textContent.replace(/\s+/g,' ').trim(),n?{v:n.v,s:n.p?3:n.d?10:2}:raw,u?u.textContent.trim():'',ex])});
+      rows.push([]);return}
+    rows.push(...pxTable(el));
+  });
+  return rows;
+}
+async function pageSheets(msg,used){
+  const back=PAGE,tabs=[...document.querySelectorAll('.tab')].map(b=>[+b.dataset.p,b.textContent.replace(/\s+/g,' ').trim()]).filter(([p])=>!PX_SKIP.has(p));
+  const names=new Set(used.map(n=>n.toLowerCase())),SH=[];
+  try{
+    for(let i=0;i<tabs.length;i++){
+      const [p,label]=tabs[i];
+      msg.textContent='Menyiapkan sheet '+label+' ('+(i+1)+'/'+tabs.length+')…';
+      try{showPage(p)}catch(e){}
+      await new Promise(z=>setTimeout(z,120));
+      const rows=pxPage(p);if(!rows.length)continue;
+      let nm=label.replace(/[\[\]:*?\/\\]/g,' ').replace(/\s+/g,' ').trim().slice(0,28)||('Tab '+p),base=nm,k=2;
+      while(names.has(nm.toLowerCase()))nm=base.slice(0,26)+' '+(k++);
+      names.add(nm.toLowerCase());
+      SH.push({name:nm,rows:[[{v:'Tab '+label,s:6}],[],...rows]});
+    }
+  }finally{showPage(back)}
+  return SH;
+}
 async function exportXlsx(){
   const btn=$('exportXlsx'),msg=$('exportMsg'),withDb=$('exportDb').checked;
   btn.disabled=true;
   try{
     msg.textContent='Menyiapkan file…';await new Promise(z=>setTimeout(z,30));
     const sheets=buildSheets();let db=null;
+    sheets.push(...await pageSheets(msg,sheets.map(x=>x.name).concat(['Rumus','Mapping','Database'])));
     sheets.push(rumusSheet());
     if(withDb){
       const X=await loadDb(),fl=dbFilter(X);
