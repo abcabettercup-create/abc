@@ -1172,6 +1172,9 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
   <div id="page26" role="tabpanel" aria-labelledby="tab26" hidden>
     <div class="fpanel" role="group" aria-label="Filter Monthly Bill Trans">
       <div class="frow">
+        <div class="fgrp"><span class="fl">Produk</span><div class="chips" id="mvb_prodChips" role="group" aria-label="Pilih produk"></div></div>
+      </div>
+      <div class="frow">
         <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="mvb_chChips" role="group" aria-label="Filter online offline"></div></div>
         <div class="fgrp"><span class="fl">Area</span><div class="chips" id="mvb_areaChips" role="group" aria-label="Filter area"></div></div>
       </div>
@@ -1260,6 +1263,9 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
   <div id="page22" role="tabpanel" aria-labelledby="tab22" hidden>
     <div class="fpanel" role="group" aria-label="Filter Monthly Value Exc Tax">
       <div class="frow">
+        <div class="fgrp"><span class="fl">Produk</span><div class="chips" id="mvx_prodChips" role="group" aria-label="Pilih produk"></div></div>
+      </div>
+      <div class="frow">
         <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="mvx_chChips" role="group" aria-label="Filter online offline"></div></div>
         <div class="fgrp"><span class="fl">Area</span><div class="chips" id="mvx_areaChips" role="group" aria-label="Filter area"></div></div>
       </div>
@@ -1277,6 +1283,9 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
 
   <div id="page23" role="tabpanel" aria-labelledby="tab23" hidden>
     <div class="fpanel" role="group" aria-label="Filter Monthly Value Inc Tax">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Produk</span><div class="chips" id="mvi_prodChips" role="group" aria-label="Pilih produk"></div></div>
+      </div>
       <div class="frow">
         <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="mvi_chChips" role="group" aria-label="Filter online offline"></div></div>
         <div class="fgrp"><span class="fl">Area</span><div class="chips" id="mvi_areaChips" role="group" aria-label="Filter area"></div></div>
@@ -3337,8 +3346,8 @@ function renderRb(){
 /* ===== Tabel bulanan per outlet (pola Monthly Prod) untuk nilai Rp ===== */
 // sumber: agregat bulanan D.m[YYYY-MM][outlet][on|off|gf|go|sf] dan D.days[YYYY-MM][ch][outlet|all|jkt|sby]
 const mvCl=ch=>ch==='all'?['on','off']:[ch];
-function mvVal(mk,o,ch,fn){const oo=(D.m[mk]||{})[o];if(!oo)return 0;let v=0;mvCl(ch).forEach(c=>{const x=oo[c];if(x)v+=fn(x)});return v}
-function mvDays(mk,ch,who){const dd=((D.days[mk]||{})[ch])||{};return dd[who]||0}
+function mvVal(mk,o,ch,fn){const oo=((MVSRC||D).m[mk]||{})[o];if(!oo)return 0;let v=0;mvCl(ch).forEach(c=>{const x=oo[c];if(x)v+=fn(x)});return v}
+function mvDays(mk,ch,who){const dd=(((MVSRC||D).days[mk]||{})[ch])||{};return dd[who]||0}
 function mvTable(o){ // {title,outs,cols:[{h,mk,fut}],ch,fn,color,areaKey}
   const {title,outs,cols,ch,fn,color,areaKey}=o;
   const tot=cols.map(()=>0);let TT=0,body='';
@@ -3352,7 +3361,35 @@ function mvTable(o){ // {title,outs,cols:[{h,mk,fut}],ch,fn,color,areaKey}
 }
 
 /* ===== Halaman 22/23: Monthly Value Exc Tax / Inc Tax ===== */
-const MVS={x:{area:'all',a:0,b:11,ch:'all'},i:{area:'all',a:0,b:11,ch:'all'},b:{area:'all',a:0,b:11,ch:'all'}};
+const MVS={x:{area:'all',a:0,b:11,ch:'all',prod:'all'},i:{area:'all',a:0,b:11,ch:'all',prod:'all'},b:{area:'all',a:0,b:11,ch:'all',prod:'all'}};
+/* agregat per produk (dihitung dari database transaksi), bentuknya sama dengan D.m dan D.days */
+let MVSRC=null;const MVPC={src:null,c:{}};
+function mvProdSrc(sel){
+  const X=DBC;if(!X)return null;
+  if(MVPC.src!==X){MVPC.src=X;MVPC.c={}}
+  const key=sel.slice().sort().join(',');if(MVPC.c[key])return MVPC.c[key];
+  const want=new Set(sel),PKS=['qc','ql','qp','qm','qt','qb'];
+  const mk=X.maps.map(mp=>{if(mp.c==='Bundle_Package')return 'bd';const j=mp.m.findIndex(v=>v>0);return j>=0?PKS[j]:null});
+  const pKey=X.pl.map(pfKey),pOn=pKey.map(k=>k!=null);
+  const m={},sets={},bills={};
+  const EM=()=>({gross:0,disc:0,refund:0,net:0,tax:0,trx:0});
+  for(let i=0;i<X.d.length;i++){
+    if(!want.has(mk[X.mp[i]]))continue;
+    const ds=X.dates[X.d[i]],mo=ds.slice(0,7),o=X.outlets[X.o[i]],pk=pKey[X.p[i]],c=pOn[X.p[i]]?'on':'off',CS=pk?['on',pk]:['off'];
+    for(const cc of CS){
+      const a=m[mo]||(m[mo]={}),b=a[o]||(a[o]={}),r=b[cc]||(b[cc]=EM());
+      r.gross+=X.g[i];r.disc+=X.dc[i];r.refund+=X.rf[i];r.net+=X.nt[i];r.tax+=X.tx[i];
+      if(X.e[i]===0){const bk=mo+'\u0000'+o+'\u0000'+cc;(bills[bk]||(bills[bk]=new Set())).add(X.r[i])}
+    }
+    if(X.e[i]===0)for(const cc of [c,'all'].concat(pk?[pk]:[])){
+      const put=sc=>{const kk=mo+'\u0000'+cc+'\u0000'+sc;(sets[kk]||(sets[kk]=new Set())).add(ds)};
+      put(o);put('all');if(AREAS.jkt.o.includes(o))put('jkt');if(AREAS.sby.o.includes(o))put('sby');
+    }
+  }
+  for(const bk in bills){const [mo,o,cc]=bk.split('\u0000');m[mo][o][cc].trx=bills[bk].size}
+  const days={};for(const kk in sets){const [k,c,sc]=kk.split('\u0000');((days[k]||(days[k]={}))[c]||(days[k][c]={}))[sc]=sets[kk].size}
+  return MVPC.c[key]={m,days};
+}
 const MVDEF={
   x:{pre:'mvx',name:'Monthly Value (Exc Tax)',items:[['Gross Sales',x=>x.gross-x.refund,'var(--c2)'],['Net Sales',x=>x.net,'var(--net)'],['Disc',x=>x.disc,'var(--disc)']]},
   i:{pre:'mvi',name:'Monthly Value (Inc Tax)',items:[['Gross Sales (Inc Tax)',x=>x.gross-x.refund+x.tax,'var(--c2)'],['Net Sales (Inc Tax)',x=>x.net+x.tax,'var(--net)']]},
@@ -3377,6 +3414,9 @@ function mvAvgTable(o){
 function renderMV(k){
   const S=MVS[k],F=MVDEF[k],P=F.pre,{ly,cm}=ayCur(),ld=D.lastDate,Y=TGT.year,re=()=>renderMV(k);
   const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
+  prodChips(P+'_prodChips',S,re);
+  if(S.prod!=='all'&&!DBC){$(P+'_wrap').innerHTML='<div class="empty">Menyiapkan data per produk…</div>';loadDb().then(re).catch(e=>{$(P+'_wrap').innerHTML='<div class="empty">Gagal memuat data per produk: '+e.message+'</div>'});return}
+  const pl=prodLbl(S),pc=S.prod==='all'?'':', '+pl;
   chChips(P+'_chChips',S.ch,v=>{S.ch=v;re()});
   mk(P+'_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],S.area,v=>{S.area=v;re()});
   const opt=MN.map((n,i)=>`<option value="${i}">${n} ${Y}</option>`).join('');
@@ -3388,11 +3428,15 @@ function renderMV(k){
   const outs=S.area==='all'?OUT.slice():OUT.filter(o=>AREAS[S.area].o.includes(o));
   const ar=S.area==='all'?'Semua area':AREAS[S.area].name;
   const lbl=(S.a===S.b?MN[S.a]:MS[S.a]+' s.d '+MS[S.b])+' '+Y;
-  $(P+'_show').textContent=lbl+', '+ar+chLbl(S.ch);
-  $(P+'_wrap').innerHTML=F.build?F.build({lbl,outs,cols,ch:S.ch,areaKey:S.area}):F.items.map(([nm,fn,col])=>mvTable({title:'Rekap '+nm+' (Rp) per bulan, '+lbl,outs,cols,ch:S.ch,fn,color:col,areaKey:S.area})).join('');
+  $(P+'_show').textContent=lbl+', '+ar+chLbl(S.ch)+', '+pl;
+  MVSRC=S.prod==='all'?null:mvProdSrc(S.prod);
+  try{
+    $(P+'_wrap').innerHTML=(S.prod==='all'?'':'<p class="note">Produk: <b>'+pl+'</b>. Nilai Rp hanya dari item produk terpilih; Bill Transaction = jumlah bill yang berisi produk terpilih; Hari trx = hari ada penjualan produk terpilih.</p>')+
+      (F.build?F.build({lbl:lbl+pc,outs,cols,ch:S.ch,areaKey:S.area}):F.items.map(([nm,fn,col])=>mvTable({title:'Rekap '+nm+' (Rp) per bulan, '+lbl+pc,outs,cols,ch:S.ch,fn,color:col,areaKey:S.area})).join(''));
+  }finally{MVSRC=null}
   $(P+'_pdf').onclick=()=>{
-    $(P+'_ph').innerHTML='<b>'+F.name+' a better cup</b> · '+lbl+' · '+ar+chLbl(S.ch)+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
-    const t=document.title;document.title=F.name+' - '+Y+' '+MS[S.a]+'-'+MS[S.b]+' - '+ar;
+    $(P+'_ph').innerHTML='<b>'+F.name+' a better cup</b> · '+lbl+' · '+ar+chLbl(S.ch)+' · '+pl+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
+    const t=document.title;document.title=F.name+' - '+Y+' '+MS[S.a]+'-'+MS[S.b]+' - '+ar+(S.prod==='all'?'':' - '+pl);
     document.body.classList.add('pr-rekap');const done=()=>{document.body.classList.remove('pr-rekap');document.title=t;window.removeEventListener('afterprint',done)};
     window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
 }
