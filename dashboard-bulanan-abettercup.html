@@ -472,6 +472,7 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
     <button type="button" class="tab" role="tab" id="tab21" data-p="21" aria-controls="page21" aria-selected="false" tabindex="-1">PUSH</button>
     <button type="button" class="tab" role="tab" id="tab16" data-p="16" aria-controls="page16" aria-selected="false" tabindex="-1">Daily Prod</button>
     <button type="button" class="tab" role="tab" id="tab18" data-p="18" aria-controls="page18" aria-selected="false" tabindex="-1">Monthly Prod</button>
+    <button type="button" class="tab" role="tab" id="tab26" data-p="26" aria-controls="page26" aria-selected="false" tabindex="-1">Monthly Bill Trans</button>
     <button type="button" class="tab" role="tab" id="tab22" data-p="22" aria-controls="page22" aria-selected="false" tabindex="-1">Monthly Value (Exc Tax)</button>
     <button type="button" class="tab" role="tab" id="tab23" data-p="23" aria-controls="page23" aria-selected="false" tabindex="-1">Monthly Value (Inc Tax)</button>
     <button type="button" class="tab" role="tab" id="tab17" data-p="17" aria-controls="page17" aria-selected="false" tabindex="-1">Avg Prod</button>
@@ -1166,6 +1167,24 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
       <h2 id="mnh_t"></h2>
       <div class="tw"><table id="mn_tbl" class="tqt"></table></div>
     </section>
+  </div>
+
+  <div id="page26" role="tabpanel" aria-labelledby="tab26" hidden>
+    <div class="fpanel" role="group" aria-label="Filter Monthly Bill Trans">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="mvb_chChips" role="group" aria-label="Filter online offline"></div></div>
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="mvb_areaChips" role="group" aria-label="Filter area"></div></div>
+      </div>
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Periode</span>
+          <label>Dari <select id="mvb_from" aria-label="Bulan awal"></select></label>
+          <label>s.d <select id="mvb_to" aria-label="Bulan akhir"></select></label></div>
+        <div class="fgrp"><span class="fshow">Ditampilkan: <b id="mvb_show"></b></span>
+          <button type="button" class="chip exp" id="mvb_pdf">Export PDF</button></div>
+      </div>
+    </div>
+    <div class="phead" id="mvb_ph"></div>
+    <div id="mvb_wrap"></div>
   </div>
 
   <div id="page24" role="tabpanel" aria-labelledby="tab24" hidden>
@@ -2621,16 +2640,16 @@ function renderPage1(){
   }finally{PFX='';Object.assign(S,saved)}
 }
 function showPage(n){
-  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;$('page18').hidden=n!==18;$('page19').hidden=n!==19;$('page20').hidden=n!==20;$('page21').hidden=n!==21;$('page22').hidden=n!==22;$('page23').hidden=n!==23;$('page24').hidden=n!==24;$('page25').hidden=n!==25;
+  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;$('page18').hidden=n!==18;$('page19').hidden=n!==19;$('page20').hidden=n!==20;$('page21').hidden=n!==21;$('page22').hidden=n!==22;$('page23').hidden=n!==23;$('page24').hidden=n!==24;$('page25').hidden=n!==25;$('page26').hidden=n!==26;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===18)renderRb();else if(n===19)renderAp();else if(n===20)renderDsk();else if(n===21)renderPush();else if(n===22)renderMV('x');else if(n===23)renderMV('i');else if(n===24)renderEst();else if(n===25)renderSV();else if(n===2)render();
+  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===18)renderRb();else if(n===19)renderAp();else if(n===20)renderDsk();else if(n===21)renderPush();else if(n===22)renderMV('x');else if(n===23)renderMV('i');else if(n===26)renderMV('b');else if(n===24)renderEst();else if(n===25)renderSV();else if(n===2)render();
   if(n===6)exFilterText();
   window.scrollTo(0,0);
 }
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>{b.onclick=()=>showPage(+b.dataset.p);
-    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,25,7,15,24,21,16,18,22,23,17,19,20,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
+    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,25,7,15,24,21,16,18,26,22,23,17,19,20,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
 }
 /* ===== Halaman 9: Weekly ===== */
 const WS={area:'all',outlet:'all',ch:'all',from:'',to:''};
@@ -3333,10 +3352,28 @@ function mvTable(o){ // {title,outs,cols:[{h,mk,fut}],ch,fn,color,areaKey}
 }
 
 /* ===== Halaman 22/23: Monthly Value Exc Tax / Inc Tax ===== */
-const MVS={x:{area:'all',a:0,b:11,ch:'all'},i:{area:'all',a:0,b:11,ch:'all'}};
+const MVS={x:{area:'all',a:0,b:11,ch:'all'},i:{area:'all',a:0,b:11,ch:'all'},b:{area:'all',a:0,b:11,ch:'all'}};
 const MVDEF={
   x:{pre:'mvx',name:'Monthly Value (Exc Tax)',items:[['Gross Sales',x=>x.gross-x.refund,'var(--c2)'],['Net Sales',x=>x.net,'var(--net)'],['Disc',x=>x.disc,'var(--disc)']]},
-  i:{pre:'mvi',name:'Monthly Value (Inc Tax)',items:[['Gross Sales (Inc Tax)',x=>x.gross-x.refund+x.tax,'var(--c2)'],['Net Sales (Inc Tax)',x=>x.net+x.tax,'var(--net)']]}};
+  i:{pre:'mvi',name:'Monthly Value (Inc Tax)',items:[['Gross Sales (Inc Tax)',x=>x.gross-x.refund+x.tax,'var(--c2)'],['Net Sales (Inc Tax)',x=>x.net+x.tax,'var(--net)']]},
+  b:{pre:'mvb',name:'Monthly Bill Trans',build:(o)=>{const {lbl,outs,cols,ch,areaKey}=o,cn=chLbl(ch);
+    return mvTable({title:'Rekap 1 · Bill Transaction per bulan, '+lbl+cn,outs,cols,ch,fn:x=>x.trx,color:'var(--c2)',areaKey})+
+      mvAvgTable({title:'Rekap 2 · Avg Bill Transaction (Net Sales / Bill, Rp) per bulan, '+lbl+cn,outs,cols,ch,color:'var(--net)'})+
+      mvAvgTable({title:'Rekap 3 · Avg Bill Transaction Offline (Rp) per bulan, '+lbl,outs,cols,ch:'off',color:'var(--tax)'})+
+      mvAvgTable({title:'Rekap 4 · Avg Bill Transaction Online (Rp) per bulan, '+lbl,outs,cols,ch:'on',color:'var(--on)'})}}};
+/* tabel rata-rata per bill: Net Sales / Bill Transaction per outlet per bulan */
+function mvAvgTable(o){
+  const {title,outs,cols,ch,color}=o,nfn=x=>x.net,tfn=x=>x.trx;
+  const cn=cols.map(()=>0),ct=cols.map(()=>0);let GN=0,GT=0,body='';
+  const avg=(n,t)=>t?n/t:0;
+  outs.forEach(ot=>{const n=cols.map(c=>c.fut?0:mvVal(c.mk,ot,ch,nfn)),t=cols.map(c=>c.fut?0:mvVal(c.mk,ot,ch,tfn));
+    const a=cols.map((c,k)=>avg(n[k],t[k])),mx=Math.max(0,...a),sn=n.reduce((x,y)=>x+y,0),st=t.reduce((x,y)=>x+y,0);
+    n.forEach((x,k)=>{cn[k]+=x;ct[k]+=t[k]});GN+=sn;GT+=st;
+    body+=`<tr><td>${ot}</td>`+cols.map((c,k)=>{if(c.fut)return '<td></td>';if(!t[k])return '<td class="z">-</td>';const al=mx>0?Math.min(1,Math.max(0,a[k])/mx):0;return `<td style="background:color-mix(in srgb,${color} ${Math.round(al*38)}%,transparent)">${nf.format(a[k])}</td>`}).join('')+
+      `<td class="tt">${st?nf.format(sn/st):'-'}</td><td>${nf.format(st)}</td><td>${nf.format(sn)}</td></tr>`});
+  const foot=`<tfoot><tr><td>Total</td>`+cols.map((c,k)=>`<td>${c.fut?'':ct[k]?nf.format(cn[k]/ct[k]):'-'}</td>`).join('')+`<td class="tt">${GT?nf.format(GN/GT):'-'}</td><td>${nf.format(GT)}</td><td>${nf.format(GN)}</td></tr></tfoot>`;
+  return `<section><h2>${title}</h2><div class="tw"><table class="rkt mo"><thead><tr><th>Outlet</th>${cols.map(c=>`<th>${c.h}</th>`).join('')}<th class="tt">Avg periode</th><th>Bill Transaction</th><th>Net Sales</th></tr></thead><tbody>${body}</tbody>${foot}</table></div></section>`;
+}
 function renderMV(k){
   const S=MVS[k],F=MVDEF[k],P=F.pre,{ly,cm}=ayCur(),ld=D.lastDate,Y=TGT.year,re=()=>renderMV(k);
   const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
@@ -3352,7 +3389,7 @@ function renderMV(k){
   const ar=S.area==='all'?'Semua area':AREAS[S.area].name;
   const lbl=(S.a===S.b?MN[S.a]:MS[S.a]+' s.d '+MS[S.b])+' '+Y;
   $(P+'_show').textContent=lbl+', '+ar+chLbl(S.ch);
-  $(P+'_wrap').innerHTML=F.items.map(([nm,fn,col])=>mvTable({title:'Rekap '+nm+' (Rp) per bulan, '+lbl,outs,cols,ch:S.ch,fn,color:col,areaKey:S.area})).join('');
+  $(P+'_wrap').innerHTML=F.build?F.build({lbl,outs,cols,ch:S.ch,areaKey:S.area}):F.items.map(([nm,fn,col])=>mvTable({title:'Rekap '+nm+' (Rp) per bulan, '+lbl,outs,cols,ch:S.ch,fn,color:col,areaKey:S.area})).join('');
   $(P+'_pdf').onclick=()=>{
     $(P+'_ph').innerHTML='<b>'+F.name+' a better cup</b> · '+lbl+' · '+ar+chLbl(S.ch)+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
     const t=document.title;document.title=F.name+' - '+Y+' '+MS[S.a]+'-'+MS[S.b]+' - '+ar;
@@ -5182,7 +5219,7 @@ function initExport(){
   const g=document.getElementById('ex_goto');if(g)g.onclick=()=>showPage(2);
 }
 period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initProduct();initWeekly();initBank();initOnline();initTarget();initAch();initTplan();initMon();initReport();initExport();initUpload();initSheet();showPage(1);
-let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else if(PAGE===16)renderRk();else if(PAGE===17)renderRh();else if(PAGE===18)renderRb();else if(PAGE===19)renderAp();else if(PAGE===20)renderDsk();else if(PAGE===21)renderPush();else if(PAGE===22)renderMV('x');else if(PAGE===23)renderMV('i');else if(PAGE===24)renderEst();else if(PAGE===25)renderSV();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else if(PAGE===16)renderRk();else if(PAGE===17)renderRh();else if(PAGE===18)renderRb();else if(PAGE===19)renderAp();else if(PAGE===20)renderDsk();else if(PAGE===21)renderPush();else if(PAGE===22)renderMV('x');else if(PAGE===23)renderMV('i');else if(PAGE===26)renderMV('b');else if(PAGE===24)renderEst();else if(PAGE===25)renderSV();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
 </html>
