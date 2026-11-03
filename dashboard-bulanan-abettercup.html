@@ -437,6 +437,45 @@ table.svd tfoot td{font-weight:600}
 table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,transparent)}
 </style>
 <style>#o_kpi{grid-template-columns:repeat(3,1fr)}#o_kpi>div:nth-child(n+4){border-top:1px solid var(--rule)}#o_kpi>div:nth-child(3n){border-right:0}#o_kpi>div:nth-child(3n+1){padding-left:0}@media (max-width:860px){#o_kpi{grid-template-columns:repeat(2,1fr)}#o_kpi>div:nth-child(n){border-top:0;border-right:0;padding-left:0}}</style>
+<style>
+.acset{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-top:8px;font-size:14px}
+.acset input[type=number]{width:70px;padding:5px 6px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit}
+.acset select,.acset input[type=date]{padding:5px 6px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit}
+.acin{width:100%;min-width:80px;max-width:120px;padding:5px 6px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;text-align:right}
+.acin-t td:nth-child(-n+2),.acin-t th:nth-child(-n+2){text-align:left!important}
+.acul{margin:10px 0 0;padding-left:20px;line-height:1.6;font-size:14px}
+.acul li.w3{color:var(--bad)}.acul li.w2{color:var(--bad)}.acul li.w1{color:var(--disc)}
+.acs{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600;white-space:nowrap}
+.acs.ok{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.acs.mid{background:color-mix(in srgb,var(--disc) 20%,transparent);color:var(--disc)}
+.acs.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.acwarn{margin-top:10px;padding:8px 12px;border-left:3px solid var(--bad);background:color-mix(in srgb,var(--bad) 8%,transparent);font-size:13px}
+.acok{margin-top:10px;color:var(--good);font-weight:600}
+.scot td:first-child,.scot th:first-child{text-align:left!important}
+.scsb{margin-top:0;height:16px}
+#sc_chart{margin-top:8px}
+body.pr-rekap #page28 .fpanel,body.pr-rekap #page29 .fpanel,body.pr-rekap #page28 button{display:none!important}
+body.pr-rekap #page28 section,body.pr-rekap #page29 section{padding:0 0 4mm;border:0;break-inside:avoid}
+body.pr-rekap .acin{border:0;padding:0;background:transparent}
+.acu2 td:nth-child(-n+2),.acu2 th:nth-child(-n+2){text-align:left!important}
+.vct.acu td:last-child,.vct.acu th:last-child{white-space:nowrap}
+</style>
+<style>
+.vcg{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+@media (max-width:980px){.vcg{grid-template-columns:minmax(0,1fr)}}
+.vct tr.vsub td{font-weight:700;background:var(--hi)}
+.vct tr.vvt td{font-weight:600;font-style:italic;background:color-mix(in srgb,var(--hi) 45%,transparent)}
+.vct tr.vgt td{font-weight:700;border-top:2px solid var(--ink)}
+.vct td.vo{font-weight:600;white-space:nowrap}
+.vct th:nth-child(-n+4),.vct td:nth-child(-n+4){text-align:left!important}
+.vcm{max-width:520px}
+.vct.vcu td:nth-child(4),.vct.vcu th:nth-child(4){text-align:right!important}
+.vct tr.vfirst td{border-top:1px solid var(--rule)}
+.vcm td,.vcm th{text-align:left!important}
+body.pr-rekap #page27 .fpanel{display:none!important}
+body.pr-rekap #page27 section{padding:0 0 4mm;border:0;break-inside:avoid}
+body.pr-rekap .vcg{grid-template-columns:minmax(0,1fr) 46mm;gap:4mm}
+</style>
 <style>.gp{font-weight:700}.gp.ok{color:var(--good)}.gp.mid{color:var(--disc)}.gp.lo{color:var(--bad)}#tg_tbl tr.sub td,#ay_tbl tr.sub td{font-weight:700;background:var(--hi)}.gyear td small{display:block;color:var(--mute);font-size:11px;line-height:1.3}.gyear td{vertical-align:top}.gbar{height:6px;border-radius:3px;background:var(--rule);overflow:hidden;min-width:60px;margin-top:4px}.gbar span{display:block;height:100%}#ay_kpi{grid-template-columns:repeat(3,1fr)}#ay_kpi>div:nth-child(n+4){border-top:1px solid var(--rule)}#ay_kpi>div:nth-child(3n){border-right:0}#ay_kpi>div:nth-child(3n+1){padding-left:0}@media (max-width:860px){#ay_kpi{grid-template-columns:repeat(2,1fr)}#ay_kpi>div:nth-child(n){border-top:0;border-right:0;padding-left:0}}.tqt input[type=number]{font:600 14px var(--bd);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:4px 6px;width:72px;text-align:right}.tqt tr.tqm th{border-bottom:2px solid var(--rule);padding-top:6px;padding-bottom:8px;color:var(--ink)}.tqt #tq_master{border:2px solid var(--net)}.tqt input.ovr{border-color:var(--c3);box-shadow:0 0 0 1px var(--c3)}.tqt td small{display:block;color:var(--mute);font-size:11px}.tqt tr.sub td{font-weight:700;background:var(--hi)}.tqt td.t27{font-weight:700}.tqt{font-size:13px}.tqt th{white-space:normal;line-height:1.2;vertical-align:bottom;font-size:11.5px;padding:6px 6px}.tqt td{padding:6px 6px;white-space:nowrap}.tqt input[type=number]{width:54px;padding:2px 4px;font-size:13px}.tqt td small{font-size:10px}.tqt input.tqp{width:78px}.tqt input.tqd{width:58px}.tqt td:nth-child(2),.tqt th:nth-child(2){text-align:left}.tqt td:first-child,.tqt th:first-child{text-align:left;width:36px}#mn_tbl{font-size:14px}#mn_tbl th{font-size:12.5px}#mn_tbl input[type=number]{width:54px}#mn_tbl input[data-pd]{width:64px}#mn_tbl td:first-child,#mn_tbl th:first-child{text-align:left;width:auto}#mn_tbl td:nth-child(2),#mn_tbl th:nth-child(2){text-align:right}.rkt{font-size:12.5px}.rkt th,.rkt td{padding:5px 5px;text-align:right;white-space:nowrap}.rkt th:first-child,.rkt td:first-child{text-align:left;position:sticky;left:0;background:var(--bg);z-index:1}.rkt thead th small{display:block;font-weight:400;color:var(--mute);font-size:10px}.rkt th.we{color:var(--bad)}.rkt td.z{color:var(--mute)}.rkt tr.sub td{font-weight:700;background:var(--hi)}.rkt tr.sub td:first-child{background:var(--hi)}.rkb td:first-child{white-space:normal;min-width:220px}.rkt td.tt,.rkt th.tt{font-weight:700;border-left:1px solid var(--rule)}.dskt td:first-child a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--rule);cursor:pointer}.dskt tr.sel td{background:var(--hi)}.dskt td:nth-child(3){white-space:normal;min-width:110px;max-width:170px;text-align:left}.dskt th{white-space:normal;vertical-align:bottom}.dskt td small{display:block;color:var(--mute);font-size:10.5px}.gd.up{color:var(--good);font-weight:700}.gd.dn{color:var(--bad);font-weight:700}#dsk_imp{grid-template-columns:repeat(4,1fr)}.rkt th.pz{background:color-mix(in srgb,var(--disc) 28%,transparent);color:var(--ink)}.rkt td.pz{box-shadow:inset 0 2px 0 var(--disc),inset 0 -2px 0 var(--disc)}.put{font-size:15px}.put th{font-size:13px}.put td,.put th{padding:8px 10px}.put input[type=number]{width:80px;font-size:15px}.put td:nth-child(2),.put th:nth-child(2){text-align:left}.put tfoot td{font-weight:700}.punote{font:600 clamp(20px,2.4vw,28px)/1.4 var(--hd);color:var(--ink);margin:22px 0 6px;max-width:none}@media (max-width:600px){.punote{font-size:18px}}.upd{margin:4px 0 0;font-size:15px;color:var(--ink)}.upd b{color:var(--net)}.upd span{color:var(--mute);font-size:13px}.puupd{color:var(--net);font-weight:600}</style>
 </head>
 <body>
@@ -476,6 +515,9 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
     <button type="button" class="tab" role="tab" id="tab22" data-p="22" aria-controls="page22" aria-selected="false" tabindex="-1">Monthly Value (Exc Tax)</button>
     <button type="button" class="tab" role="tab" id="tab23" data-p="23" aria-controls="page23" aria-selected="false" tabindex="-1">Monthly Value (Inc Tax)</button>
     <button type="button" class="tab" role="tab" id="tab17" data-p="17" aria-controls="page17" aria-selected="false" tabindex="-1">Avg Prod</button>
+    <button type="button" class="tab" role="tab" id="tab29" data-p="29" aria-controls="page29" aria-selected="false" tabindex="-1">Summary Cup</button>
+    <button type="button" class="tab" role="tab" id="tab27" data-p="27" aria-controls="page27" aria-selected="false" tabindex="-1">Variant Cup</button>
+    <button type="button" class="tab" role="tab" id="tab28" data-p="28" aria-controls="page28" aria-selected="false" tabindex="-1">PO Cup</button>
     <button type="button" class="tab" role="tab" id="tab19" data-p="19" aria-controls="page19" aria-selected="false" tabindex="-1">Promo</button>
     <button type="button" class="tab" role="tab" id="tab20" data-p="20" aria-controls="page20" aria-selected="false" tabindex="-1">Discount</button>
     <button type="button" class="tab" role="tab" id="tab12" data-p="12" aria-controls="page12" aria-selected="false" tabindex="-1">MTD Ach</button>
@@ -1239,6 +1281,51 @@ table.svd tr.ton td{font-weight:600;background:color-mix(in srgb,var(--on) 8%,tr
     </div>
     <p class="note" style="margin-top:16px">Rata-rata jual per hari = jumlah terjual dalam bulan ÷ jumlah hari ada transaksi di outlet itu.</p>
     <div id="rh_wrap"></div>
+  </div>
+
+  <div id="page27" role="tabpanel" aria-labelledby="tab27" hidden>
+    <div class="fpanel" role="group" aria-label="Filter Variant Cup">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="vc_chChips" role="group" aria-label="Filter online offline"></div></div>
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="vc_areaChips" role="group" aria-label="Filter area"></div></div>
+        <div class="fgrp"><span class="fl">Tampilkan</span><div class="chips" id="vc_metChips" role="group" aria-label="Pilih ukuran Cup atau Net Sales"></div></div>
+      </div>
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Periode</span>
+          <label>Dari <select id="vc_from" aria-label="Bulan awal"></select></label>
+          <label>s.d <select id="vc_to" aria-label="Bulan akhir"></select></label></div>
+        <div class="fgrp"><span class="fshow">Ditampilkan: <b id="vc_show"></b></span>
+          <button type="button" class="chip exp" id="vc_pdf">Export PDF</button></div>
+      </div>
+    </div>
+    <div class="phead" id="vc_ph"></div>
+    <div id="vc_wrap"></div>
+  </div>
+
+  <div id="page29" role="tabpanel" aria-labelledby="tab29" hidden>
+    <div class="fpanel" role="group" aria-label="Filter Summary Cup">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="sc_chChips" role="group" aria-label="Filter online offline"></div></div>
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="sc_areaChips" role="group" aria-label="Filter area"></div></div>
+      </div>
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Periode</span>
+          <label>Dari <select id="sc_from" aria-label="Bulan awal"></select></label>
+          <label>s.d <select id="sc_to" aria-label="Bulan akhir"></select></label></div>
+        <div class="fgrp"><span class="fshow">Ditampilkan: <b id="sc_show"></b></span>
+          <button type="button" class="chip exp" id="sc_pdf">Export PDF</button></div>
+      </div>
+    </div>
+    <div class="phead" id="sc_ph"></div>
+    <div id="sc_wrap"></div>
+  </div>
+
+  <div id="page28" role="tabpanel" aria-labelledby="tab28" hidden>
+    <div class="fpanel" role="group" aria-label="PO Cup"><div class="frow fend">
+      <div class="fgrp"><span class="fshow">PO Cup · data transaksi s.d <b id="ac_show"></b></span>
+        <button type="button" class="chip exp" id="ac_pdf">Export PDF</button></div></div></div>
+    <div class="phead" id="ac_ph"></div>
+    <div id="ac_wrap"></div>
   </div>
 
   <div id="page18" role="tabpanel" aria-labelledby="tab18" hidden>
@@ -2649,16 +2736,16 @@ function renderPage1(){
   }finally{PFX='';Object.assign(S,saved)}
 }
 function showPage(n){
-  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;$('page18').hidden=n!==18;$('page19').hidden=n!==19;$('page20').hidden=n!==20;$('page21').hidden=n!==21;$('page22').hidden=n!==22;$('page23').hidden=n!==23;$('page24').hidden=n!==24;$('page25').hidden=n!==25;$('page26').hidden=n!==26;
+  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;$('page18').hidden=n!==18;$('page19').hidden=n!==19;$('page20').hidden=n!==20;$('page21').hidden=n!==21;$('page22').hidden=n!==22;$('page23').hidden=n!==23;$('page24').hidden=n!==24;$('page25').hidden=n!==25;$('page26').hidden=n!==26;$('page27').hidden=n!==27;$('page28').hidden=n!==28;$('page29').hidden=n!==29;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===18)renderRb();else if(n===19)renderAp();else if(n===20)renderDsk();else if(n===21)renderPush();else if(n===22)renderMV('x');else if(n===23)renderMV('i');else if(n===26)renderMV('b');else if(n===24)renderEst();else if(n===25)renderSV();else if(n===2)render();
+  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===18)renderRb();else if(n===19)renderAp();else if(n===20)renderDsk();else if(n===21)renderPush();else if(n===22)renderMV('x');else if(n===23)renderMV('i');else if(n===26)renderMV('b');else if(n===27)renderVC();else if(n===28)renderAC();else if(n===29)renderSC();else if(n===24)renderEst();else if(n===25)renderSV();else if(n===2)render();
   if(n===6)exFilterText();
   window.scrollTo(0,0);
 }
 function initTabs(){
   const tabs=[...document.querySelectorAll('.tab')];
   tabs.forEach(b=>{b.onclick=()=>showPage(+b.dataset.p);
-    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,25,7,15,24,21,16,18,26,22,23,17,19,20,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
+    b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const ord=[1,2,9,5,3,4,8,11,10,25,7,15,24,21,16,18,26,22,23,17,29,27,28,19,20,12,13,14,6],k=ord.indexOf(PAGE),n=ord[(k+(e.key==='ArrowRight'?1:ord.length-1))%ord.length];showPage(n);$('tab'+n).focus()}}});
 }
 /* ===== Halaman 9: Weekly ===== */
 const WS={area:'all',outlet:'all',ch:'all',from:'',to:''};
@@ -3437,6 +3524,320 @@ function renderMV(k){
   $(P+'_pdf').onclick=()=>{
     $(P+'_ph').innerHTML='<b>'+F.name+' a better cup</b> · '+lbl+' · '+ar+chLbl(S.ch)+' · '+pl+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
     const t=document.title;document.title=F.name+' - '+Y+' '+MS[S.a]+'-'+MS[S.b]+' - '+ar+(S.prod==='all'?'':' - '+pl);
+    document.body.classList.add('pr-rekap');const done=()=>{document.body.classList.remove('pr-rekap');document.title=t;window.removeEventListener('afterprint',done)};
+    window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
+}
+
+/* ===== Halaman 27: Variant Cup (Better Cup per ukuran) ===== */
+// Ukuran: Large+Hot=14 Oz, Large+Ice=16 Oz, Reguler+Hot=10 Oz, Reguler+Ice=12 Oz.
+// Hot = nama item mengandung kata "Hot"; selain itu Ice. Large = Variant "Large" (atau "(L)" di nama paket bundling); selain itu Reguler.
+const VCS={area:'all',a:0,b:11,ch:'all',met:'q'};
+const VCSZ=[['10 Oz','Reguler','Hot'],['12 Oz','Reguler','Ice'],['14 Oz','Large','Hot'],['16 Oz','Large','Ice']];
+const VC_HOT_LIST=['Hot Cappucinno','Hot Americano','Hot Chocolate Latte','Hot Latte','Hot Lime Honey Tea','Hot Matcha Latte','Hot Lemongrass Ginger Tea','Hot Cappucinno (L) + Pain au Chocolate'];
+const vcIsHot=n=>/\bhot\b/i.test(String(n||''));
+const vcIsLarge=(v,n)=>{v=String(v||'').trim().toLowerCase();if(v==='large')return true;if(v)return false;return /\(\s*l\s*\)/i.test(String(n||''))};
+const VCC={src:null,c:{}};
+function vcData(ch){
+  const X=DBC;if(VCC.src!==X){VCC.src=X;VCC.c={}}if(VCC.c[ch])return VCC.c[ch];
+  const pKey=X.pl.map(pfKey),szN=X.nl.map(vcIsHot),R={},hot=new Map();
+  for(let i=0;i<X.d.length;i++){
+    const mp=X.maps[X.mp[i]];if(!(mp.m[0]>0))continue;
+    const pk=pKey[X.p[i]];if(ch==='on'&&!pk||ch==='off'&&pk||PFN[ch]&&pk!==ch)continue;
+    const nm=X.nl[X.n[i]],h=szN[X.n[i]],L=vcIsLarge(X.vl[X.v[i]],nm),z=(L?2:0)+(h?0:1);
+    const mo=X.dates[X.d[i]].slice(0,7),o=X.outlets[X.o[i]],q=X.q[i]*mp.m[0];
+    const a=R[mo]||(R[mo]={}),b=a[o]||(a[o]=[0,0,0,0,0,0,0,0]);b[z]+=q;b[z+4]+=X.nt[i];
+    if(h)hot.set(nm,(hot.get(nm)||0)+q);
+  }
+  return VCC.c[ch]={R,hot};
+}
+function renderVC(){
+  const S=VCS,{ly,cm}=ayCur(),ld=D.lastDate,Y=TGT.year,re=renderVC;
+  const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
+  chChips('vc_chChips',S.ch,v=>{S.ch=v;re()});
+  mk('vc_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],S.area,v=>{S.area=v;re()});
+  mk('vc_metChips',[['q','Cup'],['nt','Net Sales']],S.met,v=>{S.met=v;re()});
+  const NT=S.met==='nt',U=NT?'Rp':'Cup',UL=NT?'Net Sales':'Cup';
+  const opt=MN.map((n,i)=>`<option value="${i}">${n} ${Y}</option>`).join('');
+  const fs=$('vc_from'),ts=$('vc_to');if(!fs.options.length){fs.innerHTML=opt;ts.innerHTML=opt}
+  fs.value=S.a;ts.value=S.b;
+  fs.onchange=e=>{S.a=+e.target.value;if(S.a>S.b)S.b=S.a;re()};
+  ts.onchange=e=>{S.b=+e.target.value;if(S.b<S.a)S.a=S.b;re()};
+  const ar=S.area==='all'?'Semua area':AREAS[S.area].name,lbl=(S.a===S.b?MN[S.a]:MS[S.a]+' s.d '+MS[S.b])+' '+Y;
+  $('vc_show').textContent=lbl+', '+ar+chLbl(S.ch)+', '+UL;
+  if(!DBC){$('vc_wrap').innerHTML='<div class="empty">Menyiapkan data variant…</div>';loadDb().then(re).catch(e=>{$('vc_wrap').innerHTML='<div class="empty">Gagal memuat data: '+e.message+'</div>'});return}
+  const {R,hot}=vcData(S.ch);
+  const cols=[];for(let m=S.a;m<=S.b;m++)cols.push({h:MS[m],mk:Y+'-'+String(m+1).padStart(2,'0'),fut:ly<Y||(ly===Y&&m>cm)});
+  const outs=S.area==='all'?OUT.slice():OUT.filter(o=>AREAS[S.area].o.includes(o));
+  const get=(c,o,z)=>c.fut?0:(((R[c.mk]||{})[o]||[])[z+(NT?4:0)]||0);
+  const f=v=>nf.format(v),pc=(a,b)=>b?(a/b*100).toLocaleString('id-ID',{maximumFractionDigits:1})+'%':'-';
+  const cell=(c,v)=>c.fut?'<td></td>':`<td class="${v?'':'z'}">${v?f(v):'-'}</td>`;
+  const G=cols.map(()=>[0,0,0,0]);let body='';
+  const vRow=(lead,nm,vals,t,p)=>`<tr class="vvt">${lead}<td>${nm} Total</td><td></td><td></td>`+cols.map((c,k)=>c.fut?'<td></td>':`<td>${vals[k]?f(vals[k]):'-'}</td>`).join('')+`<td class="tt">${f(t)}</td><td>${p}</td></tr>`;
+  outs.forEach(o=>{
+    const tot=cols.map(()=>0);let ot=0;const zt=[0,0,0,0];
+    VCSZ.forEach((sz,z)=>{const vals=cols.map((c,k)=>{const v=get(c,o,z);tot[k]+=v;G[k][z]+=v;return v});const t=vals.reduce((a,v)=>a+v,0);zt[z]=t;ot+=t;
+      body+=`<tr class="${z===0?'vfirst':''}"><td class="vo">${z===0?o:''}</td><td>${sz[1]}</td><td>${sz[2]}</td><td>${sz[0]}</td>`+cols.map((c,k)=>cell(c,vals[k])).join('')+`<td class="tt">${f(t)}</td><td>__P${z}__</td></tr>`;
+      if(z%2===1){const a=z-1,vv=cols.map((c,k)=>c.fut?0:get(c,o,a)+get(c,o,z));body+=vRow('<td></td>',sz[1],vv,zt[a]+zt[z],'__Q'+a+'__')}});
+    body=body.replace(/__P(\d)__/g,(_,z)=>pc(zt[+z],ot)).replace(/__Q(\d)__/g,(_,z)=>pc(zt[+z]+zt[+z+1],ot));
+    body+=`<tr class="vsub"><td class="vo">${o} Total</td><td></td><td></td><td></td>`+cols.map((c,k)=>c.fut?'<td></td>':`<td>${tot[k]?f(tot[k]):'-'}</td>`).join('')+`<td class="tt">${f(ot)}</td><td>${ot?'100%':'-'}</td></tr>`;
+  });
+  const GT=cols.map((c,k)=>G[k].reduce((a,v)=>a+v,0)),gt=GT.reduce((a,v)=>a+v,0);
+  let foot='';VCSZ.forEach((sz,z)=>{const t=G.reduce((a,r)=>a+r[z],0);foot+=`<tr class="${z===0?'vfirst':''}"><td class="vo">${z===0?'Semua outlet':''}</td><td>${sz[1]}</td><td>${sz[2]}</td><td>${sz[0]}</td>`+cols.map((c,k)=>c.fut?'<td></td>':`<td>${f(G[k][z])}</td>`).join('')+`<td class="tt">${f(t)}</td><td>${pc(t,gt)}</td></tr>`;
+    if(z%2===1){const a=z-1,vv=G.map(r=>r[a]+r[z]),tt=vv.reduce((x,y)=>x+y,0);foot+=vRow('<td></td>',sz[1],vv,tt,pc(tt,gt))}});
+  foot+=`<tr class="vgt"><td class="vo">Grand Total</td><td></td><td></td><td></td>`+cols.map((c,k)=>c.fut?'<td></td>':`<td>${f(GT[k])}</td>`).join('')+`<td class="tt">${f(gt)}</td><td>${gt?'100%':'-'}</td></tr>`;
+  const main=`<section><h2>Rekap Better Cup per Variant (${U}), ${lbl}, ${ar}${chLbl(S.ch)}</h2><div class="tw"><table class="rkt mo vct"><thead><tr><th>Outlet</th><th>Variant</th><th>Hot/Ice</th><th>Ukuran</th>${cols.map(c=>`<th>${c.h}</th>`).join('')}<th class="tt">Total</th><th>% outlet</th></tr></thead><tbody>${body}${foot}</tbody></table></div></section>`;
+  const gz=VCSZ.map((_,z)=>G.reduce((a,r)=>a+r[z],0));
+  const master=`<section><h2>${NT?'Rekap Net Sales Cup':'Rekap Penggunaan Cup'} per bulan (${U}), ${lbl}, ${ar}${chLbl(S.ch)}</h2><p class="note">Hot = nama item mengandung kata "Hot", selain itu Ice. Large = Variant Large (paket bundling: tanda "(L)" di nama), selain itu Reguler.${NT?' Net Sales = Net Sales item Better Cup; untuk paket bundling dipakai Net Sales paket (termasuk pastry di dalam paket).':''}</p><div class="tw"><table class="rkt mo vct vcu"><thead><tr><th>Variant</th><th>Hot/Ice</th><th>Ukuran</th>${cols.map(c=>`<th>${c.h}</th>`).join('')}<th class="tt">Total</th><th>% ${UL}</th></tr></thead><tbody>`+
+    [[2,'Large','Hot'],[3,'Large','Ice'],[0,'Reguler','Hot'],[1,'Reguler','Ice']].map(([z,v,h],i)=>`<tr class="${i%2===0?'vfirst':''}"><td class="vo">${i%2===0?v:''}</td><td>${h}</td><td>${VCSZ[z][0]}</td>`+cols.map((c,k)=>cell(c,G[k][z])).join('')+`<td class="tt">${f(gz[z])}</td><td>${pc(gz[z],gt)}</td></tr>`+
+      (i%2===1?(()=>{const a=z-1,vv=G.map(r=>r[a]+r[z]),tt=gz[a]+gz[z];return `<tr class="vvt"><td>${v} Total</td><td></td><td></td>`+cols.map((c,k)=>c.fut?'<td></td>':`<td>${vv[k]?f(vv[k]):'-'}</td>`).join('')+`<td class="tt">${f(tt)}</td><td>${pc(tt,gt)}</td></tr>`})():'')).join('')+
+    `<tr class="vgt"><td class="vo">Grand Total</td><td></td><td></td>`+cols.map((c,k)=>c.fut?'<td></td>':`<td>${GT[k]?f(GT[k]):'-'}</td>`).join('')+`<td class="tt">${f(gt)}</td><td>${gt?'100%':'-'}</td></tr></tbody></table></div></section>`;
+  $('vc_wrap').innerHTML=master+main;
+  $('vc_pdf').onclick=()=>{
+    $('vc_ph').innerHTML='<b>Variant Cup a better cup</b> · '+lbl+' · '+ar+chLbl(S.ch)+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
+    const t=document.title;document.title='Variant Cup ('+UL+') - '+Y+' '+MS[S.a]+'-'+MS[S.b]+' - '+ar;
+    document.body.classList.add('pr-rekap');const done=()=>{document.body.classList.remove('pr-rekap');document.title=t;window.removeEventListener('afterprint',done)};
+    window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
+}
+
+/* ===== Halaman 28: PO Cup (pemakaian, posisi stok, saran PO) ===== */
+const ACK='abc_cupstock_v1';
+const AC_KRIAN=['Tunjungan','Petra University','Mulyosari'];
+const AC=(()=>{let v=null;try{v=JSON.parse(localStorage.getItem(ACK))}catch(e){}v=v||{};
+  return {date:v.date||'',st:v.st||{},po:v.po||{},basis:v.basis||30,lt:v.lt!=null?v.lt:14,ss:v.ss!=null?v.ss:7,cyc:v.cyc!=null?v.cyc:30}})();
+const acSave=()=>{try{localStorage.setItem(ACK,JSON.stringify(AC))}catch(e){}};
+const AC_SZ=[[2,'Large','Hot'],[3,'Large','Ice'],[0,'Reguler','Hot'],[1,'Reguler','Ice']]; // urutan tampilan: 14,16,10,12
+const acToday=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const acAdd=(ds,n)=>{const d=new Date(ds+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+Math.round(n));return d.toISOString().slice(0,10)};
+const acDiff=(a,b)=>Math.round((new Date(b+'T00:00:00Z')-new Date(a+'T00:00:00Z'))/864e5);
+const acGroups=()=>{const k=OUT.filter(o=>AC_KRIAN.includes(o)),j=OUT.filter(o=>!AC_KRIAN.includes(o));
+  return [{id:'jtb',name:'Gudang Jatibaru',outs:j},{id:'krn',name:'Gudang Krian',outs:k}]};
+const ACD={src:null,v:null};
+function acDaily(){ // pemakaian cup per outlet per tanggal per ukuran
+  const X=DBC;if(ACD.src===X)return ACD.v;
+  const by={},first={};
+  for(let i=0;i<X.d.length;i++){const mp=X.maps[X.mp[i]];const ds=X.dates[X.d[i]],o=X.outlets[X.o[i]];
+    if(!first[o]||ds<first[o])first[o]=ds;
+    if(!(mp.m[0]>0))continue;
+    const nm=X.nl[X.n[i]],z=(vcIsLarge(X.vl[X.v[i]],nm)?2:0)+(vcIsHot(nm)?0:1);
+    const a=by[o]||(by[o]={}),b=a[ds]||(a[ds]=[0,0,0,0]);b[z]+=X.q[i]*mp.m[0]}
+  ACD.src=X;return ACD.v={by,first};
+}
+function acRate(o,end,days){ // rata-rata pemakaian per hari kalender di jendela [end-days+1, end]
+  const {by,first}=acDaily(),st=acAdd(end,-(days-1)),f=first[o];if(!f||f>end)return {r:[0,0,0,0],n:0};
+  const s0=f>st?f:st,n=acDiff(s0,end)+1,t=[0,0,0,0],m=by[o]||{};
+  for(const ds in m)if(ds>=s0&&ds<=end)m[ds].forEach((v,z)=>t[z]+=v);
+  return {r:t.map(v=>v/n),n,t};
+}
+const acNum=v=>v===''||v==null?null:+v;
+function renderAC(){
+  const W=$('ac_wrap');
+  if(!DBC){W.innerHTML='<div class="empty">Menyiapkan data pemakaian cup…</div>';loadDb().then(renderAC).catch(e=>{W.innerHTML='<div class="empty">Gagal memuat data: '+e.message+'</div>'});return}
+  const ld=D.lastDate,today=acToday(),G=acGroups(),B=AC.basis,LT=AC.lt,SS=AC.ss,CY=AC.cyc;
+  const f=v=>nf.format(Math.round(v)),f1=v=>v.toLocaleString('id-ID',{maximumFractionDigits:v<10?1:0});
+  const pc=(a,b)=>b?(a/b*100).toLocaleString('id-ID',{maximumFractionDigits:1})+'%':'-';
+  const dL=ds=>dLong(ds),SZ=z=>VCSZ[z][0];
+  // rate per outlet & group
+  const R={},P={};OUT.forEach(o=>{R[o]=acRate(o,ld,B);P[o]=acRate(o,acAdd(ld,-B),B)});
+  const sum=(outs,M)=>[0,1,2,3].map(z=>outs.reduce((a,o)=>a+(M[o]?M[o].r[z]:0),0));
+  G.forEach(g=>{g.r=sum(g.outs,R);g.p=sum(g.outs,P)});
+  const tot=[0,1,2,3].map(z=>G.reduce((a,g)=>a+g.r[z],0)),totP=[0,1,2,3].map(z=>G.reduce((a,g)=>a+g.p[z],0));
+  const T=tot.reduce((a,v)=>a+v,0),TP=totP.reduce((a,v)=>a+v,0);
+  const trend=(a,b)=>b?((a/b-1)*100):null,tr=v=>v==null?'-':`<span class="${v>=0?'pos':'neg'}">${v>=0?'+':''}${v.toLocaleString('id-ID',{maximumFractionDigits:1})}%</span>`;
+  // monthly history (from vcData)
+  const {R:VM}=vcData('all'),months=D.months.slice(),mz=months.map(m=>{const t=[0,0,0,0];OUT.forEach(o=>{const x=(VM[m]||{})[o];if(x)for(let z=0;z<4;z++)t[z]+=x[z]});return t});
+  const mt=mz.map(t=>t.reduce((a,v)=>a+v,0)),full=months.map((m,i)=>i<months.length-1||!partialMo(m));
+  let peak=-1;mt.forEach((v,i)=>{if(full[i]&&(peak<0||v>mt[peak]))peak=i});
+  const stale=acDiff(ld,today);
+  // ===== settings
+  let h=`<section><h2>Pengaturan analisa</h2><div class="acset">
+    <label>Basis rata-rata <select id="ac_basis">${[14,30,60,90].map(n=>`<option value="${n}" ${n===B?'selected':''}>${n} hari terakhir</option>`).join('')}</select></label>
+    <label>Lead time PO <input type="number" min="0" id="ac_lt" value="${LT}"> hari</label>
+    <label>Safety stock <input type="number" min="0" id="ac_ss" value="${SS}"> hari</label>
+    <label>Siklus order <input type="number" min="1" id="ac_cyc" value="${CY}"> hari</label></div>
+    <p class="note">Pemakaian dihitung dari transaksi Better Cup s.d ${dL(ld)} (${B} hari terakhir, dibagi hari kalender). Ukuran: Reguler Hot 10 Oz, Reguler Ice 12 Oz, Large Hot 14 Oz, Large Ice 16 Oz. Gudang Krian melayani ${AC_KRIAN.join(', ')}; outlet lain dilayani Gudang Jatibaru.</p>
+    ${stale>3?`<p class="acwarn">Data transaksi terakhir ${dL(ld)} (${stale} hari lalu). Sinkronkan data terbaru agar saran PO akurat.</p>`:''}</section>`;
+  // ===== summary
+  const share=z=>pc(tot[z],T),hotS=pc(tot[0]+tot[2],T),lgS=pc(tot[2]+tot[3],T);
+  const topZ=[0,1,2,3].sort((a,b)=>tot[b]-tot[a])[0],tTot=trend(T,TP);
+  const fast=[0,1,2,3].map(z=>({z,t:trend(tot[z],totP[z])})).filter(x=>x.t!=null).sort((a,b)=>b.t-a.t);
+  const bullets=[
+    `Rata-rata pemakaian ${B} hari terakhir <b>${f(T)} cup/hari</b> (${f(T*30)} cup per 30 hari), ${tTot==null?'belum ada pembanding':tTot>=0?'naik <b>'+tTot.toLocaleString('id-ID',{maximumFractionDigits:1})+'%</b>':'turun <b>'+Math.abs(tTot).toLocaleString('id-ID',{maximumFractionDigits:1})+'%</b>'} dibanding ${B} hari sebelumnya.`,
+    `Ukuran paling banyak dipakai <b>${SZ(topZ)} (${VCSZ[topZ][1]} ${VCSZ[topZ][2]})</b>, ${share(topZ)} dari total. Large ${lgS}, Reguler ${pc(tot[0]+tot[1],T)}; Hot hanya ${hotS}.`,
+    fast.length?`Pertumbuhan tercepat: <b>${SZ(fast[0].z)}</b> (${fast[0].t>=0?'+':''}${fast[0].t.toLocaleString('id-ID',{maximumFractionDigits:1})}%). Paling melambat: ${SZ(fast[fast.length-1].z)} (${fast[fast.length-1].t>=0?'+':''}${fast[fast.length-1].t.toLocaleString('id-ID',{maximumFractionDigits:1})}%).`:'',
+    peak>=0?`Bulan pemakaian tertinggi: <b>${mlabel(months[peak])}</b> dengan ${f(mt[peak])} cup.`:'',
+    G.map(g=>{const s=g.r.reduce((a,v)=>a+v,0);return `${g.name}: ${f(s)} cup/hari (${pc(s,T)}), kebutuhan 1 siklus PO (${LT+CY+SS} hari) ±${f(s*(LT+CY+SS))} cup.`}).join(' ')
+  ].filter(Boolean);
+  h+=`<section><h2>Summary analisa penggunaan cup</h2><ul class="acul">${bullets.map(b=>`<li>${b}</li>`).join('')}</ul></section>`;
+  // ===== table usage per size & group
+  const rowU=(lead,r,p,cls)=>AC_SZ.map(([z,v,hi],i)=>{const t=trend(r[z],p[z]);return `<tr class="${i===0?'vfirst':''}">${i===0?lead:'<td></td>'}<td>${v}</td><td>${hi}</td><td>${SZ(z)}</td><td>${f1(r[z])}</td><td>${f1(p[z])}</td><td>${tr(t)}</td><td>${f(r[z]*7)}</td><td>${f(r[z]*30)}</td><td>${f(r[z]*60)}</td><td>${f(r[z]*(LT+CY+SS))}</td></tr>`}).join('')+
+    (()=>{const a=r.reduce((x,y)=>x+y,0),b=p.reduce((x,y)=>x+y,0);return `<tr class="${cls}"><td>${cls==='vgt'?'Grand Total':'Total'}</td><td></td><td></td><td></td><td>${f1(a)}</td><td>${f1(b)}</td><td>${tr(trend(a,b))}</td><td>${f(a*7)}</td><td>${f(a*30)}</td><td>${f(a*60)}</td><td>${f(a*(LT+CY+SS))}</td></tr>`})();
+  h+=`<section><h2>Pemakaian & proyeksi kebutuhan cup per gudang (pcs)</h2><div class="tw"><table class="rkt mo vct acu"><thead><tr><th>Gudang</th><th>Variant</th><th>Hot/Ice</th><th>Ukuran</th><th>Rata2/hari (${B} hr)</th><th>Rata2/hari ${B} hr sebelumnya</th><th>Tren</th><th>Kebutuhan 7 hr</th><th>30 hr</th><th>60 hr</th><th>1 siklus PO (${LT+CY+SS} hr)</th></tr></thead><tbody>`+
+    G.map(g=>rowU(`<td class="vo">${g.name}</td>`,g.r,g.p,'vsub')).join('')+rowU('<td class="vo">Semua gudang</td>',tot,totP,'vgt')+`</tbody></table></div></section>`;
+  // ===== stock input
+  const inp=(k,obj)=>{const v=obj[k];return `<input type="number" min="0" class="acin" data-k="${k}" data-o="${obj===AC.po?'po':'st'}" value="${v==null?'':v}" placeholder="-">`};
+  let ib='';
+  G.forEach(g=>{
+    ib+=`<tr class="vsub"><td class="vo">${g.name}</td><td>Stok gudang</td>`+AC_SZ.map(([z])=>`<td>${inp(g.id+'|'+z,AC.st)}</td>`).join('')+'</tr>';
+    ib+=`<tr><td></td><td>PO sudah dibuat, belum datang</td>`+AC_SZ.map(([z])=>`<td>${inp(g.id+'|'+z,AC.po)}</td>`).join('')+'</tr>';
+    g.outs.forEach(o=>{ib+=`<tr><td></td><td>Stok outlet ${o}</td>`+AC_SZ.map(([z])=>`<td>${inp(o+'|'+z,AC.st)}</td>`).join('')+'</tr>'});
+  });
+  h+=`<section><h2>Posisi stok cup (pcs)</h2><div class="acset"><label>Tanggal hitung stok <input type="date" id="ac_date" value="${AC.date||today}"></label>
+    <button type="button" class="chip" id="ac_clear">Kosongkan stok</button><span class="fn">Isian tersimpan otomatis di browser ini.</span></div>
+    <div class="tw"><table class="rkt acin-t"><thead><tr><th>Gudang</th><th>Lokasi</th>${AC_SZ.map(([z,v,hi])=>`<th>${SZ(z)}<br><small>${v} ${hi}</small></th>`).join('')}</tr></thead><tbody>${ib}</tbody></table></div></section>`;
+  // ===== analysis if filled
+  const filled=k=>acNum(AC.st[k])!=null;
+  const anyG=g=>AC_SZ.some(([z])=>filled(g.id+'|'+z)||g.outs.some(o=>filled(o+'|'+z)));
+  const sd=AC.date||today,el=Math.max(0,acDiff(sd,today));
+  const warns=[];let ah='';
+  G.forEach(g=>{
+    if(!anyG(g))return;
+    let rows='';
+    AC_SZ.forEach(([z,v,hi],i)=>{
+      if(!filled(g.id+'|'+z)&&!g.outs.some(o=>filled(o+'|'+z))&&acNum(AC.po[g.id+'|'+z])==null){rows+=`<tr class="${i===0?'vfirst':''}">${i===0?`<td class="vo">${g.name}</td>`:'<td></td>'}<td>${v}</td><td>${hi}</td><td>${SZ(z)}</td><td colspan="4" style="text-align:left!important;color:var(--mute)">Stok ukuran ini belum diisi</td><td>${f1(g.r[z])}</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`;return}
+      const sw=acNum(AC.st[g.id+'|'+z])||0,so=g.outs.reduce((a,o)=>a+(acNum(AC.st[o+'|'+z])||0),0),po=acNum(AC.po[g.id+'|'+z])||0,rt=g.r[z];
+      const s0=sw+so+po,now=Math.max(0,s0-rt*el);
+      let cov=null,hab='-',bat='-',sar=0,stat='<span class="acs ok">Tidak ada pemakaian</span>',lv=0;
+      if(rt>0){cov=now/rt;const habis=acAdd(today,cov),batas=acAdd(today,cov-(LT+SS)),sisa=Math.floor(cov-(LT+SS));
+        hab=dL(habis);bat=dL(batas);sar=cov>=LT+SS?Math.ceil(rt*CY):Math.max(0,Math.ceil(rt*(LT+CY+SS)-now));
+        if(cov<LT){stat='<span class="acs bad">KRITIS: habis sebelum PO tiba</span>';lv=3;warns.push([3,`<b>${g.name} ${SZ(z)}</b> (${v} ${hi}) cukup ±${f1(cov)} hari, habis sekitar ${dL(habis)}. Lebih cepat dari lead time ${LT} hari: PO hari ini <b>${f(sar)} pcs</b> dan siapkan stok darurat/transfer.`])}
+        else if(cov<LT+SS){stat='<span class="acs bad">PO SEKARANG</span>';lv=2;warns.push([2,`<b>${g.name} ${SZ(z)}</b> cukup ±${f1(cov)} hari (habis ${dL(habis)}). Sudah lewat batas PO: buat PO hari ini <b>${f(sar)} pcs</b>.`])}
+        else if(cov<LT+SS+7){stat=`<span class="acs mid">Siapkan PO (${sisa} hari lagi)</span>`;lv=1;warns.push([1,`<b>${g.name} ${SZ(z)}</b>: PO paling lambat <b>${dL(batas)}</b> (${sisa} hari lagi), saran <b>${f(sar)} pcs</b>.`])}
+        else stat=`<span class="acs ok">Aman, PO ${dL(batas)}</span>`;}
+      rows+=`<tr class="${i===0?'vfirst':''}">${i===0?`<td class="vo">${g.name}</td>`:'<td></td>'}<td>${v}</td><td>${hi}</td><td>${SZ(z)}</td><td>${f(sw)}</td><td>${f(so)}</td><td>${f(po)}</td><td><b>${f(now)}</b></td><td>${f1(rt)}</td><td>${cov==null?'-':f1(cov)}</td><td>${hab}</td><td>${bat}</td><td><b>${sar?f(sar):'-'}</b></td><td>${stat}</td></tr>`});
+    ah+=rows;
+  });
+  if(ah){
+    warns.sort((a,b)=>b[0]-a[0]);
+    h+=`<section><h2>Warning PO cup</h2>${warns.length?`<ul class="acul">${warns.map(w=>`<li class="w${w[0]}">${w[1]}</li>`).join('')}</ul>`:'<p class="acok">Semua ukuran aman. Tidak ada PO yang perlu dibuat dalam 7 hari ke depan.</p>'}
+      <p class="note">Batas PO = tanggal stok habis dikurangi lead time ${LT} hari dan safety stock ${SS} hari. Saran PO: bila PO dibuat tepat di batas PO = pemakaian ${CY} hari (1 siklus); bila batas PO sudah lewat = kebutuhan (lead time ${LT} + siklus ${CY} + safety ${SS} hari) dikurangi total stok + PO belum datang. Semua dalam pcs.${el?` Stok dihitung mundur ${el} hari dari tanggal hitung stok (${dL(sd)}) memakai rata-rata pemakaian.`:''}</p></section>`;
+    h+=`<section><h2>Analisa stok & saran PO per gudang (pcs)</h2><div class="tw"><table class="rkt mo vct acu"><thead><tr><th>Gudang</th><th>Variant</th><th>Hot/Ice</th><th>Ukuran</th><th>Stok gudang</th><th>Stok outlet</th><th>PO belum datang</th><th>Total stok + PO</th><th>Pemakaian/hari</th><th>Cukup (hari)</th><th>Perkiraan habis</th><th>Batas PO</th><th>Saran PO (pcs)</th><th>Status</th></tr></thead><tbody>${ah}</tbody></table></div></section>`;
+    // outlet cover
+    let oh='';
+    G.forEach(g=>g.outs.forEach(o=>{if(!AC_SZ.some(([z])=>filled(o+'|'+z)))return;
+      oh+=`<tr><td class="vo">${o}</td><td>${g.name}</td>`+AC_SZ.map(([z])=>{const s=acNum(AC.st[o+'|'+z]);if(s==null)return '<td>-</td>';const rt=R[o].r[z],now=Math.max(0,s-rt*el);if(!rt)return `<td>${f(now)} pcs</td>`;const c=now/rt;
+        return `<td><span class="acs ${c<3?'bad':c<SS?'mid':'ok'}">${f1(c)} hari</span><br><small>${f(now)} pcs · ${f1(rt)}/hr</small></td>`}).join('')+'</tr>'}));
+    if(oh)h+=`<section><h2>Ketahanan stok outlet</h2><p class="note">Merah = kurang dari 3 hari (kirim segera dari gudang), kuning = kurang dari safety stock ${SS} hari (jadwalkan kirim).</p><div class="tw"><table class="rkt acu2"><thead><tr><th>Outlet</th><th>Gudang</th>${AC_SZ.map(([z,v,hi])=>`<th>${SZ(z)}<br><small>${v} ${hi}</small></th>`).join('')}</tr></thead><tbody>${oh}</tbody></table></div></section>`;
+  }else h+=`<section><p class="pgnote">Isi posisi stok di atas (gudang dan/atau outlet) untuk melihat warning PO, perkiraan tanggal stok habis, batas PO, dan saran jumlah PO per ukuran.</p></section>`;
+  // monthly history
+  h+=`<section><h2>Historis pemakaian cup per bulan (semua outlet)</h2><div class="tw"><table class="rkt mo vct acu"><thead><tr><th>Variant</th><th>Hot/Ice</th><th>Ukuran</th>${months.map(m=>`<th>${MS[+m.slice(5,7)-1]}${partialMo(m)?'*':''}</th>`).join('')}<th class="tt">Total</th></tr></thead><tbody>`+
+    AC_SZ.map(([z,v,hi])=>`<tr><td>${v}</td><td>${hi}</td><td>${SZ(z)}</td>${mz.map(t=>`<td>${t[z]?f(t[z]):'-'}</td>`).join('')}<td class="tt">${f(mz.reduce((a,t)=>a+t[z],0))}</td></tr>`).join('')+
+    `<tr class="vgt"><td>Total</td><td></td><td></td>${mt.map(v=>`<td>${f(v)}</td>`).join('')}<td class="tt">${f(mt.reduce((a,v)=>a+v,0))}</td></tr></tbody></table></div>${months.some(m=>partialMo(m))?'<p class="note">* bulan berjalan, data belum penuh.</p>':''}</section>`;
+  W.innerHTML=h;
+  $('ac_show').textContent=dLong(ld);
+  $('ac_pdf').onclick=()=>{
+    $('ac_ph').innerHTML='<b>PO Cup a better cup</b> · Gudang Jatibaru dan Gudang Krian · stok per '+dLong(AC.date||today)+'<br><small>Data transaksi s.d '+dLong(ld)+'. Lead time '+LT+' hari, safety stock '+SS+' hari, siklus order '+CY+' hari. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
+    const t=document.title;document.title='PO Cup - '+(AC.date||today);
+    document.body.classList.add('pr-rekap');const done=()=>{document.body.classList.remove('pr-rekap');document.title=t;window.removeEventListener('afterprint',done)};
+    window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
+  // events
+  const num=(id,k)=>{$(id).onchange=e=>{const v=Math.max(0,+e.target.value||0);AC[k]=k==='cyc'?Math.max(1,v):v;acSave();renderAC()}};
+  $('ac_basis').onchange=e=>{AC.basis=+e.target.value;acSave();renderAC()};num('ac_lt','lt');num('ac_ss','ss');num('ac_cyc','cyc');
+  $('ac_date').onchange=e=>{AC.date=e.target.value;acSave();renderAC()};
+  $('ac_clear').onclick=()=>{if(!confirm('Kosongkan semua isian stok dan PO?'))return;AC.st={};AC.po={};AC.date='';acSave();renderAC()};
+  W.querySelectorAll('input.acin').forEach(x=>x.onchange=()=>{const o=x.dataset.o==='po'?AC.po:AC.st,v=x.value.trim();if(v==='')delete o[x.dataset.k];else o[x.dataset.k]=Math.max(0,+v||0);if(!AC.date)AC.date=$('ac_date').value||today;acSave();const y=window.scrollY;renderAC();window.scrollTo(0,y)});
+}
+
+/* ===== Halaman 29: Summary Cup ===== */
+const SCS={area:'all',a:0,b:11,ch:'all'};
+const SC_COL=['var(--c4)','var(--c2)','var(--c5)','var(--c1)']; // 10,12,14,16 Oz
+const SC_ORD=[3,1,2,0]; // urutan tampilan: 16,12,14,10 (terbesar dulu)
+function scStack(el,cats,o){
+  const W=Math.max(320,el.clientWidth||900),mob=W<560,H=mob?260:310,ml=mob?44:56,mr=8,mt=30,mb=50;
+  const max=Math.max(1,...cats.map(c=>c.v.reduce((a,x)=>a+x,0)))*1.08,iw=W-ml-mr,ih=H-mt-mb,band=iw/Math.max(1,cats.length),bw=Math.min(60,band*.62);
+  const y=v=>mt+ih-(Math.max(0,v)/max)*ih;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.aria}">`;
+  for(let i=0;i<=4;i++){const v=max/4*i,yy=y(v);s+=`<line x1="${ml}" x2="${W-mr}" y1="${yy}" y2="${yy}" stroke="var(--rule)"/><text x="${ml-8}" y="${yy+4}" text-anchor="end" font-size="11" fill="var(--mute)">${o.ax(v)}</text>`}
+  cats.forEach((c,i)=>{const cx=ml+band*i+band/2,x=cx-bw/2;let acc=0;const tot=c.v.reduce((a,x)=>a+x,0);
+    s+=`<g><title>${c.tip}</title>`;
+    [0,1,2,3].forEach(z=>{const v=Math.max(0,c.v[z]);if(!v)return;const y1=y(acc+v),h=y(acc)-y1;s+=`<rect x="${x}" y="${y1}" width="${bw}" height="${h}" fill="${SC_COL[z]}"/>`;acc+=v});
+    if(tot>0)s+=`<text x="${cx}" y="${y(acc)-6}" text-anchor="middle" font-size="${mob?10:12}" font-weight="600" fill="var(--ink)">${o.fmt(tot)}</text>`;
+    s+=`<text x="${cx}" y="${H-28}" text-anchor="middle" font-size="13" font-weight="500" fill="var(--ink)">${c.l}</text>`;
+    s+=`<text x="${cx}" y="${H-11}" text-anchor="middle" font-size="${mob?10:11.5}" fill="var(--c1)">${tot>0?c.sub:'-'}</text></g>`});
+  el.innerHTML=s+'</svg>';
+}
+function renderSC(){
+  const S=SCS,{ly,cm}=ayCur(),ld=D.lastDate,Y=TGT.year,re=renderSC;
+  const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
+  chChips('sc_chChips',S.ch,v=>{S.ch=v;re()});
+  mk('sc_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],S.area,v=>{S.area=v;re()});
+  const opt=MN.map((n,i)=>`<option value="${i}">${n} ${Y}</option>`).join('');
+  const fs=$('sc_from'),ts=$('sc_to');if(!fs.options.length){fs.innerHTML=opt;ts.innerHTML=opt}
+  const lastM=ly===Y?cm:11;if(S.b>lastM)S.b=Math.max(0,lastM);if(S.a>S.b)S.a=S.b;
+  fs.value=S.a;ts.value=S.b;
+  fs.onchange=e=>{S.a=+e.target.value;if(S.a>S.b)S.b=S.a;re()};
+  ts.onchange=e=>{S.b=+e.target.value;if(S.b<S.a)S.a=S.b;re()};
+  const ar=S.area==='all'?'Semua area':AREAS[S.area].name,lbl=(S.a===S.b?MN[S.a]:MS[S.a]+' s.d '+MS[S.b])+' '+Y;
+  $('sc_show').textContent=lbl+', '+ar+chLbl(S.ch);
+  const W=$('sc_wrap');
+  if(!DBC){W.innerHTML='<div class="empty">Menyiapkan data cup…</div>';loadDb().then(re).catch(e=>{W.innerHTML='<div class="empty">Gagal memuat data: '+e.message+'</div>'});return}
+  const outs=S.area==='all'?OUT.slice():OUT.filter(o=>AREAS[S.area].o.includes(o));
+  const mkey=m=>Y+'-'+String(m+1).padStart(2,'0'),mks=[];for(let m=S.a;m<=S.b;m++)mks.push(mkey(m));
+  const n=mks.length,pks=[];for(let m=S.a-n;m<S.a;m++)if(m>=0)pks.push(mkey(m));
+  const f=v=>nf.format(Math.round(v)),f1=v=>v.toLocaleString('id-ID',{maximumFractionDigits:v<10?1:0});
+  const pc=(a,b)=>b?(a/b*100).toLocaleString('id-ID',{maximumFractionDigits:1})+'%':'-';
+  const agg=(ch,keys,os)=>{const {R}=vcData(ch),q=[0,0,0,0],nt=[0,0,0,0];keys.forEach(k=>os.forEach(o=>{const x=(R[k]||{})[o];if(x)for(let z=0;z<4;z++){q[z]+=x[z];nt[z]+=x[z+4]}}));return {q,nt,Q:q.reduce((a,v)=>a+v,0),N:nt.reduce((a,v)=>a+v,0)}};
+  const days=(keys,who)=>keys.reduce((a,k)=>a+((((D.days[k]||{})[S.ch])||{})[who]||0),0);
+  const A=agg(S.ch,mks,outs),P=pks.length===n?agg(S.ch,pks,outs):null;
+  const dA=days(mks,S.area),dP=P?days(pks,S.area):0;
+  if(!A.Q){W.innerHTML='<div class="empty">Tidak ada penjualan Better Cup pada filter ini.</div>';return}
+  const unitP=n===1?'bulan lalu':n+' bulan sebelumnya';
+  const dl=(c,p)=>p?delta(c,p,false,false,unitP):'<span>Tidak ada pembanding</span>';
+  const card=(lab,col,v,u,lines,title)=>`<div><dt>${col?`<i style="background:${col}"></i>`:''}${lab}</dt><dd><div class="v"${title?` title="${title}"`:''}>${v}${u?`<span class="u">${u}</span>`:''}</div>${lines.filter(Boolean).map(l=>`<div class="d">${l}</div>`).join('')}</dd></div>`;
+  const bar=(parts,aria)=>`<div class="sb" role="img" aria-label="${aria}">${parts.map(p=>`<span style="width:${p.w}%;background:${p.c}"></span>`).join('')}</div><div class="sbn">${parts.map(p=>`<span><i class="dot" style="background:${p.c}"></i>${p.l} ${p.w.toLocaleString('id-ID',{maximumFractionDigits:1})}%</span>`).join('')}</div>`;
+  const L=A.q[2]+A.q[3],Rg=A.q[0]+A.q[1],Ho=A.q[0]+A.q[2],Ic=A.q[1]+A.q[3];
+  const LN=A.nt[2]+A.nt[3],RN=A.nt[0]+A.nt[1],HN=A.nt[0]+A.nt[2],IN=A.nt[1]+A.nt[3];
+  const pL=P?P.q[2]+P.q[3]:0,pR=P?P.q[0]+P.q[1]:0,pH=P?P.q[0]+P.q[2]:0,pI=P?P.q[1]+P.q[3]:0;
+  const shPts=(a,b,pa,pb)=>{if(!P||!(pa+pb))return '';const d=(a/(a+b)-pa/(pa+pb))*100;return `<span class="${d>=0?'pos':'neg'}">${d>=0?'+':'−'}${Math.abs(d).toFixed(1).replace('.',',')} poin</span> porsi vs ${unitP}`};
+  let h='';
+  // 1. ringkasan
+  h+=`<section><h2>Ringkasan cup, ${lbl}</h2><p class="sub">${ar}${chLbl(S.ch)||', Online dan Offline'}. Data s.d ${dLong(ld)}. ${dA} hari ada transaksi.</p>
+  <dl class="kpi">${card('Total cup terpakai','var(--ink)',f(A.Q),'Cup',[dl(A.Q,P&&P.Q)])}${card('Net Sales Better Cup','var(--net)',cmp(A.N),'',[dl(A.N,P&&P.N)],rp(A.N))}${card('Rata-rata cup per hari','var(--c2)',f1(dA?A.Q/dA:0),'Cup',[P&&dP?delta(A.Q/dA,P.Q/dP,false,true,unitP):''])}${card('Rata-rata Net Sales per cup','var(--c4)',rp(A.Q?A.N/A.Q:0),'',[P&&P.Q?delta(A.N/A.Q,P.N/P.Q,false,false,unitP):''])}</dl></section>`;
+  // 2. kontribusi
+  h+=`<section><h2>Kontribusi Large vs Reguler</h2><dl class="kpi kpi2 kpi3">${card('Large (14 Oz + 16 Oz)','var(--c1)',f(L),'Cup',[`<b class="ct">${pc(L,A.Q)}</b> dari total cup`,`Net Sales ${cmp(LN)} (${pc(LN,A.N)})`,shPts(L,Rg,pL,pR)])}${card('Reguler (10 Oz + 12 Oz)','var(--c4)',f(Rg),'Cup',[`<b class="ct">${pc(Rg,A.Q)}</b> dari total cup`,`Net Sales ${cmp(RN)} (${pc(RN,A.N)})`,shPts(Rg,L,pR,pL)])}
+    <div class="wide"><dt>Kontribusi jumlah cup</dt><dd>${bar([{l:'Large',c:'var(--c1)',w:L/A.Q*100},{l:'Reguler',c:'var(--c4)',w:Rg/A.Q*100}],'Large dan Reguler')}<div class="d">Harga net rata-rata: Large ${rp(L?LN/L:0)}, Reguler ${rp(Rg?RN/Rg:0)} per cup</div></dd></div></dl></section>`;
+  h+=`<section><h2>Kontribusi Hot vs Ice</h2><dl class="kpi kpi2 kpi3">${card('Ice (12 Oz + 16 Oz)','var(--c2)',f(Ic),'Cup',[`<b class="ct">${pc(Ic,A.Q)}</b> dari total cup`,`Net Sales ${cmp(IN)} (${pc(IN,A.N)})`,shPts(Ic,Ho,pI,pH)])}${card('Hot (10 Oz + 14 Oz)','var(--c5)',f(Ho),'Cup',[`<b class="ct">${pc(Ho,A.Q)}</b> dari total cup`,`Net Sales ${cmp(HN)} (${pc(HN,A.N)})`,shPts(Ho,Ic,pH,pI)])}
+    <div class="wide"><dt>Kontribusi jumlah cup</dt><dd>${bar([{l:'Ice',c:'var(--c2)',w:Ic/A.Q*100},{l:'Hot',c:'var(--c5)',w:Ho/A.Q*100}],'Ice dan Hot')}<div class="d">Harga net rata-rata: Ice ${rp(Ic?IN/Ic:0)}, Hot ${rp(Ho?HN/Ho:0)} per cup</div></dd></div></dl></section>`;
+  h+=`<section><h2>Kontribusi per ukuran cup</h2><dl class="kpi kpi2">${SC_ORD.map(z=>card(VCSZ[z][0]+' · '+VCSZ[z][1]+' '+VCSZ[z][2],SC_COL[z],f(A.q[z]),'Cup',[`<b class="ct">${pc(A.q[z],A.Q)}</b> dari total cup`,`Net Sales ${cmp(A.nt[z])}`,P?dl(A.q[z],P.q[z]):''])).join('')}</dl>
+    <div style="margin-top:14px">${bar(SC_ORD.map(z=>({l:VCSZ[z][0],c:SC_COL[z],w:A.q[z]/A.Q*100})),'Kontribusi per ukuran')}</div></section>`;
+  // 3. tren bulanan
+  const {R}=vcData(S.ch),mon=[];for(let m=0;m<=lastM;m++){const k=mkey(m),v=[0,0,0,0];outs.forEach(o=>{const x=(R[k]||{})[o];if(x)for(let z=0;z<4;z++)v[z]+=x[z]});mon.push({m,k,v})}
+  h+=`<section><h2>Tren pemakaian cup per bulan, ${Y}</h2><p class="sub">Tumpukan per ukuran. Angka di bawah bulan = porsi Large.</p><div class="sbn">${SC_ORD.map(z=>`<span><i class="dot" style="background:${SC_COL[z]}"></i>${VCSZ[z][0]} (${VCSZ[z][1]} ${VCSZ[z][2]})</span>`).join('')}</div><div class="chart" id="sc_chart"></div></section>`;
+  // 4. per outlet
+  const orow=outs.map(o=>{const a=agg(S.ch,mks,[o]),d=days(mks,o);return {o,a,d}}).filter(x=>x.a.Q>0).sort((x,y)=>y.a.Q-x.a.Q);
+  const mixBar=a=>`<div class="sb scsb">${SC_ORD.map(z=>`<span style="width:${a.Q?a.q[z]/a.Q*100:0}%;background:${SC_COL[z]}" title="${VCSZ[z][0]}: ${f(a.q[z])} cup (${pc(a.q[z],a.Q)})"></span>`).join('')}</div>`;
+  h+=`<section><h2>Komposisi ukuran cup per outlet</h2><div class="tw"><table class="rkt scot"><thead><tr><th>Outlet</th><th>Total cup</th><th>Cup / hari</th><th>% Large</th><th>% Ice</th><th>Ukuran terbanyak</th><th style="min-width:240px">Komposisi 16 · 12 · 14 · 10 Oz</th></tr></thead><tbody>`+
+    orow.map(({o,a,d})=>{const top=[0,1,2,3].sort((x,y)=>a.q[y]-a.q[x])[0];return `<tr><td>${o}</td><td>${f(a.Q)}</td><td>${d?f1(a.Q/d):'-'}</td><td>${pc(a.q[2]+a.q[3],a.Q)}</td><td>${pc(a.q[1]+a.q[3],a.Q)}</td><td>${VCSZ[top][0]} (${pc(a.q[top],a.Q)})</td><td>${mixBar(a)}</td></tr>`}).join('')+
+    `</tbody><tfoot><tr><td>Total</td><td>${f(A.Q)}</td><td>${dA?f1(A.Q/dA):'-'}</td><td>${pc(L,A.Q)}</td><td>${pc(Ic,A.Q)}</td><td></td><td>${mixBar(A)}</td></tr></tfoot></table></div></section>`;
+  // 5. per channel
+  const chs=[['off','Offline'],['on','Online'],['gf','GrabFood'],['go','GoFood'],['sf','ShopeeFood']].map(([c,nm])=>({nm,a:agg(c,mks,outs)})).filter(x=>x.a.Q>0);
+  h+=`<section><h2>Komposisi ukuran cup per penjualan</h2><p class="sub">Tidak terpengaruh filter Penjualan.</p><div class="tw"><table class="rkt scot"><thead><tr><th>Penjualan</th><th>Total cup</th><th>% Large</th><th>% Ice</th><th>Net / cup</th><th style="min-width:240px">Komposisi 16 · 12 · 14 · 10 Oz</th></tr></thead><tbody>`+
+    chs.map(({nm,a})=>`<tr><td>${nm}</td><td>${f(a.Q)}</td><td>${pc(a.q[2]+a.q[3],a.Q)}</td><td>${pc(a.q[1]+a.q[3],a.Q)}</td><td>${rp(a.Q?a.N/a.Q:0)}</td><td>${mixBar(a)}</td></tr>`).join('')+`</tbody></table></div></section>`;
+  // 6. top item
+  const X=DBC,oset=new Set(outs),mset=new Set(mks),pKey=X.pl.map(pfKey),IT=new Map();
+  for(let i=0;i<X.d.length;i++){const mp=X.maps[X.mp[i]];if(!(mp.m[0]>0))continue;const o=X.outlets[X.o[i]];if(!oset.has(o))continue;const ds=X.dates[X.d[i]];if(!mset.has(ds.slice(0,7)))continue;
+    const pk=pKey[X.p[i]];if(S.ch==='on'&&!pk||S.ch==='off'&&pk||PFN[S.ch]&&pk!==S.ch)continue;
+    const nm=X.nl[X.n[i]],q=X.q[i]*mp.m[0],Lg=vcIsLarge(X.vl[X.v[i]],nm);let e=IT.get(nm);if(!e){e=[0,0,0,vcIsHot(nm)];IT.set(nm,e)}e[0]+=q;if(Lg)e[1]+=q;e[2]+=X.nt[i]}
+  const its=[...IT.entries()].filter(([k,v])=>v[0]>0).sort((a,b)=>b[1][0]-a[1][0]).slice(0,10);
+  h+=`<section><h2>10 menu dengan pemakaian cup terbanyak</h2><div class="tw"><table class="rkt scot"><thead><tr><th>Menu</th><th>Hot/Ice</th><th>Cup</th><th>% dari total cup</th><th>% Large</th><th>Net Sales</th><th>Net / cup</th></tr></thead><tbody>`+
+    its.map(([k,v])=>`<tr><td>${k}</td><td>${v[3]?'Hot':'Ice'}</td><td>${f(v[0])}</td><td>${pc(v[0],A.Q)}</td><td>${pc(v[1],v[0])}</td><td>${f(v[2])}</td><td>${rp(v[0]?v[2]/v[0]:0)}</td></tr>`).join('')+`</tbody></table></div></section>`;
+  // 7. insight
+  const topO=orow[0],hiL=orow.slice().sort((x,y)=>(y.a.q[2]+y.a.q[3])/y.a.Q-(x.a.q[2]+x.a.q[3])/x.a.Q),onl=chs.find(c=>c.nm==='Online'),off=chs.find(c=>c.nm==='Offline');
+  const topZ=[0,1,2,3].sort((x,y)=>A.q[y]-A.q[x])[0];
+  const ins=[
+    `Cup paling banyak dipakai <b>${VCSZ[topZ][0]} (${VCSZ[topZ][1]} ${VCSZ[topZ][2]})</b>: ${pc(A.q[topZ],A.Q)} dari total ${f(A.Q)} cup.`,
+    `Large ${pc(L,A.Q)} vs Reguler ${pc(Rg,A.Q)}. Large menyumbang ${pc(LN,A.N)} Net Sales cup, dengan harga net rata-rata ${rp(L?LN/L:0)} vs ${rp(Rg?RN/Rg:0)} untuk Reguler.`,
+    `Ice mendominasi (${pc(Ic,A.Q)}); Hot hanya ${pc(Ho,A.Q)}, jadi stok cup Hot (10 Oz dan 14 Oz) cukup disiapkan kecil.`,
+    P&&P.Q?`Pemakaian cup ${A.Q>=P.Q?'naik':'turun'} ${pc(Math.abs(A.Q-P.Q),P.Q)} dibanding ${unitP} (${f(P.Q)} → ${f(A.Q)} cup).`:'',
+    topO?`Outlet dengan pemakaian terbesar: <b>${topO.o}</b> (${f(topO.a.Q)} cup, ${pc(topO.a.Q,A.Q)}).`:'',
+    hiL.length>1?`Porsi Large tertinggi di <b>${hiL[0].o}</b> (${pc(hiL[0].a.q[2]+hiL[0].a.q[3],hiL[0].a.Q)}), terendah di ${hiL[hiL.length-1].o} (${pc(hiL[hiL.length-1].a.q[2]+hiL[hiL.length-1].a.q[3],hiL[hiL.length-1].a.Q)}).`:'',
+    onl&&off?`Porsi Large di Online ${pc(onl.a.q[2]+onl.a.q[3],onl.a.Q)} vs Offline ${pc(off.a.q[2]+off.a.q[3],off.a.Q)}.`:''
+  ].filter(Boolean);
+  h=h.replace('</section>',`<h3 class="ch3" style="margin-top:18px">Poin penting</h3><ul class="acul">${ins.map(x=>`<li>${x}</li>`).join('')}</ul></section>`);
+  W.innerHTML=h+`<p class="note">Hot = nama item mengandung kata "Hot", selain itu Ice. Large = Variant Large (paket bundling: tanda "(L)" di nama), selain itu Reguler. Ukuran: Reguler Hot 10 Oz, Reguler Ice 12 Oz, Large Hot 14 Oz, Large Ice 16 Oz. Net Sales paket bundling dihitung utuh.</p>`;
+  scStack($('sc_chart'),mon.map(x=>{const t=x.v.reduce((a,v)=>a+v,0);return {l:MS[x.m]+(partialMo(x.k)?'*':''),v:x.v,sub:t?pc(x.v[2]+x.v[3],t):'-',tip:`${MN[x.m]}: ${f(t)} cup · `+SC_ORD.map(z=>VCSZ[z][0]+' '+f(x.v[z])).join(', ')}}),{aria:'Pemakaian cup per bulan per ukuran',fmt:v=>f(v),ax:v=>v>=1000?(v/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+' rb':f(v)});
+  $('sc_pdf').onclick=()=>{
+    $('sc_ph').innerHTML='<b>Summary Cup a better cup</b> · '+lbl+' · '+ar+chLbl(S.ch)+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
+    const t=document.title;document.title='Summary Cup - '+Y+' '+MS[S.a]+'-'+MS[S.b]+' - '+ar;
     document.body.classList.add('pr-rekap');const done=()=>{document.body.classList.remove('pr-rekap');document.title=t;window.removeEventListener('afterprint',done)};
     window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
 }
@@ -5263,7 +5664,7 @@ function initExport(){
   const g=document.getElementById('ex_goto');if(g)g.onclick=()=>showPage(2);
 }
 period();buildPage1();initFilters();initTrend();initTraffic();initTabs();initDaily();initProduct();initWeekly();initBank();initOnline();initTarget();initAch();initTplan();initMon();initReport();initExport();initUpload();initSheet();showPage(1);
-let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else if(PAGE===16)renderRk();else if(PAGE===17)renderRh();else if(PAGE===18)renderRb();else if(PAGE===19)renderAp();else if(PAGE===20)renderDsk();else if(PAGE===21)renderPush();else if(PAGE===22)renderMV('x');else if(PAGE===23)renderMV('i');else if(PAGE===26)renderMV('b');else if(PAGE===24)renderEst();else if(PAGE===25)renderSV();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(PAGE===1)renderPage1();else if(PAGE===3)renderTrend();else if(PAGE===4)renderTraffic();else if(PAGE===8)renderProduct();else if(PAGE===9)renderWeekly();else if(PAGE===10)renderBank();else if(PAGE===11)renderOnline();else if(PAGE===12)renderTarget();else if(PAGE===13)renderAch();else if(PAGE===14)renderTplan();else if(PAGE===15)renderMon();else if(PAGE===16)renderRk();else if(PAGE===17)renderRh();else if(PAGE===18)renderRb();else if(PAGE===19)renderAp();else if(PAGE===20)renderDsk();else if(PAGE===21)renderPush();else if(PAGE===22)renderMV('x');else if(PAGE===23)renderMV('i');else if(PAGE===26)renderMV('b');else if(PAGE===27)renderVC();else if(PAGE===28)renderAC();else if(PAGE===29)renderSC();else if(PAGE===24)renderEst();else if(PAGE===25)renderSV();else{charts();qcharts();drawVar(outs());drawSplit(outs())}},120)});
 </script>
 </body>
 </html>
