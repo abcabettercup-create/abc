@@ -91,6 +91,22 @@ section{padding:34px 0 8px;border-top:1px solid var(--rule);scroll-margin-top:60
 .fgrp{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap}
 .fgrp.fright{margin-left:auto;justify-content:flex-end}
 .fl{font:700 14px var(--hd);min-width:46px}
+.ipk{position:relative}
+.ipanel{position:absolute;z-index:40;top:calc(100% + 6px);right:0;width:min(400px,88vw);background:var(--bg);border:1px solid var(--rule);border-radius:10px;padding:10px;box-shadow:0 10px 28px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:8px}
+.ipanel[hidden]{display:none}
+@media (max-width:700px){.ipanel{right:auto;left:0}}
+.ipanel input[type=search]{font:500 14px var(--bd);color:var(--ink);background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:8px 10px;width:100%;box-sizing:border-box}
+.ilist{max-height:320px;overflow:auto;display:flex;flex-direction:column;gap:1px}
+.fpanel .ilist label{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:6px;font-size:13.5px;color:var(--ink);cursor:pointer}
+.fpanel .ilist label:hover{background:var(--hi)}
+.ilist label small{margin-left:auto;color:var(--mute);font-size:12px;white-space:nowrap}
+.ilist .ih{font:700 12px var(--hd);color:var(--mute);padding:8px 6px 2px;text-transform:uppercase;letter-spacing:.04em}
+.iact{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--rule);padding-top:8px}
+.chip.isel{display:inline-flex;align-items:center;gap:6px}
+.chip.isel span{font-weight:700}
+table.rkf td small.fx{display:block;font-size:10px;font-weight:600;color:var(--mute);line-height:1.1;margin-top:1px}
+table.rkf td small.fx.up{color:var(--good)}table.rkf td small.fx.dn{color:var(--bad)}
+table.rkf td:first-child small{font-weight:400;color:var(--mute)}
 .fpanel label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mute)}
 .fpanel select{font:500 14px var(--bd);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:7px 28px 7px 10px;min-height:36px}
 .fpanel [hidden]{display:none}
@@ -1260,6 +1276,17 @@ body.pr-rekap .vcg{grid-template-columns:minmax(0,1fr) 46mm;gap:4mm}
           <button type="button" class="chip" id="rk_prev" aria-label="Periode sebelumnya">‹</button><button type="button" class="chip" id="rk_next" aria-label="Periode berikutnya">›</button></div>
       </div>
       <div class="frow fend">
+        <div class="fgrp"><span class="fl">Tampilkan</span><div class="chips" id="rk_metChips" role="group" aria-label="Pilih Qty, Gross Sales atau Net Sales"></div></div>
+        <div class="fgrp"><span class="fl">Item</span>
+          <div class="ipk"><button type="button" class="chip" id="rk_ibtn" aria-expanded="false" aria-controls="rk_ipanel">Semua item ▾</button>
+            <div class="ipanel" id="rk_ipanel" role="dialog" aria-label="Pilih item" hidden>
+              <input type="search" id="rk_iq" placeholder="Cari nama item…" aria-label="Cari item">
+              <div class="ilist" id="rk_ilist" role="group" aria-label="Daftar item"></div>
+              <div class="iact"><button type="button" class="chip" id="rk_iclr">Semua item</button><button type="button" class="chip" id="rk_idone" aria-pressed="true">Selesai</button></div>
+            </div></div>
+          <div class="chips" id="rk_isel" aria-label="Item terpilih"></div></div>
+      </div>
+      <div class="frow fend">
         <div class="fgrp"><span class="fl">Produk</span><div class="chips" id="rk_prodChips" role="group" aria-label="Pilih produk"></div></div>
         <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="rk_chChips" role="group" aria-label="Filter online offline"></div></div>
         <div class="fgrp"><span class="fl">Area</span><div class="chips" id="rk_areaChips" role="group" aria-label="Filter area rekap"></div></div>
@@ -2355,6 +2382,7 @@ async function exportXlsx(){
   btn.disabled=true;
   try{
     msg.textContent='Menyiapkan file…';await new Promise(z=>setTimeout(z,30));
+    try{await loadDb()}catch(e){}
     const sheets=buildSheets();let db=null;
     sheets.push(...await pageSheets(msg,sheets.map(x=>x.name).concat(['Rumus','Mapping','Database'])));
     sheets.push(rumusSheet());
@@ -3271,20 +3299,51 @@ function renderMon(){
 }
 
 /* ===== Halaman 16: Rekap Better Cup per tanggal ===== */
-const RKS={mode:'m',m:'',w:'',area:'all',prod:'all',ch:'all'};
+const RKS={mode:'m',m:'',w:'',area:'all',prod:'all',ch:'all',met:'q',items:[]};
 const RKP=[['qc','Better Cup','Cup',1,'var(--net)'],['qp','Pastry','Pcs',3,'var(--disc)'],['ql','Better 1 L','Btl',2,'var(--on)'],['qt','Tumbler','Pcs',5,'var(--tax)'],['qm','Mineral','Btl',4,'var(--off)'],['bd','Bundling','Paket',-1,'var(--c3)']];
 let BNDC=null,BNDsrc=null;
 function bndIdx(ch){ch=ch||'all';if(BNDsrc!==D.bnd||!BNDC){BNDsrc=D.bnd;BNDC={}}if(BNDC[ch])return BNDC[ch];const R={day:{}};BNDC[ch]=R;const B=D.bnd;if(!B)return R;
   B.r.forEach(r=>{if(!rowOK(r,ch))return;const [d,oi,ni,q]=r,o=B.o[oi];(R.day[o]||(R.day[o]={}))[d]=(R.day[o][d]||0)+q});return R}
+const RKM=[['q','Qty'],['g','Gross Sales'],['n','Net Sales']];
+let RK_IL=[],RK_PI=false;
+const rkNm=s=>String(s||'').replace(/\s*-\s*TJG\s*$/i,'').replace(/\s+/g,' ').trim().toLowerCase();
+function rkPickInit(){if(RK_PI)return;RK_PI=true;
+  const btn=$('rk_ibtn'),pn=$('rk_ipanel'),q=$('rk_iq');
+  const close=()=>{pn.hidden=true;btn.setAttribute('aria-expanded','false')};
+  btn.onclick=()=>{if(!pn.hidden){close();return}pn.hidden=false;btn.setAttribute('aria-expanded','true');
+    if(!DBC){$('rk_ilist').innerHTML='<div class="ih">Menyiapkan daftar item…</div>';loadDb().then(renderRk).catch(e=>{$('rk_ilist').innerHTML='<div class="ih">Gagal memuat: '+e.message+'</div>'})}else rkList();q.focus()};
+  q.oninput=rkList;
+  $('rk_iclr').onclick=()=>{RKS.items=[];q.value='';renderRk()};
+  $('rk_idone').onclick=close;
+  document.addEventListener('click',e=>{if(!pn.hidden&&!e.target.closest('.ipk'))close()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!pn.hidden){close();btn.focus()}});
+}
+function rkList(){const L=$('rk_ilist');if(!L)return;const st=L.scrollTop,qq=$('rk_iq').value.trim().toLowerCase(),sel=new Set(RKS.items);
+  const unit=RKS.met==='q'?'':' (Rp rb)';
+  const row=it=>`<label><input type="checkbox" data-it="${encodeURIComponent(it.nm)}"${sel.has(it.nm)?' checked':''}> ${it.nm}<small>${nf.format(RKS.met==='q'?it.q:it.v/1000)}${unit}</small></label>`;
+  const f=RK_IL.filter(it=>!qq||it.nm.toLowerCase().includes(qq));
+  const a=f.filter(it=>sel.has(it.nm)),b=f.filter(it=>!sel.has(it.nm));
+  const miss=RKS.items.filter(n=>!RK_IL.some(it=>it.nm===n)&&(!qq||n.toLowerCase().includes(qq)));
+  L.innerHTML=(a.length||miss.length?'<div class="ih">Terpilih</div>'+a.map(row).join('')+miss.map(n=>row({nm:n,q:0,v:0})).join(''):'')+
+    (b.length?'<div class="ih">'+(qq?'Hasil cari':'Item pada periode ini')+' ('+b.length+')</div>'+b.map(row).join(''):(a.length?'':'<div class="ih">Tidak ada item yang cocok</div>'));
+  L.scrollTop=st;
+  L.querySelectorAll('input[data-it]').forEach(c=>c.onchange=e=>{const n=decodeURIComponent(e.target.dataset.it);
+    RKS.items=e.target.checked?RKS.items.concat(n):RKS.items.filter(x=>x!==n);renderRk()});
+}
 function renderRk(){
   const {ly,ldd,cm}=ayCur(),ld=D.lastDate;
   if(RKS.m==='')RKS.m=D.months[D.months.length-1];
   if(!RKS.w)RKS.w=isoWeekKey(ld);
+  rkPickInit();
   const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
   mk('rk_modeChips',[['m','Monthly'],['w','Weekly']],RKS.mode,v=>{RKS.mode=v;renderRk()});
+  mk('rk_metChips',RKM,RKS.met,v=>{RKS.met=v;renderRk()});
   mk('rk_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],RKS.area,v=>{RKS.area=v;renderRk()});
   chChips('rk_chChips',RKS.ch,v=>{RKS.ch=v;renderRk()});
   prodChips('rk_prodChips',RKS,renderRk);
+  // item terpilih
+  $('rk_ibtn').textContent=(RKS.items.length?RKS.items.length+' item dipilih':'Semua item')+' ▾';
+  const isb=$('rk_isel');isb.innerHTML='';RKS.items.forEach(n=>{const b=document.createElement('button');b.type='button';b.className='chip isel';b.setAttribute('aria-pressed','true');b.setAttribute('aria-label','Hapus filter '+n);b.innerHTML=n.replace(/</g,'&lt;')+' <span aria-hidden="true">×</span>';b.onclick=()=>{RKS.items=RKS.items.filter(x=>x!==n);renderRk()};isb.appendChild(b)});
   const sel=$('rk_sel'),M=RKS.mode==='m';
   $('rk_pl').textContent=M?'Bulan':'Minggu';
   const opts=M?D.months.map(m=>[m,mlabel(m)]):WKS.map(k=>{const w=WK[k];return [k,'Minggu '+(+k.split('-W')[1])+' ('+dShort(w.a)+' s.d '+dShort(w.b)+')']});
@@ -3299,52 +3358,87 @@ function renderRk(){
   let days=[];
   if(M){const y=+RKS.m.slice(0,4),mo=+RKS.m.slice(5,7);for(let d=1;d<=dim(y,mo);d++)days.push(RKS.m+'-'+String(d).padStart(2,'0'))}
   else{const w=WK[RKS.w];let d=new Date(w.a+'T00:00:00Z');const k=RKS.w;
-    // mulai Senin minggu ISO
     while(isoWeekKey(new Date(d.getTime()-864e5).toISOString().slice(0,10))===k)d=new Date(d.getTime()-864e5);
     for(let i=0;i<7;i++){days.push(d.toISOString().slice(0,10));d=new Date(d.getTime()+864e5)}}
   const di=days.map(d=>TD.indexOf(d));
   const allO=OUT.slice(),outs=RKS.area==='all'?allO:allO.filter(o=>AREAS[RKS.area].o.includes(o));
   const grpOf=o=>{const t=TGT.rows.find(x=>x.o===o);return t?t.grp:'Lainnya'};
-  
   const hasTx=(o,i)=>{if(i<0)return false;const r=chRow(o,i,RKS.ch);return !!r&&((r[0]||0)>0||(r[1]||0)>0||(r[8]||0)>0)};
   const lbl=M?mlabel(RKS.m):sel.options[sel.selectedIndex].text;
-  $('rk_show').textContent=lbl+', '+(RKS.area==='all'?'Semua area':AREAS[RKS.area].name)+chLbl(RKS.ch);
+  const metL=RKM.find(x=>x[0]===RKS.met)[1],itL=RKS.items.length?(RKS.items.length<=3?RKS.items.join(', '):RKS.items.length+' item'):'';
+  $('rk_show').textContent=lbl+', '+metL+', '+(RKS.area==='all'?'Semua area':AREAS[RKS.area].name)+chLbl(RKS.ch)+(itL?', item: '+itL:'');
+  // data mentah per item (dibutuhkan untuk Gross/Net Sales & filter item)
+  const needRaw=RKS.met!=='q'||RKS.items.length>0||!$('rk_ipanel').hidden;
+  if(needRaw&&!DBC){$('rk_wrap').innerHTML='<div class="empty">Menyiapkan data per item…</div>';loadDb().then(renderRk).catch(e=>{$('rk_wrap').innerHTML='<div class="empty">Gagal memuat data: '+e.message+'</div>'});return}
+  let V=null,ISEL=null,GRP=null,AL=null;
+  if(DBC&&needRaw){const X=DBC,pos=new Map(days.map((d,k)=>[d,k])),dk=X.dates.map(d=>pos.has(d)?pos.get(d):-1),oset=new Set(outs),pc=xCh(X);
+    const PK=RKP.filter(p=>prodHas(RKS,p[0])),isB=X.cl.map(c=>c==='Bundle_Package'),selN=new Set(RKS.items);
+    ISEL=RKS.items.length?new Set(X.nl.map((n,j)=>selN.has(n)?j:-1).filter(j=>j>=0)):null;
+    V={};PK.forEach(p=>{V[p[0]]={};outs.forEach(o=>V[p[0]][o]=days.map(()=>0))});GRP=new Set();
+    if(ISEL){AL={};outs.forEach(o=>AL[o]=days.map(()=>0))}
+    const IL=new Map();
+    for(let i=0;i<X.d.length;i++){const k=dk[X.d[i]];if(k<0)continue;const o=X.outlets[X.o[i]];if(!oset.has(o))continue;if(!chOKp(RKS.ch,pc[X.p[i]]))continue;
+      const n=X.n[i],mp=X.maps[X.mp[i]],q=X.q[i],gv=X.g[i]-X.rf[i],nv=X.nt[i];
+      if(AL&&ISEL.has(n))AL[o][k]+=RKS.met==='g'?gv:nv;
+      for(const p of PK){const w=p[3]<0?(isB[X.c[i]]?1:0):(mp.m[p[3]-1]||0);if(!w)continue;
+        let it=IL.get(n);if(!it){it={nm:X.nl[n],q:0,v:0,last:-1};IL.set(n,it)}if(it.last!==i){it.last=i;it.q+=q;it.v+=RKS.met==='g'?gv:nv}
+        if(ISEL&&!ISEL.has(n))continue;if(ISEL)GRP.add(p[0]);
+        V[p[0]][o][k]+=RKS.met==='q'?q*w:RKS.met==='g'?gv:nv}}
+    RK_IL=[...IL.values()].filter(it=>!/plastic/i.test(it.nm)).sort((a,b)=>b.q-a.q);
+    if(!$('rk_ipanel').hidden)rkList()}
   const HR=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
   const dow=d=>new Date(d+'T00:00:00Z').getUTCDay();
+  const RP=RKS.met!=='q',fv=v=>nf.format(RP?v/1000:v);
   let head='<thead><tr><th>Outlet</th>'+days.map(d=>{const w=dow(d);return `<th class="${w===0||w===6?'we':''}">${+d.slice(8)}<small>${M?HR[w]:HR[w]+' '+MS[+d.slice(5,7)-1]}</small></th>`}).join('')+'<th class="tt">Total</th><th>Hari trx</th><th>Rata2 / hari</th></tr></thead>';
+  const FL=[];
   const build=([pk,pn,pu,ix,pc])=>{
-  const BX=ix<0?bndIdx(RKS.ch):null;
-  const val=(o,i)=>{if(i<0)return 0;if(BX){const m=BX.day[o];return m&&m[i]||0}const r=chRow(o,i,RKS.ch);return r?(r[ix]||0):0};
-  const cell=(v,mx,d,fut,tx)=>{const w=dow(d),we=w===0||w===6?' we':'';if(fut)return `<td class="${we}"></td>`;if(!tx)return `<td class="z${we}">-</td>`;
-    const a=mx>0?Math.min(1,v/mx):0;return `<td class="${we.trim()}" style="background:color-mix(in srgb,${pc} ${Math.round(a*38)}%,transparent)">${nf.format(v)}</td>`};
+  const BX=!V&&ix<0?bndIdx(RKS.ch):null;
+  const val=(o,k)=>{if(V)return V[pk][o][k];const i=di[k];if(i<0)return 0;if(BX){const m=BX.day[o];return m&&m[i]||0}const r=chRow(o,i,RKS.ch);return r?(r[ix]||0):0};
+  const cell=(v,mx,d,fut,tx)=>{const w=dow(d),we=w===0||w===6?' we':'';if(fut)return `<td class="${we}"></td>`;if(!tx&&!v)return `<td class="z${we}">-</td>`;
+    const a=mx>0?Math.min(1,v/mx):0;return `<td class="${we.trim()}" style="background:color-mix(in srgb,${pc} ${Math.round(a*38)}%,transparent)">${fv(v)}</td>`};
   const futD=d=>d>ld;
-  let body='';const tot=days.map(()=>0);let TT=0,TX=0;
+  let body='';const tot=days.map(()=>0);let TT=0;
   const groups={};outs.forEach(o=>(groups[grpOf(o)]||(groups[grpOf(o)]=[])).push(o));
-  const gk=Object.keys(groups);
-  gk.forEach(g=>{const st=days.map(()=>0);let sT=0,sX=0;
-    groups[g].forEach(o=>{const vs=di.map(i=>val(o,i)),tx=di.map(i=>hasTx(o,i)),mx=Math.max(0,...vs);
-      const t=vs.reduce((a,v)=>a+v,0),n=tx.filter(Boolean).length;vs.forEach((v,k)=>{st[k]+=v;tot[k]+=v});sT+=t;TT+=t;
-      body+=`<tr><td>${o}</td>`+days.map((d,k)=>cell(vs[k],mx,d,futD(d),tx[k])).join('')+`<td class="tt">${nf.format(t)}</td><td>${n}</td><td>${n?nf.format(t/n):'-'}</td></tr>`});
-    if(false){const n=days.filter((d,k)=>groups[g].some(o=>hasTx(o,di[k]))).length;body+=`<tr class="sub"><td>Subtotal ${g}</td>`+days.map((d,k)=>`<td>${futD(d)?'':nf.format(st[k])}</td>`).join('')+`<td class="tt">${nf.format(sT)}</td><td>${n}</td><td>${n?nf.format(sT/n):'-'}</td></tr>`}});
+  Object.keys(groups).forEach(g=>{
+    groups[g].forEach(o=>{const vs=days.map((d,k)=>val(o,k)),tx=di.map(i=>hasTx(o,i)),mx=Math.max(0,...vs);
+      const t=vs.reduce((a,v)=>a+v,0),n=tx.filter(Boolean).length;vs.forEach((v,k)=>{tot[k]+=v});TT+=t;
+      body+=`<tr><td>${o}</td>`+days.map((d,k)=>cell(vs[k],mx,d,futD(d),tx[k])).join('')+`<td class="tt">${fv(t)}</td><td>${n}</td><td>${n?fv(t/n):'-'}</td></tr>`})});
   const nT=days.filter((d,k)=>outs.some(o=>hasTx(o,di[k]))).length;
-  const foot=`<tfoot><tr><td>Total</td>`+days.map((d,k)=>`<td>${futD(d)?'':nf.format(tot[k])}</td>`).join('')+`<td class="tt">${nf.format(TT)}</td><td>${nT}</td><td>${nT?nf.format(TT/nT):'-'}</td></tr></tfoot>`;
-  return `<section><h2>Rekap ${pn} (${pu}) ${M?'per tanggal':'per hari'}, ${lbl}</h2><div class="tw"><table class="rkt${M?'':' wk'}">`+head+'<tbody>'+body+'</tbody>'+foot+'</table></div></section>';};
+  const foot=`<tfoot><tr><td>Total</td>`+days.map((d,k)=>`<td>${futD(d)?'':fv(tot[k])}</td>`).join('')+`<td class="tt">${fv(TT)}</td><td>${nT}</td><td>${nT?fv(TT/nT):'-'}</td></tr></tfoot>`;
+  FL.push({pk,pn,pu,tot:tot.slice(),TT,nT,pc});
+  const unit=RKS.met==='q'?pu:metL+', Rp ribu';
+  return `<section><h2>Rekap ${pn} (${unit}) ${M?'per tanggal':'per hari'}, ${lbl}${itL?' · Item: '+itL.replace(/</g,'&lt;'):''}</h2><div class="tw"><table class="rkt${M?'':' wk'}">`+head+'<tbody>'+body+'</tbody>'+foot+'</table></div></section>';};
   $('rk_pdf').onclick=()=>{
     const ar=RKS.area==='all'?'Semua area':AREAS[RKS.area].name,pr=prodLbl(RKS);
-    $('rk_ph').innerHTML='<b>Rekap Produk a better cup</b> · '+lbl+' · '+ar+' · '+pr+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
-    const t=document.title;document.title='Rekap Produk - '+(M?RKS.m:RKS.w)+' - '+ar+(RKS.prod==='all'?'':' - '+pr);
+    $('rk_ph').innerHTML='<b>Rekap Produk a better cup</b> · '+lbl+' · '+metL+' · '+ar+' · '+pr+(itL?' · Item: '+itL.replace(/</g,'&lt;'):'')+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
+    const t=document.title;document.title='Rekap Produk - '+(M?RKS.m:RKS.w)+' - '+metL+' - '+ar+(RKS.prod==='all'?'':' - '+pr);
     document.body.classList.add('pr-rekap');const done=()=>{document.body.classList.remove('pr-rekap');document.title=t;window.removeEventListener('afterprint',done)};
     window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
   let bdet='';
-  if(prodHas(RKS,'bd')){const B=D.bnd,set=new Set(di.filter(i=>i>=0)),oset=new Set(outs);
-    if(B){const T={},tot={};B.r.forEach(rw=>{if(!rowOK(rw,RKS.ch))return;const [d,oi,ni,q,nt]=rw,o=B.o[oi];if(!set.has(d)||!oset.has(o))return;const t=T[ni]||(T[ni]={});t[o]=(t[o]||0)+q;tot[ni]=(tot[ni]||[0,0]);tot[ni][0]+=q;tot[ni][1]+=nt});
+  const showP=RKP.filter(p=>prodHas(RKS,p[0])&&(!ISEL||GRP.has(p[0])));
+  if(prodHas(RKS,'bd')&&(!ISEL||GRP.has('bd'))){const B=D.bnd,set=new Set(di.filter(i=>i>=0)),oset=new Set(outs),bsel=RKS.items.length?new Set(RKS.items.map(rkNm)):null;
+    if(B){const T={},tot={};B.r.forEach(rw=>{if(!rowOK(rw,RKS.ch))return;const [d,oi,ni,q,nt]=rw,o=B.o[oi];if(!set.has(d)||!oset.has(o))return;if(bsel&&!bsel.has(rkNm(B.n[ni])))return;const t=T[ni]||(T[ni]={});t[o]=(t[o]||0)+q;tot[ni]=(tot[ni]||[0,0]);tot[ni][0]+=q;tot[ni][1]+=nt});
       const ids=Object.keys(tot).map(Number).sort((a,b)=>tot[b][0]-tot[a][0]);
       if(ids.length){const cols=outs.filter(o=>ids.some(n=>T[n][o]));const ct={};let gq=0,gn=0;
         bdet=`<section><h2>Rincian Bundling per paket, ${lbl}</h2><div class="tw"><table class="rkt rkb"><thead><tr><th>Paket bundling</th>${cols.map(o=>`<th>${o}</th>`).join('')}<th class="tt">Total paket</th><th>Net Sales</th></tr></thead><tbody>`+
           ids.map(n=>{gq+=tot[n][0];gn+=tot[n][1];return `<tr><td>${B.n[n]}</td>${cols.map(o=>{const v=T[n][o]||0;ct[o]=(ct[o]||0)+v;return `<td class="${v?'':'z'}">${v?nf.format(v):'-'}</td>`}).join('')}<td class="tt">${nf.format(tot[n][0])}</td><td>${nf.format(tot[n][1])}</td></tr>`}).join('')+
           `</tbody><tfoot><tr><td>Total</td>${cols.map(o=>`<td>${nf.format(ct[o]||0)}</td>`).join('')}<td class="tt">${nf.format(gq)}</td><td>${nf.format(gn)}</td></tr></tfoot></table></div></section>`}
       else if(RKS.prod!=='all'&&RKS.prod.length===1&&RKS.prod[0]==='bd')bdet='<p class="note">Tidak ada penjualan bundling pada periode ini.</p>'}}
-  $('rk_wrap').innerHTML=RKP.filter(p=>prodHas(RKS,p[0])).map(build).join('')+bdet;
+  const note=RKS.met!=='q'?'<p class="note">'+metL+' dalam Rp ribu. '+(RKS.met==='g'?'Gross Sales = gross setelah refund (sebelum diskon). ':'Net Sales = setelah diskon & refund, sebelum pajak. ')+'Item paket bundling yang berisi cup dan pastry dihitung di kedua tabel.</p>':'';
+  const secs=showP.map(build).join('');
+  const fluk=()=>{const am=RKS.met==='g'?'g':'n',amL=am==='g'?'Gross Sales':'Net Sales',futD=d=>d>ld,pc='var(--c2)';
+    const val=(o,k)=>{if(AL)return AL[o][k];const i=di[k];if(i<0)return 0;const r=chRow(o,i,RKS.ch);return r?(r[am==='g'?0:8]||0):0};
+    const fr=v=>nf.format(v/1000);
+    let body='';const tot=days.map(()=>0);let TT=0;
+    outs.forEach(o=>{const vs=days.map((d,k)=>val(o,k)),tx=di.map(i=>hasTx(o,i)),mx=Math.max(0,...vs),t=vs.reduce((a,v)=>a+v,0),n=tx.filter(Boolean).length;
+      vs.forEach((v,k)=>tot[k]+=v);TT+=t;
+      body+=`<tr><td>${o}</td>`+days.map((d,k)=>{const v=vs[k],w=dow(d),we=w===0||w===6?' we':'';if(futD(d))return `<td class="${we}"></td>`;if(!tx[k]&&!v)return `<td class="z${we}">-</td>`;
+        const a=mx>0?Math.min(1,v/mx):0;return `<td class="${we.trim()}" style="background:color-mix(in srgb,${pc} ${Math.round(a*38)}%,transparent)">${fr(v)}</td>`}).join('')+
+        `<td class="tt">${fr(t)}</td><td>${n}</td><td>${n?fr(t/n):'-'}</td></tr>`});
+    const nT=days.filter((d,k)=>outs.some(o=>hasTx(o,di[k]))).length;
+    const foot=`<tfoot><tr><td>Total</td>`+days.map((d,k)=>`<td>${futD(d)?'':fr(tot[k])}</td>`).join('')+`<td class="tt">${fr(TT)}</td><td>${nT}</td><td>${nT?fr(TT/nT):'-'}</td></tr></tfoot>`;
+    return `<section><h2>Fluktuasi All Produk (${amL}, Rp ribu) ${M?'per tanggal':'per hari'}, ${lbl}${itL?' · Item: '+itL.replace(/</g,'&lt;'):''}</h2><p class="note" style="margin:0 0 8px">${itL?'Total item terpilih':'Total semua item (seluruh penjualan)'} per outlet, dalam Rp ribu.${RKS.met==='q'?' Saat tampilan Qty, tabel ini memakai Net Sales.':''}</p><div class="tw"><table class="rkt${M?'':' wk'}">`+head+'<tbody>'+body+'</tbody>'+foot+'</table></div></section>'};
+  $('rk_wrap').innerHTML=note+fluk()+(ISEL&&!showP.length?'<div class="empty">Item terpilih tidak termasuk produk yang dipilih, atau tidak ada penjualan pada periode ini.</div>':secs)+bdet;
 }
 
 /* ===== Halaman 17: Rekap rata-rata jual per hari per bulan ===== */
