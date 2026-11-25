@@ -319,8 +319,9 @@ tr.psp{display:none}
   body.pr-rekap .top,body.pr-rekap .tabs,body.pr-rekap #page16 .fpanel,body.pr-rekap #page16>.note,body.pr-rekap #page18 .fpanel{display:none!important}
   body.pr-rekap .wrap{max-width:none;padding:0}
   body.pr-rekap .phead{display:block;font-size:11px;margin:0 0 6px;line-height:1.4}
-  body.pr-rekap #page18 section,body.pr-rekap #page16 section{padding:0 0 4mm;border:0;break-inside:avoid;page-break-inside:avoid}
-  body.pr-rekap #page18 h2,body.pr-rekap #page16 h2{font-size:12px;margin:0 0 3px;padding-left:6px}
+  body.pr-rekap #page30 .fpanel,body.pr-rekap #page30>.note{display:none!important}
+  body.pr-rekap #page30 section,body.pr-rekap #page18 section,body.pr-rekap #page16 section{padding:0 0 4mm;border:0;break-inside:avoid;page-break-inside:avoid}
+  body.pr-rekap #page30 h2,body.pr-rekap #page18 h2,body.pr-rekap #page16 h2{font-size:12px;margin:0 0 3px;padding-left:6px}
   body.pr-rekap .tw{overflow:visible!important;max-height:none!important;margin-top:2px}
   body.pr-rekap .rkt{font-size:8px;width:100%}
   body.pr-rekap .rkt th,body.pr-rekap .rkt td{padding:2px 2px;font-size:8px!important;line-height:1.25}
@@ -526,6 +527,7 @@ body.pr-rekap .vcg{grid-template-columns:minmax(0,1fr) 46mm;gap:4mm}
     <button type="button" class="tab" role="tab" id="tab24" data-p="24" aria-controls="page24" aria-selected="false" tabindex="-1">Estimasi</button>
     <button type="button" class="tab" role="tab" id="tab21" data-p="21" aria-controls="page21" aria-selected="false" tabindex="-1">PUSH</button>
     <button type="button" class="tab" role="tab" id="tab16" data-p="16" aria-controls="page16" aria-selected="false" tabindex="-1">Daily Prod</button>
+    <button type="button" class="tab" role="tab" id="tab30" data-p="30" aria-controls="page30" aria-selected="false" tabindex="-1">Daily Analysis</button>
     <button type="button" class="tab" role="tab" id="tab18" data-p="18" aria-controls="page18" aria-selected="false" tabindex="-1">Monthly Prod</button>
     <button type="button" class="tab" role="tab" id="tab26" data-p="26" aria-controls="page26" aria-selected="false" tabindex="-1">Monthly Bill Trans</button>
     <button type="button" class="tab" role="tab" id="tab22" data-p="22" aria-controls="page22" aria-selected="false" tabindex="-1">Monthly Value (Exc Tax)</button>
@@ -1296,6 +1298,25 @@ body.pr-rekap .vcg{grid-template-columns:minmax(0,1fr) 46mm;gap:4mm}
     </div>
     <div class="phead" id="rk_ph"></div>
     <div id="rk_wrap"></div>
+  </div>
+
+  <div id="page30" role="tabpanel" aria-labelledby="tab30" hidden>
+    <div class="fpanel" role="group" aria-label="Filter Daily Analysis">
+      <div class="frow">
+        <div class="fgrp"><span class="fl">Periode</span><div class="chips" id="da_modeChips" role="group" aria-label="Monthly atau Weekly"></div></div>
+        <div class="fgrp"><span class="fl" id="da_pl">Bulan</span><select id="da_sel" aria-label="Pilih periode"></select>
+          <button type="button" class="chip" id="da_prev" aria-label="Periode sebelumnya">‹</button><button type="button" class="chip" id="da_next" aria-label="Periode berikutnya">›</button></div>
+      </div>
+      <div class="frow fend">
+        <div class="fgrp"><span class="fl">Penjualan</span><div class="chips" id="da_chChips" role="group" aria-label="Filter online offline"></div></div>
+        <div class="fgrp"><span class="fl">Area</span><div class="chips" id="da_areaChips" role="group" aria-label="Filter area"></div></div>
+        <div class="fgrp"><span class="fshow">Ditampilkan: <b id="da_show"></b></span>
+          <button type="button" class="chip exp" id="da_pdf">Export PDF</button></div>
+      </div>
+    </div>
+    <div class="phead" id="da_ph"></div>
+    <p class="note" style="margin-top:16px">Angka dalam Rp ribu (contoh 7.139 = Rp 7,1 jt). Gross Sales = penjualan kotor setelah refund, sebelum diskon. Net Sales = Gross Sales − Diskon, sebelum pajak.</p>
+    <div id="da_wrap"></div>
   </div>
 
   <div id="page17" role="tabpanel" aria-labelledby="tab17" hidden>
@@ -2764,9 +2785,9 @@ function renderPage1(){
   }finally{PFX='';Object.assign(S,saved)}
 }
 function showPage(n){
-  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;$('page18').hidden=n!==18;$('page19').hidden=n!==19;$('page20').hidden=n!==20;$('page21').hidden=n!==21;$('page22').hidden=n!==22;$('page23').hidden=n!==23;$('page24').hidden=n!==24;$('page25').hidden=n!==25;$('page26').hidden=n!==26;$('page27').hidden=n!==27;$('page28').hidden=n!==28;$('page29').hidden=n!==29;
+  PAGE=n;document.body.dataset.pg=n;$('page1').hidden=n!==1;$('page2').hidden=n!==2;$('page3').hidden=n!==3;$('page4').hidden=n!==4;$('page5').hidden=n!==5;$('page6').hidden=n!==6;$('page7').hidden=n!==7;$('page8').hidden=n!==8;$('page9').hidden=n!==9;$('page10').hidden=n!==10;$('page11').hidden=n!==11;$('page12').hidden=n!==12;$('page13').hidden=n!==13;$('page14').hidden=n!==14;$('page15').hidden=n!==15;$('page16').hidden=n!==16;$('page17').hidden=n!==17;$('page18').hidden=n!==18;$('page19').hidden=n!==19;$('page20').hidden=n!==20;$('page21').hidden=n!==21;$('page22').hidden=n!==22;$('page23').hidden=n!==23;$('page24').hidden=n!==24;$('page25').hidden=n!==25;$('page26').hidden=n!==26;$('page27').hidden=n!==27;$('page28').hidden=n!==28;$('page29').hidden=n!==29;$('page30').hidden=n!==30;
   document.querySelectorAll('.tab').forEach(b=>{const on=+b.dataset.p===n;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===18)renderRb();else if(n===19)renderAp();else if(n===20)renderDsk();else if(n===21)renderPush();else if(n===22)renderMV('x');else if(n===23)renderMV('i');else if(n===26)renderMV('b');else if(n===27)renderVC();else if(n===28)renderAC();else if(n===29)renderSC();else if(n===24)renderEst();else if(n===25)renderSV();else if(n===2)render();
+  if(n===1)renderPage1();else if(n===3)renderTrend();else if(n===4)renderTraffic();else if(n===5)renderDaily();else if(n===7)renderReport();else if(n===8)renderProduct();else if(n===9)renderWeekly();else if(n===10)renderBank();else if(n===11)renderOnline();else if(n===12)renderTarget();else if(n===13)renderAch();else if(n===14)renderTplan();else if(n===15)renderMon();else if(n===16)renderRk();else if(n===17)renderRh();else if(n===18)renderRb();else if(n===19)renderAp();else if(n===20)renderDsk();else if(n===21)renderPush();else if(n===22)renderMV('x');else if(n===23)renderMV('i');else if(n===26)renderMV('b');else if(n===27)renderVC();else if(n===28)renderAC();else if(n===29)renderSC();else if(n===30)renderDA();else if(n===24)renderEst();else if(n===25)renderSV();else if(n===2)render();
   if(n===6)exFilterText();
   window.scrollTo(0,0);
 }
@@ -3441,6 +3462,76 @@ function renderRk(){
   $('rk_wrap').innerHTML=note+fluk()+(ISEL&&!showP.length?'<div class="empty">Item terpilih tidak termasuk produk yang dipilih, atau tidak ada penjualan pada periode ini.</div>':secs)+bdet;
 }
 
+
+/* ===== Halaman 30: Daily Analysis (Gross, Diskon, Net per outlet per hari) ===== */
+const DAS={mode:'m',m:'',w:'',area:'all',ch:'all'};
+function renderDA(){
+  const ld=D.lastDate;
+  if(DAS.m==='')DAS.m=D.months[D.months.length-1];
+  if(!DAS.w)DAS.w=isoWeekKey(ld);
+  const mk=(box,list,cur,fn)=>{const e=$(box);e.innerHTML='';list.forEach(([v,tx])=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=tx;b.setAttribute('aria-pressed',cur===v);b.onclick=()=>fn(v);e.appendChild(b)})};
+  mk('da_modeChips',[['m','Monthly'],['w','Weekly']],DAS.mode,v=>{DAS.mode=v;renderDA()});
+  mk('da_areaChips',[['all','Semua area'],['jkt',AREAS.jkt.name],['sby',AREAS.sby.name]],DAS.area,v=>{DAS.area=v;renderDA()});
+  chChips('da_chChips',DAS.ch,v=>{DAS.ch=v;renderDA()});
+  const sel=$('da_sel'),M=DAS.mode==='m';
+  $('da_pl').textContent=M?'Bulan':'Minggu';
+  const opts=M?D.months.map(m=>[m,mlabel(m)]):WKS.map(k=>{const w=WK[k];return [k,'Minggu '+(+k.split('-W')[1])+' ('+dShort(w.a)+' s.d '+dShort(w.b)+')']});
+  sel.innerHTML=opts.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+  sel.value=M?DAS.m:DAS.w;
+  sel.onchange=e=>{if(M)DAS.m=e.target.value;else DAS.w=e.target.value;renderDA()};
+  const idx=opts.findIndex(o=>o[0]===sel.value);
+  $('da_prev').disabled=idx<=0;$('da_next').disabled=idx>=opts.length-1;
+  $('da_prev').onclick=()=>{const v=opts[idx-1][0];if(M)DAS.m=v;else DAS.w=v;renderDA()};
+  $('da_next').onclick=()=>{const v=opts[idx+1][0];if(M)DAS.m=v;else DAS.w=v;renderDA()};
+  let days=[];
+  if(M){const y=+DAS.m.slice(0,4),mo=+DAS.m.slice(5,7);for(let d=1;d<=dim(y,mo);d++)days.push(DAS.m+'-'+String(d).padStart(2,'0'))}
+  else{const w=WK[DAS.w];let d=new Date(w.a+'T00:00:00Z');const k=DAS.w;
+    while(isoWeekKey(new Date(d.getTime()-864e5).toISOString().slice(0,10))===k)d=new Date(d.getTime()-864e5);
+    for(let i=0;i<7;i++){days.push(d.toISOString().slice(0,10));d=new Date(d.getTime()+864e5)}}
+  const di=days.map(d=>TD.indexOf(d));
+  const outs=DAS.area==='all'?OUT.slice():OUT.filter(o=>AREAS[DAS.area].o.includes(o));
+  const lbl=M?mlabel(DAS.m):sel.options[sel.selectedIndex].text,ar=DAS.area==='all'?'Semua area':AREAS[DAS.area].name;
+  $('da_show').textContent=lbl+', '+ar+chLbl(DAS.ch);
+  const HR=['Min','Sen','Sel','Rab','Kam','Jum','Sab'],dow=d=>new Date(d+'T00:00:00Z').getUTCDay(),futD=d=>d>ld;
+  const row=(o,i)=>i<0?null:chRow(o,i,DAS.ch);
+  const hasTx=(o,i)=>{const r=row(o,i);return !!r&&((r[0]||0)>0||(r[1]||0)>0||(r[8]||0)>0)};
+  const V=(o,i,ix)=>{const r=row(o,i);return r?Math.abs(r[ix]||0):0};
+  const fr=v=>nf.format(v/1000),pf=(a,b)=>b?(a/b*100).toFixed(1).replace('.',',')+'%':'-';
+  const G={},T={};outs.forEach(o=>{G[o]=0});
+  const build=(name,ix,pc,isD)=>{
+    const head='<thead><tr><th>Outlet</th>'+days.map(d=>{const w=dow(d);return `<th class="${w===0||w===6?'we':''}">${+d.slice(8)}<small>${M?HR[w]:HR[w]+' '+MS[+d.slice(5,7)-1]}</small></th>`}).join('')+'<th class="tt">Total</th><th>Hari trx</th><th>Rata2 / hari</th>'+(isD?'<th>% dari Gross</th>':'')+'</tr></thead>';
+    let body='';const tot=days.map(()=>0),gt=days.map(()=>0);let TT=0,GT=0;
+    outs.forEach(o=>{const vs=di.map(i=>V(o,i,ix)),gs=di.map(i=>V(o,i,0)),tx=di.map(i=>hasTx(o,i)),mx=Math.max(0,...vs);
+      const t=vs.reduce((a,v)=>a+v,0),g=gs.reduce((a,v)=>a+v,0),n=tx.filter(Boolean).length;vs.forEach((v,k)=>{tot[k]+=v;gt[k]+=gs[k]});TT+=t;GT+=g;
+      body+=`<tr><td>${o}</td>`+days.map((d,k)=>{const v=vs[k],w=dow(d),we=w===0||w===6?' we':'';if(futD(d))return `<td class="${we}"></td>`;if(!tx[k]&&!v)return `<td class="z${we}">-</td>`;
+        const a=mx>0?Math.min(1,v/mx):0;return `<td class="${we.trim()}" style="background:color-mix(in srgb,${pc} ${Math.round(a*38)}%,transparent)"${isD&&gs[k]?` title="${pf(v,gs[k])} dari Gross"`:''}>${fr(v)}</td>`}).join('')+
+        `<td class="tt">${fr(t)}</td><td>${n}</td><td>${n?fr(t/n):'-'}</td>${isD?`<td><b>${pf(t,g)}</b></td>`:''}</tr>`});
+    const nT=days.filter((d,k)=>outs.some(o=>hasTx(o,di[k]))).length;
+    const foot=`<tfoot><tr><td>Total</td>`+days.map((d,k)=>`<td>${futD(d)?'':fr(tot[k])}</td>`).join('')+`<td class="tt">${fr(TT)}</td><td>${nT}</td><td>${nT?fr(TT/nT):'-'}</td>${isD?`<td>${pf(TT,GT)}</td>`:''}</tr>`+
+      (isD?`<tr><td>% dari Gross</td>`+days.map((d,k)=>`<td>${futD(d)||!gt[k]?'':pf(tot[k],gt[k])}</td>`).join('')+`<td class="tt">${pf(TT,GT)}</td><td></td><td></td><td></td></tr>`:'')+'</tfoot>';
+    return `<section><h2>Rekap ${name} (Rp ribu) ${M?'per tanggal':'per hari'}, ${lbl}</h2><div class="tw"><table class="rkt${M?'':' wk'}">`+head+'<tbody>'+body+'</tbody>'+foot+'</table></div></section>'};
+  const buildP=()=>{
+    const head='<thead><tr><th>Outlet</th>'+days.map(d=>{const w=dow(d);return `<th class="${w===0||w===6?'we':''}">${+d.slice(8)}<small>${M?HR[w]:HR[w]+' '+MS[+d.slice(5,7)-1]}</small></th>`}).join('')+'<th class="tt">Total</th><th>Hari trx</th><th>Tertinggi</th><th>Terendah</th></tr></thead>';
+    const pc=(dv,gv)=>gv?dv/gv*100:null,p1=v=>v==null?'-':v.toFixed(1).replace('.',',')+'%';
+    const cell=(p,d)=>{const w=dow(d),we=w===0||w===6?' we':'';if(futD(d))return `<td class="${we}"></td>`;if(p==null)return `<td class="z${we}">-</td>`;
+      const a=Math.min(1,p/30);return `<td class="${we.trim()}" style="background:color-mix(in srgb,var(--bad) ${Math.round(a*40)}%,transparent)">${p1(p)}</td>`};
+    let body='';const td=days.map(()=>0),tg=days.map(()=>0);let TD2=0,TG=0;
+    outs.forEach(o=>{const ds=di.map(i=>V(o,i,7)),gs=di.map(i=>V(o,i,0)),tx=di.map(i=>hasTx(o,i)),ps=ds.map((v,k)=>tx[k]?pc(v,gs[k]):null);
+      ds.forEach((v,k)=>{td[k]+=v;tg[k]+=gs[k]});const sd=ds.reduce((a,v)=>a+v,0),sg=gs.reduce((a,v)=>a+v,0);TD2+=sd;TG+=sg;
+      const vv=ps.map((p,k)=>futD(days[k])?null:p).filter(p=>p!=null),mx=vv.length?Math.max(...vv):null,mn=vv.length?Math.min(...vv):null;
+      const dmx=mx==null?'':' <small>('+(+days[ps.indexOf(mx)].slice(8))+')</small>',dmn=mn==null?'':' <small>('+(+days[ps.indexOf(mn)].slice(8))+')</small>';
+      body+=`<tr><td>${o}</td>`+days.map((d,k)=>cell(ps[k],d)).join('')+`<td class="tt">${p1(pc(sd,sg))}</td><td>${tx.filter(Boolean).length}</td><td>${p1(mx)}${dmx}</td><td>${p1(mn)}${dmn}</td></tr>`});
+    const nT=days.filter((d,k)=>outs.some(o=>hasTx(o,di[k]))).length;
+    const foot=`<tfoot><tr><td>Total</td>`+days.map((d,k)=>`<td>${futD(d)||!tg[k]?'':p1(pc(td[k],tg[k]))}</td>`).join('')+`<td class="tt">${p1(pc(TD2,TG))}</td><td>${nT}</td><td></td><td></td></tr></tfoot>`;
+    return `<section><h2>Rekap % Diskon dari Gross ${M?'per tanggal':'per hari'}, ${lbl}</h2><p class="note" style="margin:0 0 8px">% = Diskon ÷ Gross Sales outlet pada hari itu. Total = total diskon ÷ total gross periode ini. Warna makin merah = diskon makin besar (penuh di ≥30%). Angka dalam kurung = tanggal.</p><div class="tw"><table class="rkt${M?'':' wk'}">`+head+'<tbody>'+body+'</tbody>'+foot+'</table></div></section>'};
+  $('da_wrap').innerHTML=build('Gross Sales',0,'var(--c2)')+build('Diskon',7,'var(--disc)',true)+build('Net Sales',8,'var(--net)')+buildP();
+  $('da_pdf').onclick=()=>{
+    $('da_ph').innerHTML='<b>Daily Analysis a better cup</b> · '+lbl+' · '+ar+chLbl(DAS.ch)+'<br><small>Rp ribu. Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
+    const t=document.title;document.title='Daily Analysis - '+(M?DAS.m:DAS.w)+' - '+ar;
+    document.body.classList.add('pr-rekap');const done=()=>{document.body.classList.remove('pr-rekap');document.title=t;window.removeEventListener('afterprint',done)};
+    window.addEventListener('afterprint',done);window.print();setTimeout(done,1500)};
+}
+
 /* ===== Halaman 17: Rekap rata-rata jual per hari per bulan ===== */
 const RHS={area:'all',ch:'all'};
 function renderRh(){
@@ -3572,8 +3663,10 @@ function mvProdSrc(sel){
   return MVPC.c[key]={m,days};
 }
 const MVDEF={
-  x:{pre:'mvx',name:'Monthly Value (Exc Tax)',items:[['Gross Sales',x=>x.gross-x.refund,'var(--c2)'],['Net Sales',x=>x.net,'var(--net)'],['Disc',x=>x.disc,'var(--disc)']]},
-  i:{pre:'mvi',name:'Monthly Value (Inc Tax)',items:[['Gross Sales (Inc Tax)',x=>x.gross-x.refund+x.tax,'var(--c2)'],['Net Sales (Inc Tax)',x=>x.net+x.tax,'var(--net)']]},
+  x:{pre:'mvx',name:'Monthly Value (Exc Tax)',items:[['Gross Sales',x=>x.gross-x.refund,'var(--c2)'],['Net Sales',x=>x.net,'var(--net)'],['Disc',x=>x.disc,'var(--disc)']],
+    pct:{gl:'Gross Sales',g:x=>x.gross-x.refund}},
+  i:{pre:'mvi',name:'Monthly Value (Inc Tax)',items:[['Gross Sales (Inc Tax)',x=>x.gross-x.refund+x.tax,'var(--c2)'],['Net Sales (Inc Tax)',x=>x.net+x.tax,'var(--net)'],['Disc',x=>x.disc,'var(--disc)']],
+    pct:{gl:'Gross Sales (Inc Tax)',g:x=>x.gross-x.refund+x.tax}},
   b:{pre:'mvb',name:'Monthly Bill Trans',build:(o)=>{const {lbl,outs,cols,ch,areaKey}=o,cn=chLbl(ch);
     return mvTable({title:'Rekap 1 · Bill Transaction per bulan, '+lbl+cn,outs,cols,ch,fn:x=>x.trx,color:'var(--c2)',areaKey})+
       mvAvgTable({title:'Rekap 2 · Avg Bill Transaction (Net Sales / Bill, Rp) per bulan, '+lbl+cn,outs,cols,ch,color:'var(--net)'})+
@@ -3591,6 +3684,20 @@ function mvAvgTable(o){
       `<td class="tt">${st?nf.format(sn/st):'-'}</td><td>${nf.format(st)}</td><td>${nf.format(sn)}</td></tr>`});
   const foot=`<tfoot><tr><td>Total</td>`+cols.map((c,k)=>`<td>${c.fut?'':ct[k]?nf.format(cn[k]/ct[k]):'-'}</td>`).join('')+`<td class="tt">${GT?nf.format(GN/GT):'-'}</td><td>${nf.format(GT)}</td><td>${nf.format(GN)}</td></tr></tfoot>`;
   return `<section><h2>${title}</h2><div class="tw"><table class="rkt mo"><thead><tr><th>Outlet</th>${cols.map(c=>`<th>${c.h}</th>`).join('')}<th class="tt">Avg periode</th><th>Bill Transaction</th><th>Net Sales</th></tr></thead><tbody>${body}</tbody>${foot}</table></div></section>`;
+}
+/* tabel % diskon dari gross per outlet per bulan */
+function mvPctTable(o){
+  const {title,outs,cols,ch,gfn,note}=o,dfn=x=>x.disc;
+  const p1=v=>v==null?'-':v.toFixed(1).replace('.',',')+'%',pc=(d,g)=>g?d/g*100:null;
+  const cd=cols.map(()=>0),cg=cols.map(()=>0);let GD=0,GG=0,body='';
+  outs.forEach(ot=>{const d=cols.map(c=>c.fut?0:mvVal(c.mk,ot,ch,dfn)),g=cols.map(c=>c.fut?0:mvVal(c.mk,ot,ch,gfn)),ps=cols.map((c,k)=>c.fut?null:pc(d[k],g[k]));
+    d.forEach((x,k)=>{cd[k]+=x;cg[k]+=g[k]});const sd=d.reduce((a,b)=>a+b,0),sg=g.reduce((a,b)=>a+b,0);GD+=sd;GG+=sg;
+    const vv=ps.filter(p=>p!=null),mx=vv.length?Math.max(...vv):null,mn=vv.length?Math.min(...vv):null;
+    const lab=v=>v==null?'':' <small>('+cols[ps.indexOf(v)].h+')</small>';
+    body+=`<tr><td>${ot}</td>`+cols.map((c,k)=>{if(c.fut)return '<td></td>';const p=ps[k];if(p==null)return '<td class="z">-</td>';return `<td style="background:color-mix(in srgb,var(--bad) ${Math.round(Math.min(1,p/30)*40)}%,transparent)">${p1(p)}</td>`}).join('')+
+      `<td class="tt">${p1(pc(sd,sg))}</td><td>${p1(mx)}${lab(mx)}</td><td>${p1(mn)}${lab(mn)}</td></tr>`});
+  const foot=`<tfoot><tr><td>Total</td>`+cols.map((c,k)=>`<td>${c.fut||!cg[k]?'':p1(pc(cd[k],cg[k]))}</td>`).join('')+`<td class="tt">${p1(pc(GD,GG))}</td><td></td><td></td></tr></tfoot>`;
+  return `<section><h2>${title}</h2><p class="note" style="margin:0 0 8px">${note}</p><div class="tw"><table class="rkt mo"><thead><tr><th>Outlet</th>${cols.map(c=>`<th>${c.h}</th>`).join('')}<th class="tt">Total periode</th><th>Tertinggi</th><th>Terendah</th></tr></thead><tbody>${body}</tbody>${foot}</table></div></section>`;
 }
 function renderMV(k){
   const S=MVS[k],F=MVDEF[k],P=F.pre,{ly,cm}=ayCur(),ld=D.lastDate,Y=TGT.year,re=()=>renderMV(k);
@@ -3613,7 +3720,8 @@ function renderMV(k){
   MVSRC=S.prod==='all'?null:mvProdSrc(S.prod);
   try{
     $(P+'_wrap').innerHTML=(S.prod==='all'?'':'<p class="note">Produk: <b>'+pl+'</b>. Nilai Rp hanya dari item produk terpilih; Bill Transaction = jumlah bill yang berisi produk terpilih; Hari trx = hari ada penjualan produk terpilih.</p>')+
-      (F.build?F.build({lbl:lbl+pc,outs,cols,ch:S.ch,areaKey:S.area}):F.items.map(([nm,fn,col])=>mvTable({title:'Rekap '+nm+' (Rp) per bulan, '+lbl+pc,outs,cols,ch:S.ch,fn,color:col,areaKey:S.area})).join(''));
+      (F.build?F.build({lbl:lbl+pc,outs,cols,ch:S.ch,areaKey:S.area}):F.items.map(([nm,fn,col])=>mvTable({title:'Rekap '+nm+' (Rp) per bulan, '+lbl+pc,outs,cols,ch:S.ch,fn,color:col,areaKey:S.area})).join('')+
+        (F.pct?mvPctTable({title:'Rekap % Disc dari '+F.pct.gl+' per bulan, '+lbl+pc,outs,cols,ch:S.ch,gfn:F.pct.g,note:'% = Disc ÷ '+F.pct.gl+' outlet pada bulan itu. Total periode = total Disc ÷ total '+F.pct.gl+'. Warna makin merah = diskon makin besar (penuh di ≥30%). Dalam kurung = bulan.'}):''));
   }finally{MVSRC=null}
   $(P+'_pdf').onclick=()=>{
     $(P+'_ph').innerHTML='<b>'+F.name+' a better cup</b> · '+lbl+' · '+ar+chLbl(S.ch)+' · '+pl+'<br><small>Data s.d '+dLong(ld)+'. Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})+'</small>';
